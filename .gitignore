@@ -1,0 +1,23 @@
+# Gradle / Kotlin
+.gradle/
+build/
+.kotlin/
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing keys and secrets — never commit
+*.jks
+*.keystore
+keystore.properties
+play-service-account*.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

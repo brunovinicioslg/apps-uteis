@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Main screen: flashlight -->
+    <string name="torch_turn_on">Turn flashlight on</string>
+    <string name="torch_turn_off">Turn flashlight off</string>
+    <string name="torch_status_on">Flashlight on</string>
+    <string name="torch_status_off">Flashlight off</string>
+    <string name="torch_status_no_flash">This device has no flash</string>
+    <string name="torch_status_busy">The flash is being used by another app</string>
+
+    <!-- Main screen: hints -->
+    <string name="notifications_title">Allow notifications</string>
+    <string name="notifications_summary">Android requires a persistent notification for shake detection to work while the app is closed. It also lets you turn the flashlight on without opening the app.</string>
+    <string name="notifications_button">Allow</string>
+    <string name="battery_title">Keep the system from stopping shake detection</string>
+    <string name="battery_summary_generic">Exempt Alumia from battery optimization so detection does not stop on its own.</string>
+    <string name="battery_summary_xiaomi">On the app screen, open Battery saver and choose No restrictions. Also turn on Autostart.</string>
+    <string name="battery_summary_samsung">On the app screen, open Battery and choose Unrestricted.</string>
+    <string name="battery_button">Open settings</string>
+
+    <!-- Main screen: shake detection -->
+    <string name="detection_title">Shake to turn on</string>
+    <string name="detection_on_summary">On: works with the app closed and the screen locked.</string>
+    <string name="detection_off_summary">Off.</string>
+    <string name="sensitivity_title">Sensitivity</string>
+    <string name="sensitivity_low">Low</string>
+    <string name="sensitivity_medium">Medium</string>
+    <string name="sensitivity_high">High</string>
+    <string name="strokes_title">Shakes needed</string>
+    <string name="strokes_summary">More shakes prevent accidental triggers.</string>
+    <string name="screen_off_title">Work with the screen off</string>
+    <string name="screen_off_summary">Uses a little more battery.</string>
+    <string name="pocket_title">Ignore in a pocket or bag</string>
+    <string name="pocket_summary">Uses the proximity sensor.</string>
+    <string name="vibrate_title">Vibrate when the gesture toggles the light</string>
+
+    <!-- Main screen: flashlight options -->
+    <string name="torch_section_title">Flashlight</string>
+    <string name="auto_off_title">Turn off automatically after</string>
+    <string name="low_battery_title">Turn off when the battery reaches</string>
+    <string name="option_never">Never</string>
+    <string name="minutes_short">%1$d min</string>
+    <string name="percent_short">%1$d%%</string>
+    <string name="level_title">Brightness</string>
+
+    <!-- Main screen: shortcuts -->
+    <string name="shortcuts_title">Shortcuts</string>
+    <string name="side_key_title">Icon for the side key</string>
+    <string name="side_key_summary">Adds a \"Toggle flashlight\" icon. Pick it in Side key > Double press (Samsung) or Quick Tap (Pixel).</string>
+    <string name="shortcuts_other">There is also a Quick Settings tile, a home screen widget and shortcuts when you touch and hold the app icon.</string>
+
+    <!-- Main screen: about -->
+    <string name="about_title">About</string>
+    <string name="about_text">Version %1$s. Free, no ads, no internet access and no data collection. Open source under the GPL-3.0 license.</string>
+    <string name="about_source">View source code</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Shake detection</string>
+    <string name="notification_channel_description">Persistent notification Android requires for shake detection to run in the background.</string>
+    <string name="notification_detecting">Shake the phone to turn the flashlight on</string>
+    <string name="notification_torch_on">Flashlight on</string>
+    <string name="notification_starting">Alumia</string>
+    <string name="action_turn_on">Turn on</string>
+    <string name="action_turn_off">Turn off</string>
+    <string name="action_disable_detection">Turn off shake</string>
+
+    <!-- Quick Settings tile, widget, shortcuts -->
+    <string name="tile_label">Shake</string>
+    <string name="tile_on">On</string>
+    <string name="tile_off">Off</string>
+    <string name="widget_label">Flashlight</string>
+    <string name="widget_description">Button to turn the flashlight on and off</string>
+    <string name="side_key_label">Toggle flashlight</string>
+    <string name="shortcut_torch_short">Flashlight</string>
+    <string name="shortcut_torch_long">Toggle flashlight</string>
+    <string name="shortcut_detection_short">Shake</string>
+    <string name="shortcut_detection_long">Toggle shake detection</string>
+</resources>

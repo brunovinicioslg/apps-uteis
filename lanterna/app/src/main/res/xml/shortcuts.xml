@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/shortcut_torch"
+        android:shortcutId="toggle_torch"
+        android:shortcutLongLabel="@string/shortcut_torch_long"
+        android:shortcutShortLabel="@string/shortcut_torch_short">
+        <intent
+            android:action="io.github.brunovinicioslg.alumia.action.TOGGLE_TORCH"
+            android:targetClass="io.github.brunovinicioslg.alumia.shortcut.ToggleActivity"
+            android:targetPackage="io.github.brunovinicioslg.alumia" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/shortcut_detection"
+        android:shortcutId="toggle_detection"
+        android:shortcutLongLabel="@string/shortcut_detection_long"
+        android:shortcutShortLabel="@string/shortcut_detection_short">
+        <intent
+            android:action="io.github.brunovinicioslg.alumia.action.TOGGLE_DETECTION"
+            android:targetClass="io.github.brunovinicioslg.alumia.shortcut.ToggleActivity"
+            android:targetPackage="io.github.brunovinicioslg.alumia" />
+    </shortcut>
+</shortcuts>

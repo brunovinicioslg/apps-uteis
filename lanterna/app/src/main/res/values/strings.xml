@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="app_name" translatable="false">Alumia</string>
+
+    <!-- Main screen: flashlight -->
+    <string name="torch_turn_on">Ligar lanterna</string>
+    <string name="torch_turn_off">Desligar lanterna</string>
+    <string name="torch_status_on">Lanterna ligada</string>
+    <string name="torch_status_off">Lanterna desligada</string>
+    <string name="torch_status_no_flash">Este aparelho não tem flash</string>
+    <string name="torch_status_busy">O flash está em uso por outro app</string>
+
+    <!-- Main screen: hints -->
+    <string name="notifications_title">Permitir notificações</string>
+    <string name="notifications_summary">O Android exige uma notificação fixa para o chacoalhar funcionar com o app fechado. Por ela você também liga a lanterna sem abrir o app.</string>
+    <string name="notifications_button">Permitir</string>
+    <string name="battery_title">Evite que o sistema desligue o chacoalhar</string>
+    <string name="battery_summary_generic">Libere o Alumia da otimização de bateria para a detecção não parar sozinha.</string>
+    <string name="battery_summary_xiaomi">Na tela do app, abra Economia de bateria e escolha Sem restrições. Ative também o Início automático.</string>
+    <string name="battery_summary_samsung">Na tela do app, abra Bateria e escolha Irrestrito.</string>
+    <string name="battery_button">Abrir configurações</string>
+
+    <!-- Main screen: shake detection -->
+    <string name="detection_title">Chacoalhar para ligar</string>
+    <string name="detection_on_summary">Ativo: funciona com o app fechado e a tela bloqueada.</string>
+    <string name="detection_off_summary">Desativado.</string>
+    <string name="sensitivity_title">Sensibilidade</string>
+    <string name="sensitivity_low">Baixa</string>
+    <string name="sensitivity_medium">Média</string>
+    <string name="sensitivity_high">Alta</string>
+    <string name="strokes_title">Sacudidas necessárias</string>
+    <string name="strokes_summary">Mais sacudidas evitam acionamentos por acidente.</string>
+    <string name="screen_off_title">Funcionar com a tela desligada</string>
+    <string name="screen_off_summary">Usa um pouco mais de bateria.</string>
+    <string name="pocket_title">Ignorar no bolso ou na bolsa</string>
+    <string name="pocket_summary">Usa o sensor de proximidade.</string>
+    <string name="vibrate_title">Vibrar ao ligar e desligar pelo gesto</string>
+
+    <!-- Main screen: flashlight options -->
+    <string name="torch_section_title">Lanterna</string>
+    <string name="auto_off_title">Desligar automaticamente depois de</string>
+    <string name="low_battery_title">Desligar quando a bateria chegar a</string>
+    <string name="option_never">Nunca</string>
+    <string name="minutes_short">%1$d min</string>
+    <string name="percent_short">%1$d%%</string>
+    <string name="level_title">Intensidade</string>
+
+    <!-- Main screen: shortcuts -->
+    <string name="shortcuts_title">Atalhos</string>
+    <string name="side_key_title">Ícone para a tecla lateral</string>
+    <string name="side_key_summary">Cria o ícone \"Alternar lanterna\". Escolha-o em Tecla lateral > Pressionar 2 vezes (Samsung) ou Toque rápido (Pixel).</string>
+    <string name="shortcuts_other">Também há um bloco nas Configurações rápidas, um widget para a tela inicial e atalhos ao tocar e segurar o ícone do app.</string>
+
+    <!-- Main screen: about -->
+    <string name="about_title">Sobre</string>
+    <string name="about_text">Versão %1$s. Grátis, sem anúncios, sem acesso à internet e sem coleta de dados. Código aberto sob a licença GPL-3.0.</string>
+    <string name="about_source">Ver o código-fonte</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Chacoalhar</string>
+    <string name="notification_channel_description">Notificação fixa exigida pelo Android para o chacoalhar funcionar em segundo plano.</string>
+    <string name="notification_detecting">Chacoalhe o celular para ligar a lanterna</string>
+    <string name="notification_torch_on">Lanterna ligada</string>
+    <string name="notification_starting">Alumia</string>
+    <string name="action_turn_on">Ligar</string>
+    <string name="action_turn_off">Desligar</string>
+    <string name="action_disable_detection">Desativar chacoalhar</string>
+
+    <!-- Quick Settings tile, widget, shortcuts -->
+    <string name="tile_label">Chacoalhar</string>
+    <string name="tile_on">Ativado</string>
+    <string name="tile_off">Desativado</string>
+    <string name="widget_label">Lanterna</string>
+    <string name="widget_description">Botão para ligar e desligar a lanterna</string>
+    <string name="side_key_label">Alternar lanterna</string>
+    <string name="shortcut_torch_short">Lanterna</string>
+    <string name="shortcut_torch_long">Ligar/desligar lanterna</string>
+    <string name="shortcut_detection_short">Chacoalhar</string>
+    <string name="shortcut_detection_long">Chacoalhar liga/desliga</string>
+</resources>
