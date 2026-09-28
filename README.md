@@ -13,4 +13,4 @@ Plano de desenvolvimento: [PLANO.md](PLANO.md)
 
 ## Licença
 
-[GPL-3.0](LICENSE)
+[GPL-3.0](LICENSE), exceto o Sigilo (`sms-seguro/`), que usa [AGPL-3.0](sms-seguro/LICENSE) porque depende da libsignal.

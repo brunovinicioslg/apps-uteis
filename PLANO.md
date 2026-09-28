@@ -26,7 +26,7 @@ Quatro apps **gratuitos e de código aberto**, primeiro para **Android (Google P
 | Monetização | **Grátis, sem anúncios, sem compras e sem rastreadores** | Combina com código aberto e privacidade. O formulário "Segurança dos dados" da Play fica "nenhum dado coletado". Se um dia entrarem anúncios, as declarações de privacidade mudam. |
 | GPS: rotas | Em fases: v1 com avisos na via atual, v2 com rotas offline | Entrega valor antes; a navegação completa é a parte mais pesada. |
 | GPS: dados de usuários | Locais + OpenStreetMap + compartilhamento por arquivo/QR, **sem servidor** | Custo zero e privacidade total. A arquitetura fica pronta para sincronizar no futuro. |
-| Licença | **GPL-3.0** em todos (AGPL-3.0 no Sigilo se usarmos a libsignal) | Garante que versões modificadas continuem abertas. |
+| Licença | **GPL-3.0**; o Sigilo usa **AGPL-3.0** (exigida pela libsignal) | Garante que versões modificadas continuem abertas. |
 | Distribuição | Google Play (principal) + GitHub Releases; F-Droid onde der | O F-Droid não aceita dependências proprietárias (ex.: ARCore), então só alguns apps entram lá. |
 | Relatórios de erro | Android Vitals da Play Console (não precisa de SDK) + ACRA opcional, só com consentimento, enviando por e-mail | Sem servidor e sem rastreadores de terceiros. |
 
