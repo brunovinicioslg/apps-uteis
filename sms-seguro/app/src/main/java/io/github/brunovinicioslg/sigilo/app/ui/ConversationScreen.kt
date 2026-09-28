@@ -1,8 +1,12 @@
 package io.github.brunovinicioslg.sigilo.app.ui
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,8 +31,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -66,6 +70,8 @@ import io.github.brunovinicioslg.sigilo.app.db.Encryption
 import io.github.brunovinicioslg.sigilo.app.db.Message
 import io.github.brunovinicioslg.sigilo.app.db.MessageKind
 import io.github.brunovinicioslg.sigilo.app.db.MessageStatus
+import io.github.brunovinicioslg.sigilo.app.engine.MessageEngine
+import io.github.brunovinicioslg.sigilo.app.engine.SimCard
 import io.github.brunovinicioslg.sigilo.app.sms.DefaultSmsApp
 import io.github.brunovinicioslg.sigilo.app.ui.theme.LocalBubbles
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +100,14 @@ fun ConversationScreen(conversationId: Long, initialDraft: String?, onBack: () -
     var menuOpen by remember { mutableStateOf(false) }
     var dialog by remember { mutableStateOf<String?>(null) }
     var deleting by remember { mutableStateOf<Message?>(null) }
+    var switchingTo by remember { mutableStateOf<SimCard?>(null) }
+
+    // Two SIMs: which one this conversation sends from, and a way to change it.
+    val simCards = container.simCards
+    var simTick by remember { mutableIntStateOf(0) }
+    val sims by produceState(emptyList<SimCard>(), simTick) { value = withContext(Dispatchers.IO) { simCards.active() } }
+    val simInUse by rememberEngineQuery<Int?>(null, conversationId, simTick) { it.simOf(conversationId) }
+    val askPhone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { simTick++ }
 
     fun engine(action: (io.github.brunovinicioslg.sigilo.app.engine.MessageEngine) -> Unit) {
         scope.launch { container.lock.withEngine(action) }
@@ -213,6 +227,19 @@ fun ConversationScreen(conversationId: Long, initialDraft: String?, onBack: () -
                 onAcceptKey = { engine { it.acceptNewKey(conversationId) } },
                 onSafetyNumber = onSafetyNumber,
             )
+            if (simCards.slots > 1 && !simCards.hasPermission) {
+                Card(
+                    Modifier.fillMaxWidth().padding(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(stringResource(R.string.sim_permission_banner), style = MaterialTheme.typography.bodyMedium)
+                        TextButton(onClick = { askPhone.launch(Manifest.permission.READ_PHONE_STATE) }, modifier = Modifier.align(Alignment.End)) {
+                            Text(stringResource(R.string.sim_permission_allow))
+                        }
+                    }
+                }
+            }
             LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, reverseLayout = true) {
                 items(items, key = { if (it is ChatItem.Item) "m${it.message.id}" else "d${(it as ChatItem.Day).at}" }) { item ->
                     when (item) {
@@ -230,6 +257,17 @@ fun ConversationScreen(conversationId: Long, initialDraft: String?, onBack: () -
                 onDraft = { draft = it },
                 encrypted = encrypted,
                 estimate = estimate,
+                sims = sims,
+                simInUse = simInUse,
+                onChooseSim = { card ->
+                    // The contact knows us by the SIM's number: warn before an encrypted conversation moves.
+                    if (current.encryption != Encryption.NONE && current.subscriptionId != MessageEngine.NO_SUBSCRIPTION) {
+                        switchingTo = card
+                    } else {
+                        engine { it.setSim(conversationId, card.subscriptionId) }
+                        simTick++
+                    }
+                },
                 onSend = {
                     val text = draft.trim()
                     if (text.isNotEmpty()) {
@@ -267,6 +305,21 @@ fun ConversationScreen(conversationId: Long, initialDraft: String?, onBack: () -
                 }) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = { TextButton(onClick = { dialog = null }) { Text(stringResource(R.string.cancel)) } },
+        )
+    }
+    switchingTo?.let { card ->
+        AlertDialog(
+            onDismissRequest = { switchingTo = null },
+            title = { Text(stringResource(R.string.sim_switch_title)) },
+            text = { Text(stringResource(R.string.sim_switch_text, title)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    switchingTo = null
+                    engine { it.setSim(conversationId, card.subscriptionId) }
+                    simTick++
+                }) { Text(stringResource(R.string.sim_switch_confirm)) }
+            },
+            dismissButton = { TextButton(onClick = { switchingTo = null }) { Text(stringResource(R.string.cancel)) } },
         )
     }
     deleting?.let { message ->
@@ -378,18 +431,53 @@ private fun StatusIcon(status: MessageStatus) {
 }
 
 @Composable
-private fun Composer(draft: String, onDraft: (String) -> Unit, encrypted: Boolean, estimate: Int, onSend: () -> Unit) {
+private fun Composer(
+    draft: String,
+    onDraft: (String) -> Unit,
+    encrypted: Boolean,
+    estimate: Int,
+    onSend: () -> Unit,
+    sims: List<SimCard> = emptyList(),
+    simInUse: Int? = null,
+    onChooseSim: (SimCard) -> Unit = {},
+) {
     Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).navigationBarsPadding().padding(8.dp)) {
+        if (sims.size > 1) {
+            var open by remember { mutableStateOf(false) }
+            val inUse = sims.firstOrNull { it.subscriptionId == simInUse }
+            Box {
+                TextButton(onClick = { open = true }) {
+                    Icon(painterResource(R.drawable.ic_sim_card), null, Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(inUse?.let { stringResource(R.string.sim_sends_from, simName(it)) } ?: stringResource(R.string.sim_choose))
+                }
+                DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                    for (card in sims) {
+                        DropdownMenuItem(
+                            text = { Text(simName(card)) },
+                            onClick = {
+                                open = false
+                                if (card.subscriptionId != simInUse) onChooseSim(card)
+                            },
+                        )
+                    }
+                }
+            }
+        }
         Row(verticalAlignment = Alignment.Bottom) {
-            OutlinedTextField(
-                value = draft,
-                onValueChange = onDraft,
-                placeholder = { Text(stringResource(if (encrypted) R.string.message_hint_encrypted else R.string.message_hint)) },
-                maxLines = 5,
-                shape = RoundedCornerShape(24.dp),
-                leadingIcon = if (encrypted) ({ Icon(painterResource(R.drawable.ic_lock), null, Modifier.size(18.dp)) }) else null,
-                modifier = Modifier.weight(1f),
-            )
+            Box(Modifier.weight(1f)) {
+                IncognitoKeyboard(enabled = encrypted) {
+                    OutlinedTextField(
+                        value = draft,
+                        onValueChange = onDraft,
+                        placeholder = { Text(stringResource(if (encrypted) R.string.message_hint_encrypted else R.string.message_hint)) },
+                        maxLines = 5,
+                        shape = RoundedCornerShape(24.dp),
+                        leadingIcon = if (encrypted) ({ Icon(painterResource(R.drawable.ic_lock), null, Modifier.size(18.dp)) }) else null,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
             Spacer(Modifier.width(8.dp))
             FilledIconButton(onClick = onSend, enabled = draft.isNotBlank(), modifier = Modifier.size(52.dp)) {
                 Icon(painterResource(R.drawable.ic_send), stringResource(R.string.send))
@@ -403,6 +491,10 @@ private fun Composer(draft: String, onDraft: (String) -> Unit, encrypted: Boolea
         }
     }
 }
+
+@Composable
+private fun simName(card: SimCard): String =
+    if (card.name.isBlank()) stringResource(R.string.sim_slot, card.slot + 1) else stringResource(R.string.sim_slot_named, card.slot + 1, card.name)
 
 @Composable
 private fun TimerDialog(current: Int, onDismiss: () -> Unit, onChoose: (Int) -> Unit) {

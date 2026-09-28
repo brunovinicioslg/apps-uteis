@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.RemoteInput
 import androidx.core.content.ContextCompat
 import io.github.brunovinicioslg.sigilo.app.R
 import io.github.brunovinicioslg.sigilo.app.AppSettings
@@ -48,7 +49,7 @@ class Notifier(private val context: Context, private val settings: AppSettings) 
         } else {
             messages.joinToString("\n") { describe(it) }
         }
-        val notification = NotificationCompat.Builder(context, CHANNEL_MESSAGES)
+        val builder = NotificationCompat.Builder(context, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(text.lineSequence().last())
@@ -61,8 +62,61 @@ class Notifier(private val context: Context, private val settings: AppSettings) 
             .setAutoCancel(true)
             .setContentIntent(openConversation(conversation.id))
             .addAction(0, context.getString(R.string.notif_mark_read), markRead(conversation.id))
+        // Replying from here only where the notification says who wrote: never past the password
+        // lock, and not to encrypted conversations, whose notifications name no one.
+        if (!private) builder.addAction(replyAction(conversation.id))
+        notify(idFor(conversation.id), builder.build())
+    }
+
+    /**
+     * A quick reply left. Android 15+ keeps a replied notification on screen and ignores the app
+     * cancelling it: the notification is updated to show the reply, silently, and goes away soon.
+     */
+    fun showReplied(conversation: Conversation, reply: String) {
+        if (!allowed()) return
+        val notification = NotificationCompat.Builder(context, CHANNEL_MESSAGES)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(names.nameOf(conversation.address) ?: conversation.address)
+            .setContentText(context.getString(R.string.notif_you_replied, reply))
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(publicVersion())
+            .setSilent(true)
+            .setAutoCancel(true)
+            .setTimeoutAfter(REPLIED_VISIBLE_MS)
+            .setContentIntent(openConversation(conversation.id))
             .build()
         notify(idFor(conversation.id), notification)
+    }
+
+    /** A quick reply could not be sent (the app was locked meanwhile, or the radio refused). */
+    fun showReplyFailed(conversationId: Long) {
+        if (!allowed()) return
+        val notification = NotificationCompat.Builder(context, CHANNEL_MESSAGES)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.app_name))
+            .setContentText(context.getString(R.string.notif_reply_failed))
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
+            .setAutoCancel(true)
+            .setContentIntent(openConversation(conversationId))
+            .build()
+        notify(idFor(conversationId), notification)
+    }
+
+    private fun replyAction(conversationId: Long): NotificationCompat.Action {
+        val input = RemoteInput.Builder(NotificationActionReceiver.KEY_REPLY).setLabel(context.getString(R.string.notif_reply_hint)).build()
+        val intent = Intent(context, NotificationActionReceiver::class.java)
+            .setAction(NotificationActionReceiver.ACTION_REPLY)
+            .putExtra(NotificationActionReceiver.EXTRA_CONVERSATION_ID, conversationId)
+        // Mutable so Android can add the typed text; the intent is explicit, so nothing else can use it.
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+        val pending = PendingIntent.getBroadcast(context, REPLY_REQUEST_BASE + conversationId.toInt(), intent, flags)
+        return NotificationCompat.Action.Builder(0, context.getString(R.string.notif_reply), pending)
+            .addRemoteInput(input)
+            .setAllowGeneratedReplies(false)
+            .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+            .setShowsUserInterface(false)
+            .build()
     }
 
     /** SMS are waiting and the app is locked: nothing about them can be read yet. */
@@ -127,5 +181,7 @@ class Notifier(private val context: Context, private val settings: AppSettings) 
         const val CHANNEL_MESSAGES = "messages"
         private const val LOCKED_ID = 1
         private const val FIRST_CONVERSATION_ID = 100
+        private const val REPLY_REQUEST_BASE = 1_000_000
+        private const val REPLIED_VISIBLE_MS = 3_000L
     }
 }

@@ -16,6 +16,7 @@ import io.github.brunovinicioslg.sigilo.app.engine.MessageEngine
 import io.github.brunovinicioslg.sigilo.app.inbox.Inbox
 import io.github.brunovinicioslg.sigilo.app.notify.ExpiryScheduler
 import io.github.brunovinicioslg.sigilo.app.notify.Notifier
+import io.github.brunovinicioslg.sigilo.app.sms.AndroidSimCards
 import io.github.brunovinicioslg.sigilo.app.sms.AndroidSmsGateway
 import io.github.brunovinicioslg.sigilo.app.sms.AndroidSystemSms
 import io.github.brunovinicioslg.sigilo.app.sms.DefaultSmsApp
@@ -55,6 +56,7 @@ class AppContainer(private val app: Context) {
     private val expiry = ExpiryScheduler(app)
     val systemSms = AndroidSystemSms(app)
     val gateway = AndroidSmsGateway(app)
+    val simCards = AndroidSimCards(app)
 
     private val _changes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -75,7 +77,7 @@ class AppContainer(private val app: Context) {
         vault = Vault(File(app.noBackupFilesDir, "vault.bin"), AndroidKeystoreWrapper()),
         guard = UnlockGuard(File(app.noBackupFilesDir, "unlock-attempts")),
         openDatabase = { key -> SigiloDatabase.open(app, SigiloDatabase.encrypted(key)) },
-        makeEngine = { db -> MessageEngine(db, inbox, gateway, systemSms, events, AddressNormalizer(::region)) },
+        makeEngine = { db -> MessageEngine(db, inbox, gateway, systemSms, events, AddressNormalizer(::region), sims = simCards) },
     )
 
     fun start() {

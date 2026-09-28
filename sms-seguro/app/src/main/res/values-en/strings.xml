@@ -12,6 +12,10 @@
     <string name="channel_messages_description">Alerts for incoming messages.</string>
     <string name="notif_new_message">New message</string>
     <string name="notif_new_messages">New messages: %1$d</string>
+    <string name="notif_reply">Reply</string>
+    <string name="notif_reply_hint">Message</string>
+    <string name="notif_you_replied">You: %1$s</string>
+    <string name="notif_reply_failed">The reply was not sent. Open Sigilo to try again.</string>
     <string name="notif_mark_read">Mark as read</string>
     <string name="notif_invite">Wants to chat with encryption</string>
     <string name="notif_key_changed">The safety number changed</string>
@@ -58,6 +62,15 @@
     <string name="message_hint_encrypted">Encrypted message</string>
     <string name="send">Send</string>
     <string name="sms_count">%1$d SMS</string>
+    <string name="sim_slot">SIM %1$d</string>
+    <string name="sim_slot_named">SIM %1$d · %2$s</string>
+    <string name="sim_sends_from">Sends from %1$s</string>
+    <string name="sim_choose">Choose the SIM</string>
+    <string name="sim_permission_banner">This phone has two SIMs. Allow Sigilo to see them to choose which one each conversation sends from.</string>
+    <string name="sim_permission_allow">Allow</string>
+    <string name="sim_switch_title">Switch SIM?</string>
+    <string name="sim_switch_text">%1$s knows you by the other SIM’s number. Encrypted messages sent from this SIM arrive from another number and cannot be read.</string>
+    <string name="sim_switch_confirm">Switch</string>
     <string name="menu_encrypt">Turn on encryption</string>
     <string name="menu_resend_invite">Send the invite again</string>
     <string name="menu_safety">Safety number</string>

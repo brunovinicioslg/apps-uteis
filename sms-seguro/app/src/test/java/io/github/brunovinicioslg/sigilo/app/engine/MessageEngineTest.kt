@@ -52,6 +52,51 @@ class MessageEngineTest {
     }
 
     @Test
+    fun aConversationSendsFromOneSimFromItsFirstMessageOn() {
+        // Dual SIM, Android set to ask every time: the first SIM is used and kept.
+        alice.simCards = listOf(SimCard(7, 0, "Vivo"), SimCard(9, 1, "Claro"))
+        pair()
+        assertThat(alice.sent.map { it.subscriptionId }.distinct()).containsExactly(7)
+        assertThat(alice.conversationWith(bob).subscriptionId).isEqualTo(7)
+
+        // The default changes later: the conversation keeps its SIM (bob knows alice by that number).
+        alice.defaultSim = 9
+        alice.engine.sendText(alice.conversationWith(bob).id, "Oi")
+        assertThat(alice.sent.last().subscriptionId).isEqualTo(7)
+
+        // The user switches it; the SIM is then removed: the phone's default takes over.
+        alice.engine.setSim(alice.conversationWith(bob).id, 9)
+        alice.engine.sendText(alice.conversationWith(bob).id, "Pelo outro chip")
+        assertThat(alice.sent.last().subscriptionId).isEqualTo(9)
+        alice.simCards = listOf(SimCard(7, 0, "Vivo"))
+        alice.defaultSim = MessageEngine.NO_SUBSCRIPTION
+        alice.engine.sendText(alice.conversationWith(bob).id, "Chip tirado")
+        assertThat(alice.sent.last().subscriptionId).isEqualTo(7)
+    }
+
+    @Test
+    fun theDefaultSmsSimIsPreferredAndAReplyUsesTheSimTheMessageCameIn() {
+        // The test inbox says received SMS came in on SIM id 1.
+        alice.simCards = listOf(SimCard(1, 0, "Vivo"), SimCard(9, 1, "Claro"))
+        alice.defaultSim = 9
+        alice.engine.sendText(alice.conversationWith(bob).id, "Oi")
+        assertThat(alice.sent.last().subscriptionId).isEqualTo(9)
+
+        // A message from someone new arrives on SIM 1 (the test inbox says so): the reply goes out there.
+        val carol = phone("+5531933330000")
+        carol.engine.sendText(carol.conversationWith(alice).id, "Quem fala?")
+        deliver(carol, alice)
+        alice.engine.sendText(alice.conversationWith(carol).id, "Alice")
+        assertThat(alice.sent.last().subscriptionId).isEqualTo(1)
+    }
+
+    @Test
+    fun onASingleSimPhoneAndroidChooses() {
+        alice.engine.sendText(alice.conversationWith(bob).id, "Oi")
+        assertThat(alice.sent.last().subscriptionId).isEqualTo(MessageEngine.NO_SUBSCRIPTION)
+    }
+
+    @Test
     fun ordinarySmsInAndOut() {
         val providerId = alice.system.addIncoming("+5531922220000", "Oi, tudo bem?", now)
         alice.inbox.addSms("031 92222-0000", "Oi, tudo bem?", 1, now, providerId)

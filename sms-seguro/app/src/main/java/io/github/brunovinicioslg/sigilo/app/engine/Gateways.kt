@@ -17,6 +17,24 @@ interface SmsGateway {
     fun partsOf(text: String): Int
 }
 
+/** A SIM card that can send SMS; [slot] counts from 0. */
+data class SimCard(val subscriptionId: Int, val slot: Int, val name: String)
+
+/** The phone's SIM cards. */
+interface SimCards {
+    /** Active SIMs, in slot order; empty when the phone does not tell (no permission, no SIM). */
+    fun active(): List<SimCard>
+
+    /** The SIM Android sends SMS from by default; [MessageEngine.NO_SUBSCRIPTION] when it asks every time. */
+    fun defaultForSms(): Int
+
+    /** Nothing known: Android picks the SIM, as on single-SIM phones. */
+    object Unknown : SimCards {
+        override fun active(): List<SimCard> = emptyList()
+        override fun defaultForSms(): Int = MessageEngine.NO_SUBSCRIPTION
+    }
+}
+
 /** One row of the system SMS database. */
 data class SystemSmsRow(
     val id: Long,

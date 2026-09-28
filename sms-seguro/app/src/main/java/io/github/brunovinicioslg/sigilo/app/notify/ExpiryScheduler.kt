@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.RemoteInput
 import io.github.brunovinicioslg.sigilo.app.appContainer
 import kotlinx.coroutines.launch
 
@@ -37,23 +38,46 @@ class ExpiryReceiver : BroadcastReceiver() {
 
 class NotificationActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != ACTION_MARK_READ) return
         val conversationId = intent.getLongExtra(EXTRA_CONVERSATION_ID, -1)
         if (conversationId < 0) return
         val container = context.appContainer
-        container.notifier.cancel(conversationId)
-        val pending = goAsync()
-        container.scope.launch {
-            try {
-                container.lock.withEngine { it.markRead(conversationId) }
-            } finally {
-                pending.finish()
+        when (intent.action) {
+            ACTION_MARK_READ -> {
+                container.notifier.cancel(conversationId)
+                val pending = goAsync()
+                container.scope.launch {
+                    try {
+                        container.lock.withEngine { it.markRead(conversationId) }
+                    } finally {
+                        pending.finish()
+                    }
+                }
+            }
+            ACTION_REPLY -> {
+                val text = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(KEY_REPLY)?.toString()?.trim()
+                if (text.isNullOrEmpty()) return
+                val pending = goAsync()
+                container.scope.launch {
+                    try {
+                        val conversation = container.lock.withEngine { engine ->
+                            engine.sendText(conversationId, text)?.let {
+                                engine.markRead(conversationId)
+                                engine.conversation(conversationId)
+                            }
+                        }
+                        if (conversation == null) container.notifier.showReplyFailed(conversationId) else container.notifier.showReplied(conversation, text)
+                    } finally {
+                        pending.finish()
+                    }
+                }
             }
         }
     }
 
     companion object {
         const val ACTION_MARK_READ = "io.github.brunovinicioslg.sigilo.action.MARK_READ"
+        const val ACTION_REPLY = "io.github.brunovinicioslg.sigilo.action.REPLY"
+        const val KEY_REPLY = "reply"
         const val EXTRA_CONVERSATION_ID = "conversation_id"
     }
 }

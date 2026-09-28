@@ -13,7 +13,7 @@ Mensageiro com **visual parecido com o do WhatsApp** que usa **SMS como transpor
 
 ## Status (28/09/2026)
 
-**Primeira versão do app funcionando no emulador** (48 testes automáticos: 23 do núcleo, 25 do app).
+**Primeira versão do app funcionando no emulador** (53 testes automáticos: 23 do núcleo, 30 do app).
 
 **App Android** (`app/`):
 - **app de SMS padrão completo** para o Android: recebe e envia SMS comuns, grava-os no banco de SMS do sistema (como todo app de SMS), importa o histórico existente, confirma entrega (✓ enviada, ✓✓ entregue), "responder com mensagem" ao recusar uma ligação, abrir conversa a partir de links `sms:`;
@@ -25,7 +25,10 @@ Mensageiro com **visual parecido com o do WhatsApp** que usa **SMS como transpor
 - **mensagens temporárias** (30 s a 1 semana), iguais nos dois celulares, somem da tela na hora certa;
 - **chave do contato mudou**: mensagens seguradas até o usuário aceitar; número de segurança de 60 dígitos para comparar;
 - **bloqueio de números** na lista oficial do Android (vale também para ligações);
-- privacidade: sem capturas de tela nem prévia em apps recentes, notificações de conversas criptografadas sem remetente nem texto, nada no backup do Android.
+- privacidade: sem capturas de tela nem prévia em apps recentes, notificações de conversas criptografadas sem remetente nem texto, nada no backup do Android;
+- **dois chips:** cada conversa envia sempre pelo mesmo chip, fixado no primeiro envio (ou no chip em que a conversa chegou). O contato conhece você por esse número, e as respostas automáticas nunca fazem o Android perguntar o chip. Em celular com dois chips, a conversa mostra por qual chip envia e permite trocar, com aviso nas conversas criptografadas;
+- **resposta rápida pela notificação** em SMS comuns (nunca com senha nem em conversas criptografadas, cujas notificações não dizem quem é); depois de responder, a notificação mostra "Você: …" e some;
+- **teclado sem aprendizado** nas conversas criptografadas (Gboard e teclado Samsung entram no modo anônimo).
 
 **Teste no emulador** (com um "segundo celular" no computador, `peer/`, que injeta SMS no emulador):
 - SMS comum recebido, respondido e entregue;
@@ -37,7 +40,7 @@ Mensageiro com **visual parecido com o do WhatsApp** que usa **SMS como transpor
 **Falta:**
 1. **MMS**: hoje o app só registra que chegou um MMS. Baixar e mostrar imagens, e enviar MMS.
 2. Pareamento por **QR code** (sem os 17 SMS do convite) e verificação do número de segurança por QR.
-3. Escolha do chip em aparelhos com dois chips; resposta rápida pela notificação; teclado sem aprendizado.
+3. Testar a escolha do chip com os dois chips reais (o emulador tem um só; a lógica tem testes automáticos).
 4. SMS de dados binários (mensagem curta em 1 SMS sempre).
 5. Backup local criptografado para trocar de celular.
 6. **Teste entre os dois celulares reais e operadoras** (S22 × Redmi).

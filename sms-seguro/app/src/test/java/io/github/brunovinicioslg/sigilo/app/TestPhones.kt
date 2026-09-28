@@ -9,6 +9,8 @@ import io.github.brunovinicioslg.sigilo.app.db.SigiloDatabase
 import io.github.brunovinicioslg.sigilo.app.engine.AddressNormalizer
 import io.github.brunovinicioslg.sigilo.app.engine.EngineEvents
 import io.github.brunovinicioslg.sigilo.app.engine.MessageEngine
+import io.github.brunovinicioslg.sigilo.app.engine.SimCard
+import io.github.brunovinicioslg.sigilo.app.engine.SimCards
 import io.github.brunovinicioslg.sigilo.app.engine.SmsGateway
 import io.github.brunovinicioslg.sigilo.app.engine.SystemSms
 import io.github.brunovinicioslg.sigilo.app.engine.SystemSmsRow
@@ -27,8 +29,8 @@ class LibsignalTestRunner(testClass: Class<*>) : RobolectricTestRunner(testClass
         InstrumentationConfiguration.Builder(super.createClassLoaderConfig(method)).doNotAcquirePackage("org.signal.libsignal").build()
 }
 
-/** An SMS on its way: who sent it, to whom, the text and the app's message id for status reports. */
-data class SentSms(val from: String, val to: String, val text: String, val messageId: Long)
+/** An SMS on its way: who sent it, to whom, the text, the app's message id for status reports and the SIM it left from. */
+data class SentSms(val from: String, val to: String, val text: String, val messageId: Long, val subscriptionId: Int = -1)
 
 /** SMS that phones sent and that the test delivers when and how it wants (in order, shuffled, twice). */
 class FakeNetwork {
@@ -113,14 +115,23 @@ class TestPhone(
     /** SMS this phone sent, one entry per SMS. */
     val sent = mutableListOf<SentSms>()
 
+    /** The phone's SIM cards, as Android would report them. */
+    var simCards: List<SimCard> = emptyList()
+    var defaultSim: Int = MessageEngine.NO_SUBSCRIPTION
+
+    private val sims = object : SimCards {
+        override fun active() = simCards
+        override fun defaultForSms() = defaultSim
+    }
+
     private val gateway = object : SmsGateway {
         override fun sendEach(address: String, texts: List<String>, subscriptionId: Int, messageId: Long) {
-            texts.forEach { record(SentSms(number, address, it, messageId)) }
+            texts.forEach { record(SentSms(number, address, it, messageId, subscriptionId)) }
         }
 
         override fun sendText(address: String, text: String, subscriptionId: Int, messageId: Long): Int {
             val parts = partsOf(text)
-            record(SentSms(number, address, text, messageId))
+            record(SentSms(number, address, text, messageId, subscriptionId))
             return parts
         }
 
@@ -141,7 +152,7 @@ class TestPhone(
 
     private fun open() = SigiloDatabase.open(context, FrameworkSQLiteOpenHelperFactory(), dbName)
 
-    private fun newEngine() = MessageEngine(db, inbox, gateway, system, events, AddressNormalizer { "BR" }, clock)
+    private fun newEngine() = MessageEngine(db, inbox, gateway, system, events, AddressNormalizer { "BR" }, clock, sims)
 
     /** The app process died and started again: same files, fresh memory. */
     fun restart() {

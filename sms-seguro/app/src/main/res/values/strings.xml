@@ -15,6 +15,10 @@
     <string name="notif_new_message">Nova mensagem</string>
     <string name="notif_new_messages">Novas mensagens: %1$d</string>
     <string name="notif_mark_read">Marcar como lida</string>
+    <string name="notif_reply">Responder</string>
+    <string name="notif_reply_hint">Mensagem</string>
+    <string name="notif_you_replied">Você: %1$s</string>
+    <string name="notif_reply_failed">A resposta não foi enviada. Abra o Sigilo para tentar de novo.</string>
     <string name="notif_invite">Quer conversar com criptografia</string>
     <string name="notif_key_changed">A chave de segurança mudou</string>
     <string name="notif_mms">MMS recebido</string>
@@ -60,6 +64,15 @@
     <string name="message_hint_encrypted">Mensagem criptografada</string>
     <string name="send">Enviar</string>
     <string name="sms_count">%1$d SMS</string>
+    <string name="sim_slot">chip %1$d</string>
+    <string name="sim_slot_named">chip %1$d · %2$s</string>
+    <string name="sim_sends_from">Envia pelo %1$s</string>
+    <string name="sim_choose">Escolher o chip</string>
+    <string name="sim_permission_banner">Este celular tem dois chips. Permita que o Sigilo veja os chips para escolher por qual cada conversa envia.</string>
+    <string name="sim_permission_allow">Permitir</string>
+    <string name="sim_switch_title">Trocar de chip?</string>
+    <string name="sim_switch_text">%1$s conhece você pelo número do outro chip. Mensagens criptografadas enviadas por este chip chegam de outro número e não poderão ser lidas.</string>
+    <string name="sim_switch_confirm">Trocar</string>
     <string name="menu_encrypt">Ativar criptografia</string>
     <string name="menu_resend_invite">Reenviar convite</string>
     <string name="menu_safety">Número de segurança</string>

@@ -37,6 +37,7 @@ class MessageEngine(
     private val events: EngineEvents,
     private val addresses: AddressNormalizer,
     private val clock: () -> Long = System::currentTimeMillis,
+    private val sims: SimCards = SimCards.Unknown,
 ) {
     val repository = MessageRepository(db)
     private val store = DbSignalStore(db, clock)
@@ -262,17 +263,49 @@ class MessageEngine(
 
     // Outgoing.
 
+    /**
+     * The SIM a conversation sends from, fixed on first use. The contact knows us by that SIM's
+     * number (encrypted messages from the other number could not be read there), and automatic
+     * replies must never make Android ask which SIM to use. Where the SIM was removed, the phone's
+     * default takes over.
+     */
+    private fun simFor(conversation: Conversation): Int {
+        val sim = pickSim(conversation)
+        if (sim != conversation.subscriptionId) repository.setSubscription(conversation.id, sim)
+        return sim
+    }
+
+    private fun pickSim(conversation: Conversation): Int {
+        val cards = sims.active()
+        fun present(id: Int) = id != NO_SUBSCRIPTION && (cards.isEmpty() || cards.any { it.subscriptionId == id })
+        val current = conversation.subscriptionId
+        if (present(current)) return current
+        return sims.defaultForSms().takeIf(::present) ?: cards.firstOrNull()?.subscriptionId ?: current
+    }
+
+    /** The SIM the conversation will send from, for the screen; looking does not fix it. */
+    fun simOf(conversationId: Long): Int? = repository.conversation(conversationId)?.let(::pickSim)
+
+    /** The user picked another SIM for this conversation. */
+    fun setSim(conversationId: Long, subscriptionId: Int) {
+        val conversation = repository.conversation(conversationId) ?: return
+        if (subscriptionId == conversation.subscriptionId) return
+        repository.setSubscription(conversation.id, subscriptionId)
+        events.onChanged()
+    }
+
     /** Encrypted when the conversation is, as an ordinary SMS otherwise. Returns the message id. */
     fun sendText(conversationId: Long, text: String): Long? {
         val conversation = repository.conversation(conversationId) ?: return null
         if (text.isBlank()) return null
+        val sim = simFor(conversation)
         val now = clock()
         val id = if (conversation.encryption == Encryption.ACTIVE && sessions.hasSession(conversation.address)) {
             sendEncrypted(conversation, MessageKind.TEXT, text, expireSeconds = conversation.expireSeconds) {
                 messenger.composeText(conversation.address, text, conversation.expireSeconds, now)
             }
         } else {
-            val providerId = system.insertOutgoing(conversation.address, text, conversation.subscriptionId, now)
+            val providerId = system.insertOutgoing(conversation.address, text, sim, now)
             val id = inTransaction {
                 repository.insertMessage(
                     conversation.id, outgoing = true, kind = MessageKind.TEXT, body = text, encrypted = false, status = MessageStatus.PENDING,
@@ -280,7 +313,7 @@ class MessageEngine(
                 )
             }
             transmit(id) {
-                val parts = sms.sendText(conversation.address, text, conversation.subscriptionId, id)
+                val parts = sms.sendText(conversation.address, text, sim, id)
                 repository.setParts(id, parts)
             }
             id
@@ -303,7 +336,8 @@ class MessageEngine(
             if (conversation.encryption == Encryption.NONE) repository.setEncryption(conversation.id, Encryption.INVITE_SENT)
             id to parts
         }
-        transmit(id) { sms.sendEach(conversation.address, parts, conversation.subscriptionId, id) }
+        val sim = simFor(conversation)
+        transmit(id) { sms.sendEach(conversation.address, parts, sim, id) }
         events.onChanged()
     }
 
@@ -396,7 +430,8 @@ class MessageEngine(
             repository.noteEncryptedSent(conversation.id, now)
             messenger.composeAck(conversation.address, now)
         }
-        transmit(null) { sms.sendEach(conversation.address, parts, conversation.subscriptionId, NO_MESSAGE) }
+        val sim = simFor(conversation)
+        transmit(null) { sms.sendEach(conversation.address, parts, sim, NO_MESSAGE) }
     }
 
     /**
@@ -416,7 +451,8 @@ class MessageEngine(
             repository.noteEncryptedSent(conversation.id, now)
             id to parts
         }
-        transmit(id) { sms.sendEach(conversation.address, parts, conversation.subscriptionId, id) }
+        val sim = simFor(conversation)
+        transmit(id) { sms.sendEach(conversation.address, parts, sim, id) }
         return id
     }
 

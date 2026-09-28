@@ -1,6 +1,8 @@
 package io.github.brunovinicioslg.sigilo.app.ui
 
 import android.text.format.DateFormat
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -12,9 +14,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.PlatformTextInputMethodRequest
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -122,4 +127,29 @@ fun sameDay(a: Long, b: Long): Boolean {
     val ca = Calendar.getInstance().apply { timeInMillis = a }
     val cb = Calendar.getInstance().apply { timeInMillis = b }
     return ca.get(Calendar.YEAR) == cb.get(Calendar.YEAR) && ca.get(Calendar.DAY_OF_YEAR) == cb.get(Calendar.DAY_OF_YEAR)
+}
+
+/**
+ * Asks the keyboard not to learn from what is typed inside (Gboard and Samsung's keyboard show
+ * their incognito mode): encrypted messages must not end up in the keyboard's suggestions.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun IncognitoKeyboard(enabled: Boolean, content: @Composable () -> Unit) {
+    if (!enabled) {
+        content()
+        return
+    }
+    InterceptPlatformTextInput(
+        interceptor = { request, nextHandler ->
+            val incognito = object : PlatformTextInputMethodRequest {
+                override fun createInputConnection(outAttributes: EditorInfo): InputConnection =
+                    request.createInputConnection(outAttributes).also {
+                        outAttributes.imeOptions = outAttributes.imeOptions or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+                    }
+            }
+            nextHandler.startInputMethod(incognito)
+        },
+        content = content,
+    )
 }
