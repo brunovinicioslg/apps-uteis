@@ -11,6 +11,45 @@ Mensageiro com **visual parecido com o do WhatsApp** que usa **SMS como transpor
 - bloqueio de números;
 - MMS.
 
+## Status (28/09/2026)
+
+**Núcleo pronto** (`core/`), com 22 testes usando a criptografia real (libsignal 0.103, oficial do Signal, licença AGPL-3.0; o app inteiro fica sob AGPL-3.0):
+- **Protocolo:**
+  - PQXDH, com acordo de chaves pós-quântico (ML-KEM-1024);
+  - double ratchet;
+  - ratchet pós-quântico (SPQR).
+- **Convite** com o cartão de chaves públicas: por SMS ou QR code.
+- **Mensagens entregues em qualquer ordem**, perdidas ou duplicadas: todas as que chegam abrem corretamente e só uma vez.
+- **Adulteração:** qualquer mudança em mensagem comum é rejeitada (500 de 500). Nas mensagens de preparação, o conteúdo lido nunca sai alterado.
+- **Troca de chave** (reinstalação ou possível impostor) detectada; a mensagem fica guardada até o usuário confirmar.
+- **Número de segurança** de 60 dígitos, igual nos dois aparelhos só quando não há ninguém no meio.
+- **Transporte próprio por SMS:**
+  - texto "SG1:" + Base64, só com caracteres GSM-7 básicos (160 por SMS, sem conversão pela operadora);
+  - partes montadas em qualquer ordem;
+  - resistente a lixo: 12.000 casos de fuzzing, e um deles revelou e fixou uma falha que derrubaria o app.
+
+**Custo em SMS medido:**
+
+| Tipo | SMS |
+|---|---|
+| Convite (uma vez por contato) | 17 |
+| Primeira mensagem (prepara a sessão) | 16 |
+| Confirmação automática (uma vez) | 1 |
+| Mensagem curta ("Tudo bem?") | 2 |
+| Mensagem média (76 caracteres) | 2 |
+
+O protocolo ocupa ~90 bytes por mensagem, 37 deles do ratchet pós-quântico, e sobram 112 bytes úteis por SMS de texto.
+
+**Otimização prevista:** SMS de dados binários (140 bytes por SMS) deixaria mensagens curtas em 1 SMS. Depende da operadora e será testado com os 2 chips; o texto fica como alternativa automática.
+
+Detalhe técnico registrado: a libsignal usa ordens diferentes de endereços em `SessionBuilder` (contato, local) e `SessionCipher` (local, contato). O código centraliza isso em duas funções.
+
+**Falta:**
+1. App Android: app de SMS padrão, banco criptografado (SQLCipher + Keystore) com os estados da libsignal, interface estilo WhatsApp, senha, mensagens temporárias, bloqueio.
+2. SMS de dados binários.
+3. Teste entre os dois celulares e operadoras.
+4. Auditoria externa.
+
 ## Limitações que nenhuma solução contorna
 
 1. **iOS: impossível via SMS.** A Apple não permite que apps enviem SMS automaticamente nem leiam SMS recebidos. No iOS só seria possível uma versão "somente internet" (ver [Internet sem servidor](#internet-sem-servidor-fase-futura)).

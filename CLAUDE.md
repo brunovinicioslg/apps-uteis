@@ -33,6 +33,7 @@ Dentro da pasta do app (ex.: `lanterna/`):
 .\gradlew.bat test lint assembleDebug      # lanterna/: testes unitários, lint e APK de depuração
 .\gradlew.bat :shared:jvmTest :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # trena/
 .\gradlew.bat :shared:jvmTest :tools:test  # gps-relevo/ (núcleo e ferramenta de dados)
+.\gradlew.bat :core:test                   # sms-seguro/ (protocolo com libsignal real; licença AGPL-3.0)
 .\gradlew.bat connectedDebugAndroidTest    # testes instrumentados (emulador ou aparelho conectado)
 ```
 
