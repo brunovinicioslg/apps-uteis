@@ -32,8 +32,13 @@ Dentro da pasta do app (ex.: `lanterna/`):
 ```powershell
 .\gradlew.bat test lint assembleDebug      # lanterna/: testes unitários, lint e APK de depuração
 .\gradlew.bat :shared:jvmTest :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # trena/
+.\gradlew.bat :shared:jvmTest :tools:test  # gps-relevo/ (núcleo e ferramenta de dados)
 .\gradlew.bat connectedDebugAndroidTest    # testes instrumentados (emulador ou aparelho conectado)
 ```
+
+Pacote de dados do Ladeira (em `gps-relevo/`, depois de `.\gradlew.bat :tools:installDist`):
+`tools/build/install/tools/bin/tools build --bbox sul,oeste,norte,leste --out build/data/regiao.ldrp` e
+`... profile --package build/data/regiao.ldrp --at lat,lon --heading graus --vehicle CAR|TRUCK` para ver o que o app avisaria.
 
 Emulador sem janela (Git Bash): `ANDROID_AVD_HOME="$USERPROFILE/.android/avd" emulator -avd Medium_Phone_API_36.1 -no-window -no-audio -no-boot-anim`.
 No Git Bash, caminhos do aparelho com `adb` precisam de `MSYS_NO_PATHCONV=1` (senão `/sdcard` vira caminho do Windows).

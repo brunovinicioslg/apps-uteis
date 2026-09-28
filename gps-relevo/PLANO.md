@@ -6,6 +6,38 @@
 
 GPS que funciona **sem internet** e mostra a **inclinação das vias**, avisando com antecedência sobre **subidas e descidas**, principalmente as longas. Também avisa sobre radares, buracos, lombadas e outros pontos marcados.
 
+## Status (28/09/2026)
+
+**Núcleo pronto** (`shared/`, Kotlin Multiplatform, pronto para o iOS), com 46 testes:
+- matemática geográfica;
+- modelo da malha viária;
+- pacote offline compacto por células (o celular lê só a região ao redor), resistente a arquivo corrompido: 2.000 casos de fuzzing;
+- detecção de subidas e descidas por veículo, com suavização do terreno e junção de trechos interrompidos;
+- previsão da via à frente sem rota (segue a mesma via ou a continuação mais natural e para em cruzamentos em T);
+- map matching (reconhece a via mesmo com uma via marginal a 15 m e ruído de GPS de 8 m, e ignora viadutos que passam por cima);
+- motor de avisos que fala uma única vez, com antecedência proporcional à velocidade;
+- radares no sentido certo.
+
+**Ferramenta de dados** (`tools/`), com 7 testes:
+- baixa as vias do OpenStreetMap (Overpass, em pedaços pequenos) e o relevo (AWS Terrain Tiles);
+- monta a malha, com pontes e viadutos interpolados em linha reta;
+- gera o pacote.
+
+Validação com dados reais (sul de BH, 514 km de vias, pacote de 0,2 MB), na BR-040:
+
+| Sentido | Carro | Caminhão |
+|---|---|---|
+| Sul (subindo, saindo de BH) | subida de 6,6% por 775 m | subida longa: 3,4 km a 5,2% |
+| Norte (descendo para BH) | descidas de 6,1% por 1,0 e 1,6 km | descida longa: 1,65 km a 5,8% e 3,2 km a 5,1% |
+
+Inclinações máximas entre 5% e 8,8%, plausíveis para uma rodovia de serra.
+
+**Falta:**
+1. Pacote de Minas Gerais inteiro: trocar o Overpass pelo arquivo do OpenStreetMap (Geofabrik) processado localmente.
+2. Mapa vetorial offline (PMTiles).
+3. App Android: mapa, GPS em segundo plano, painel, avisos por voz, marcação de radares e buracos, gravação de trajetos.
+4. Testar dirigindo.
+
 ## Decisões tomadas
 
 - **Rotas em fases:** v1 avisa sobre a via atual; v2 traz rotas offline de A até B.
