@@ -18,6 +18,10 @@ kotlin {
     }
 
     sourceSets {
+        commonMain.dependencies {
+            // JSON parsing only (GeoJSON of the user's points); no compiler plugin needed.
+            implementation(libs.kotlinx.serialization.json)
+        }
         commonTest.dependencies {
             implementation(kotlin("test"))
         }

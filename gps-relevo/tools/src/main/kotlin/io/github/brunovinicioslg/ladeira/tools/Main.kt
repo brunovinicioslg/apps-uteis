@@ -37,15 +37,18 @@ fun main(args: Array<String>) {
             "find" -> find(options)
             "track" -> track(options)
             "drive" -> drive(options)
+            "info" -> info(options)
             else -> {
                 System.err.println(
                     """
                     Usage:
                       build   --bbox south,west,north,east --out region.ldrp [--cache dir] [--zoom 12] [--overpass url]
+                      build   --pbf state.osm.pbf --out region.ldrp [--bbox south,west,north,east] [--cache dir] [--zoom 12]
                       profile --package region.ldrp --at lat,lon --heading degrees [--distance 5000] [--vehicle CAR]
                       find    --package region.ldrp --road BR-040 [--near lat,lon] [--radius 20000]
                       track   --package region.ldrp --at lat,lon --heading degrees --out track.csv [--distance 10000] [--speed 72]
                       drive   --package region.ldrp --track track.csv [--vehicle CAR] [--no-heading true]
+                      info    --package region.ldrp
                     """.trimIndent(),
                 )
                 exitProcess(2)
@@ -58,36 +61,36 @@ fun main(args: Array<String>) {
 }
 
 private fun build(options: Map<String, String>) {
-    val (south, west, north, east) = requireNotNull(options["bbox"]) { "--bbox is required" }.split(",").map { it.trim().toDouble() }
-    require(south < north && west < east) { "bbox must be south,west,north,east" }
+    val bbox = options["bbox"]?.let(::parseBbox)
+    val pbf = options["pbf"]?.let(::File)
     val out = File(requireNotNull(options["out"]) { "--out is required" })
     val cache = File(options["cache"] ?: "build/cache")
     val zoom = options["zoom"]?.toInt() ?: 12
     val started = System.nanoTime()
 
-    // Small tiles keep each Overpass query light; results are cached so reruns are free.
-    val server = options["overpass"] ?: OVERPASS_URL
-    val tileSize = options["tile"]?.toDouble() ?: 0.03
-    val tiles = buildList {
-        var s = south
-        while (s < north) {
-            var w = west
-            while (w < east) {
-                add(listOf(s, w, minOf(s + tileSize, north), minOf(w + tileSize, east)))
-                w += tileSize
-            }
-            s += tileSize
+    val osm = when {
+        // A whole state from an OpenStreetMap extract, optionally cut to --bbox.
+        pbf != null -> {
+            require(pbf.isFile) { "No such file: $pbf" }
+            val read = Pbf.read(pbf, ::println)
+            (if (bbox != null) read.within(bbox) else read).spatiallySorted(zoom)
         }
+        bbox != null -> overpass(bbox, cache, options)
+        else -> throw IllegalArgumentException("--pbf or --bbox is required")
     }
-    val osm = tiles.mapIndexed { i, (s, w, n, e) ->
-        val query = Osm.overpassQuery(s, w, n, e)
-        val json = cached(File(cache, "overpass/${sha1(query)}.json")) { fetchOverpass(query, server) }
-        println("Tile ${i + 1}/${tiles.size}: ${json.length / 1_000} kB")
-        Osm.parseOverpass(json)
-    }.merged()
     println("Ways: ${osm.ways.size}, nodes: ${osm.nodes.size}, tagged points: ${osm.poiNodes.size}")
 
-    val result = GraphBuilder(TerrariumElevation(File(cache, "terrarium"), zoom)).build(osm)
+    val elevation = TerrariumElevation(File(cache, "terrarium"), zoom)
+    val tiles = osm.roadTiles(zoom)
+    var lastReport = 0L
+    elevation.prefetch(tiles) { done, total ->
+        val now = System.nanoTime()
+        if (done == total || now - lastReport > 10_000_000_000L) {
+            lastReport = now
+            println("Elevation tiles: $done/$total downloaded")
+        }
+    }
+    val result = GraphBuilder(elevation).build(osm)
     val bytes = RoadPackage.write(result.edges, result.pois)
     out.absoluteFile.parentFile?.mkdirs()
     out.writeBytes(bytes)
@@ -100,6 +103,35 @@ private fun build(options: Map<String, String>) {
             out.name, result.edges.size, km, result.pois.size, bytes.size / 1e6, result.skippedWays, seconds,
         ),
     )
+}
+
+private fun parseBbox(text: String): Bbox {
+    val (south, west, north, east) = text.split(",").map { it.trim().toDouble() }
+    require(south < north && west < east) { "bbox must be south,west,north,east" }
+    return Bbox(south, west, north, east)
+}
+
+/** Small tiles keep each Overpass query light; results are cached so reruns are free. */
+private fun overpass(bbox: Bbox, cache: File, options: Map<String, String>): OsmData {
+    val server = options["overpass"] ?: OVERPASS_URL
+    val tileSize = options["tile"]?.toDouble() ?: 0.03
+    val tiles = buildList {
+        var s = bbox.south
+        while (s < bbox.north) {
+            var w = bbox.west
+            while (w < bbox.east) {
+                add(listOf(s, w, minOf(s + tileSize, bbox.north), minOf(w + tileSize, bbox.east)))
+                w += tileSize
+            }
+            s += tileSize
+        }
+    }
+    return tiles.mapIndexed { i, (s, w, n, e) ->
+        val query = Osm.overpassQuery(s, w, n, e)
+        val json = cached(File(cache, "overpass/${sha1(query)}.json")) { fetchOverpass(query, server) }
+        println("Tile ${i + 1}/${tiles.size}: ${json.length / 1_000} kB")
+        Osm.parseOverpass(json)
+    }.merged()
 }
 
 private fun profile(options: Map<String, String>) {
@@ -204,6 +236,25 @@ private fun drive(options: Map<String, String>) {
                 println(String.format(Locale.ROOT, "%5.0f m  ALERT %s", traveled, text))
             }
         }
+    }
+}
+
+/** Opens a package as the app does, checks every cell (the app does it on import) and times both. */
+private fun info(options: Map<String, String>) {
+    val file = File(requireNotNull(options["package"]) { "--package is required" })
+    RandomAccessFile(file, "r").use { raf ->
+        var started = System.nanoTime()
+        val reader = RoadPackageReader(FileSource(raf))
+        val openMs = (System.nanoTime() - started) / 1_000_000
+        started = System.nanoTime()
+        val edges = reader.verify()
+        val verifyMs = (System.nanoTime() - started) / 1_000_000
+        println(
+            String.format(
+                Locale.ROOT, "%s: %.1f MB, %d cells, %d edges; open %d ms, verify %d ms",
+                file.name, file.length() / 1e6, reader.cellCount, edges, openMs, verifyMs,
+            ),
+        )
     }
 }
 

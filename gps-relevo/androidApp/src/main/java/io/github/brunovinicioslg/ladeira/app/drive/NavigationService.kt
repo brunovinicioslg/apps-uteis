@@ -14,6 +14,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
@@ -30,6 +31,11 @@ import io.github.brunovinicioslg.ladeira.geo.Geo
 import io.github.brunovinicioslg.ladeira.geo.LatLon
 import io.github.brunovinicioslg.ladeira.matching.GpsFix
 import io.github.brunovinicioslg.ladeira.profile.VehicleProfile
+import io.github.brunovinicioslg.ladeira.road.Poi
+import io.github.brunovinicioslg.ladeira.road.PoiType
+import io.github.brunovinicioslg.ladeira.road.UserPoint
+import java.io.IOException
+import java.util.UUID
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
@@ -91,6 +97,11 @@ class NavigationService : Service() {
             stopNavigation()
             return START_NOT_STICKY
         }
+        if (intent?.action == ACTION_MARK) {
+            // Only while driving: an old notification button must not start the navigation.
+            if (active) markHere() else if (!started) stopSelf()
+            return START_NOT_STICKY
+        }
         if (!started) {
             started = true
             if (startInForeground()) begin() else stopNavigation()
@@ -132,6 +143,12 @@ class NavigationService : Service() {
             appContainer.settingsRepository.settings.collect { s ->
                 settings = s
                 onEngine { engine.profile = s.vehicle }
+            }
+        }
+        scope.launch {
+            appContainer.userPoints.points.collect { points ->
+                val pois = points.map { it.poi }
+                onEngine { engine.userPois = pois }
             }
         }
         // A region imported or removed while driving: load the roads again.
@@ -192,6 +209,43 @@ class NavigationService : Service() {
             val sentences = update.alerts.map(phrases::speech)
             sentences.forEach { Log.i(TAG, "Alert: $it") }
             mainHandler.post { sentences.forEach { speech?.speak(it) } }
+        }
+    }
+
+    /**
+     * Marks where the vehicle is, in its direction of travel, with one tap: the type is chosen
+     * later, with the car stopped. Confirmed by voice, so the driver keeps the eyes on the road.
+     */
+    private fun markHere() {
+        val status = session.status.value
+        val position = status.drive?.position
+        if (position == null) {
+            say(getString(R.string.mark_no_position))
+            return
+        }
+        val point = UserPoint(
+            id = UUID.randomUUID().toString(),
+            poi = Poi(PoiType.OTHER, position, directionDegrees = status.bearing),
+            createdAtMillis = System.currentTimeMillis(),
+            needsType = true,
+        )
+        onEngine { engine.markKnown(point.poi, SystemClock.elapsedRealtime()) }
+        appContainer.applicationScope.launch(Dispatchers.IO) {
+            try {
+                appContainer.userPoints.add(point)
+            } catch (e: IOException) {
+                Log.e(TAG, "Cannot save the mark", e)
+            }
+        }
+        say(getString(R.string.mark_done))
+    }
+
+    /** Spoken when voice alerts are on, shown otherwise. */
+    private fun say(text: String) {
+        if (settings.voiceEnabled && speech != null) {
+            speech?.speak(text)
+        } else {
+            Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -272,6 +326,7 @@ class NavigationService : Service() {
 
     companion object {
         const val ACTION_STOP = "io.github.brunovinicioslg.ladeira.action.STOP_NAVIGATION"
+        const val ACTION_MARK = "io.github.brunovinicioslg.ladeira.action.MARK_HERE"
         private const val TAG = "NavigationService"
         private const val UPDATE_INTERVAL_MS = 1_000L
         private const val DEFAULT_ACCURACY_M = 20.0
@@ -289,6 +344,10 @@ class NavigationService : Service() {
 
         fun stop(context: Context) {
             context.stopService(Intent(context, NavigationService::class.java))
+        }
+
+        fun markHere(context: Context) {
+            context.startService(Intent(context, NavigationService::class.java).setAction(ACTION_MARK))
         }
     }
 }

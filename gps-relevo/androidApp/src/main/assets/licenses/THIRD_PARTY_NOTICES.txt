@@ -22,7 +22,7 @@ SOFTWARE
 - Protomaps basemap styles (BSD 3-Clause License; visual design CC0; icons
   derived from Mapzen/Tangrams icons, MIT License), https://github.com/protomaps/basemaps
 - Noto Sans fonts (SIL Open Font License 1.1), https://github.com/notofonts
-- Kotlin, kotlinx.coroutines, AndroidX and Jetpack Compose (Apache License 2.0)
+- Kotlin, kotlinx.coroutines, kotlinx.serialization, AndroidX and Jetpack Compose (Apache License 2.0)
 - Material Design icons (Apache License 2.0)
 
 

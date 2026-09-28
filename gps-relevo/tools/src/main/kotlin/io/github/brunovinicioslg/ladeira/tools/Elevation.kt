@@ -7,6 +7,8 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import javax.imageio.ImageIO
 import kotlin.math.PI
 import kotlin.math.floor
@@ -70,6 +72,28 @@ class TerrariumElevation(
         val pixels = image.getRGB(0, 0, TILE_SIZE, TILE_SIZE, null, 0, TILE_SIZE)
         tiles[key] = pixels
         return pixels
+    }
+
+    /**
+     * Downloads the tiles not on disk yet, several at a time (a state needs thousands; one by one,
+     * while building, would take hours).
+     */
+    fun prefetch(tiles: Collection<Pair<Int, Int>>, threads: Int = 8, progress: (done: Int, total: Int) -> Unit = { _, _ -> }) {
+        val missing = tiles.filter { (x, y) -> !File(cacheDir, "$zoom/$x/$y.png").exists() }
+        if (missing.isEmpty()) return
+        val pool = Executors.newFixedThreadPool(threads)
+        val done = AtomicInteger()
+        try {
+            missing.map { (x, y) ->
+                pool.submit {
+                    download("$baseUrl/$zoom/$x/$y.png", File(cacheDir, "$zoom/$x/$y.png"))
+                    val n = done.incrementAndGet()
+                    synchronized(this) { progress(n, missing.size) }
+                }
+            }.forEach { it.get() }
+        } finally {
+            pool.shutdownNow()
+        }
     }
 
     private fun download(url: String, target: File) {

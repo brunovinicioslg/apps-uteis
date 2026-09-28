@@ -33,11 +33,18 @@ object NavigationNotifications {
             Intent(context, NavigationService::class.java).setAction(NavigationService.ACTION_STOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+        // Marking from the notification works with another app in front or the screen locked.
+        val mark = PendingIntent.getService(
+            context, 2,
+            Intent(context, NavigationService::class.java).setAction(NavigationService.ACTION_MARK),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.nav_notification_title))
             .setContentText(text ?: context.getString(R.string.status_waiting_gps))
             .setContentIntent(open)
+            .addAction(0, context.getString(R.string.action_mark), mark)
             .addAction(0, context.getString(R.string.action_stop), stop)
             .setOngoing(true)
             .setOnlyAlertOnce(true)

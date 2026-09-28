@@ -30,9 +30,11 @@ class DrivePanelTest {
 
     private var started = 0
     private var mapsOpened = 0
+    private var marked = 0
+    private var pointsOpened = 0
     private var vehicle: VehicleProfile? = null
 
-    private fun show(status: NavigationStatus, hasRegions: Boolean = true, problem: PermissionProblem? = null) {
+    private fun show(status: NavigationStatus, hasRegions: Boolean = true, problem: PermissionProblem? = null, pendingMarks: Int = 0) {
         compose.setContent {
             LadeiraTheme {
                 DriveScreen(
@@ -49,6 +51,9 @@ class DrivePanelTest {
                     onOpenGpsSettings = {},
                     onOpenAppSettings = {},
                     map = { _, _ -> },
+                    onMark = { marked++ },
+                    pendingMarks = pendingMarks,
+                    onOpenPoints = { pointsOpened++ },
                 )
             }
         }
@@ -97,6 +102,20 @@ class DrivePanelTest {
         compose.onNodeWithText("Plano").assertIsDisplayed()
         compose.onNodeWithText("Descida longa em 1,2 km · 3,2 km a 6%").assertIsDisplayed()
         compose.onNodeWithText("Radar em 2,7 km · limite 80 km/h").assertIsDisplayed()
+    }
+
+    @Test
+    fun markingWhileDrivingIsOneTap() {
+        show(NavigationStatus(running = true, drive = DriveState(DriveState.Status.WAITING_FOR_GPS)))
+        compose.onNodeWithText("Marcar aqui").performClick()
+        assertEquals(1, marked)
+    }
+
+    @Test
+    fun marksWithoutATypeAreRecalledWhenStopped() {
+        show(NavigationStatus(), pendingMarks = 2)
+        compose.onNodeWithText("2 pontos marcados sem tipo: escolher agora").performClick()
+        assertEquals(1, pointsOpened)
     }
 
     @Test

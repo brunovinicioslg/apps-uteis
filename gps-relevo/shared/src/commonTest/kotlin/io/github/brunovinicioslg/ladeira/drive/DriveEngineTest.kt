@@ -80,6 +80,39 @@ class DriveEngineTest {
     }
 
     @Test
+    fun userMarksAreAnnouncedAndReplaceTheMapsPointOnlyInTheirDirection() {
+        val net = serra()
+        val engine = DriveEngine({ _, _ -> net }, VehicleProfile.CAR)
+        engine.userPois = listOf(
+            // A pothole marked driving north, and one marked on the way back south.
+            Poi(PoiType.POTHOLE, Geo.destination(BH, 0.0, 6_000.0), directionDegrees = 0.0),
+            Poi(PoiType.POTHOLE, Geo.destination(BH, 0.0, 6_500.0), directionDegrees = 180.0),
+            // The camera the map has, marked again with its new limit.
+            Poi(PoiType.SPEED_CAMERA, Geo.destination(BH, 0.0, 7_010.0), directionDegrees = 0.0, speedLimitKmh = 60),
+            // Far away: ignored.
+            Poi(PoiType.POTHOLE, Geo.destination(BH, 90.0, 50_000.0)),
+        )
+        val alerts = drive(engine, from = 5_000.0, to = 8_000.0).flatMap { it.alerts }.filterIsInstance<Alert.PoiAhead>()
+        assertEquals(listOf(PoiType.POTHOLE, PoiType.SPEED_CAMERA), alerts.map { it.poi.type })
+        assertEquals(60, alerts.last().poi.speedLimitKmh, "the user's limit, announced once")
+    }
+
+    @Test
+    fun aPointJustMarkedWhereTheVehicleStandsIsNotAnnounced() {
+        val net = serra()
+        val engine = DriveEngine({ _, _ -> net }, VehicleProfile.CAR)
+        drive(engine, from = 1_000.0, to = 1_000.0)
+        val mark = Poi(PoiType.OTHER, Geo.destination(BH, 0.0, 1_000.0), directionDegrees = 0.0)
+        engine.userPois = listOf(mark)
+        engine.markKnown(mark, nowMillis = 0)
+        // Standing still on the mark for a while: silence.
+        val stopped = (1..5).flatMap { t ->
+            engine.update(GpsFix(Geo.destination(BH, 0.0, 1_000.0), 5.0, 0.0, 0.0, timeMillis = t * 1_000L)).alerts
+        }
+        assertTrue(stopped.isEmpty(), "$stopped")
+    }
+
+    @Test
     fun statusOutsideDataAndOffRoad() {
         val net = serra()
         val covered = DriveEngine({ center, _ -> if (Geo.distance(center, BH) < 50_000) net else null }, VehicleProfile.CAR)

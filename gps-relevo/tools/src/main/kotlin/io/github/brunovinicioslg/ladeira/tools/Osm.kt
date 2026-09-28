@@ -130,6 +130,43 @@ object Osm {
     }
 }
 
+data class Bbox(val south: Double, val west: Double, val north: Double, val east: Double) {
+    operator fun contains(p: LatLon) = p.lat in south..north && p.lon in west..east
+}
+
+/** The roads with at least one node inside [bbox] (kept whole), and the points inside it. */
+fun OsmData.within(bbox: Bbox): OsmData = OsmData(
+    nodes,
+    ways.filter { w -> w.nodes.any { id -> nodes[id]?.let { it in bbox } == true } },
+    poiNodes.filter { (p, _) -> p in bbox },
+)
+
+/** Web Mercator tile holding [p] at [zoom], as (x, y). */
+fun tileOf(p: LatLon, zoom: Int): Pair<Int, Int> {
+    val (px, py) = TerrariumElevation.pixel(p.lat, p.lon, zoom)
+    return (px / TerrariumElevation.TILE_SIZE).toInt() to (py / TerrariumElevation.TILE_SIZE).toInt()
+}
+
+/**
+ * Roads ordered by the elevation tile of their first node, row by row: neighboring roads are then
+ * built one after the other and reuse the tiles in memory (a state has thousands of tiles).
+ */
+fun OsmData.spatiallySorted(zoom: Int): OsmData {
+    val key = HashMap<Long, Long>(ways.size * 2)
+    for (w in ways) {
+        val (x, y) = nodes[w.nodes.first()]?.let { tileOf(it, zoom) } ?: (0 to 0)
+        key[w.id] = (y.toLong() shl 32) or x.toLong()
+    }
+    return copy(ways = ways.sortedBy { key[it.id] })
+}
+
+/** Every elevation tile a road node falls in. */
+fun OsmData.roadTiles(zoom: Int): Set<Pair<Int, Int>> {
+    val tiles = HashSet<Pair<Int, Int>>()
+    for (w in ways) for (id in w.nodes) nodes[id]?.let { tiles += tileOf(it, zoom) }
+    return tiles
+}
+
 /** Merges tile downloads: ways crossing tile borders arrive in several tiles and are kept once. */
 fun List<OsmData>.merged(): OsmData {
     val nodes = HashMap<Long, LatLon>()

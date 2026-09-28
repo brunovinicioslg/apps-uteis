@@ -8,6 +8,37 @@
     <string name="action_start">Start</string>
     <string name="action_stop">Stop</string>
     <string name="action_maps">Maps and settings</string>
+    <string name="action_mark">Mark here</string>
+    <string name="mark_done">Point marked.</string>
+    <string name="mark_no_position">No GPS position to mark.</string>
+    <plurals name="points_pending">
+        <item quantity="one">%1$d point marked without a type: choose now</item>
+        <item quantity="other">%1$d points marked without a type: choose now</item>
+    </plurals>
+    <string name="points_title">My points</string>
+    <string name="points_summary">Cameras, potholes and other points you marked. Export the list to keep or share it.</string>
+    <string name="points_open">My points (%1$d)</string>
+    <string name="points_empty">No points marked. While driving, tap Mark here (on the screen or in the notification) when you pass a camera, pothole or speed bump. You choose the type later, with the car stopped.</string>
+    <string name="points_import">Import</string>
+    <string name="points_export">Export</string>
+    <string name="points_needs_type">Choose the type</string>
+    <string name="points_edit">Edit point</string>
+    <string name="points_marked_at">Marked on %1$s</string>
+    <string name="points_one_direction">Only in the direction it was marked</string>
+    <string name="points_one_direction_short">One direction</string>
+    <string name="points_both_directions">Both directions</string>
+    <string name="points_limit_label">Limit (km/h)</string>
+    <string name="points_note_label">Note</string>
+    <string name="points_save">Save</string>
+    <string name="points_delete_confirm">Delete this point?</string>
+    <plurals name="points_imported">
+        <item quantity="one">%1$d new point imported.</item>
+        <item quantity="other">%1$d new points imported.</item>
+    </plurals>
+    <string name="points_import_nothing">No new points in the file.</string>
+    <string name="points_import_failed">The file is not a list of points (GeoJSON).</string>
+    <string name="points_exported">List saved.</string>
+    <string name="points_export_failed">Could not save the file.</string>
     <string name="action_recenter">Recenter</string>
     <string name="action_gps_settings">Turn on GPS</string>
     <string name="action_open_settings">Open settings</string>

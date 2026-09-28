@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import io.github.brunovinicioslg.ladeira.app.drive.DriveSession
+import io.github.brunovinicioslg.ladeira.app.points.UserPointStore
 import io.github.brunovinicioslg.ladeira.app.region.RegionImporter
 import io.github.brunovinicioslg.ladeira.app.region.RegionStore
 import io.github.brunovinicioslg.ladeira.app.settings.SettingsRepository
@@ -33,9 +34,11 @@ class AppContainer(context: Context) {
     val regionStore = RegionStore(File(context.filesDir, "regions"))
     val regionImporter = RegionImporter(regionStore, applicationScope)
     val driveSession = DriveSession()
+    val userPoints = UserPointStore(File(context.filesDir, "points.geojson"))
 
     init {
         applicationScope.launch(Dispatchers.IO) { regionStore.refresh() }
+        applicationScope.launch(Dispatchers.IO) { userPoints.load() }
     }
 }
 

@@ -2,6 +2,7 @@ package io.github.brunovinicioslg.ladeira.app.drive
 
 import android.Manifest
 import android.app.Application
+import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
@@ -13,6 +14,9 @@ import io.github.brunovinicioslg.ladeira.app.appContainer
 import io.github.brunovinicioslg.ladeira.drive.DriveState
 import io.github.brunovinicioslg.ladeira.geo.Geo
 import io.github.brunovinicioslg.ladeira.geo.LatLon
+import io.github.brunovinicioslg.ladeira.road.Poi
+import io.github.brunovinicioslg.ladeira.road.PoiType
+import io.github.brunovinicioslg.ladeira.road.UserPoint
 import java.util.Locale
 import org.junit.After
 import org.junit.Before
@@ -109,6 +113,64 @@ class NavigationServiceTest {
         assertThat(said.filter { it.startsWith("Descida longa em") }).hasSize(1)
         assertThat(said.single { it.startsWith("Descida longa") }).endsWith("Use o freio motor.")
         assertThat(said.filter { it.startsWith("Radar em") }).containsExactly("Radar em 300 metros. Limite de 80.")
+    }
+
+    private fun awaitPoints(): List<UserPoint> {
+        val deadline = System.currentTimeMillis() + 5_000
+        while (System.currentTimeMillis() < deadline) {
+            idle()
+            val points = container.userPoints.points.value
+            if (points.isNotEmpty()) return points
+            Thread.sleep(1)
+        }
+        throw AssertionError("No point was saved")
+    }
+
+    @Test
+    fun markingHereSaysSoAndSavesAPointToClassifyLater() {
+        startService()
+        var d = 900.0
+        while (d <= 1_000.0) {
+            fix(TestData.along(d))
+            d += 20.0
+        }
+        controller!!.get().onStartCommand(Intent(app, NavigationService::class.java).setAction(NavigationService.ACTION_MARK), 0, 2)
+        idle()
+        assertThat(spoken()).contains("Ponto marcado.")
+        val point = awaitPoints().single()
+        assertThat(point.needsType).isTrue()
+        assertThat(point.poi.type).isEqualTo(PoiType.OTHER)
+        assertThat(point.poi.directionDegrees!!).isWithin(2.0).of(0.0)
+        assertThat(Geo.distance(point.poi.position, TestData.along(1_000.0))).isLessThan(30.0)
+
+        // Stopped on the mark: it is not announced right after "marked".
+        repeat(5) { fix(TestData.along(1_000.0), speedMps = 0f) }
+        idle()
+        assertThat(spoken().filter { it.startsWith("Alerta") }).isEmpty()
+    }
+
+    @Test
+    fun markingWithoutNavigationDoesNothing() {
+        val mark = Intent(app, NavigationService::class.java).setAction(NavigationService.ACTION_MARK)
+        val c = Robolectric.buildService(NavigationService::class.java, mark).create().startCommand(0, 1)
+        controller = c
+        idle()
+        assertThat(shadowOf(c.get()).isStoppedBySelf).isTrue()
+        assertThat(container.driveSession.status.value.running).isFalse()
+        assertThat(container.userPoints.points.value).isEmpty()
+    }
+
+    @Test
+    fun theUsersPointsAreAnnounced() {
+        container.userPoints.add(UserPoint("p1", Poi(PoiType.POTHOLE, TestData.along(2_600.0), directionDegrees = 0.0), createdAtMillis = 1))
+        startService()
+        var d = 2_000.0
+        while (d <= 2_700.0) {
+            fix(TestData.along(d))
+            d += 20.0
+        }
+        idle()
+        assertThat(spoken().filter { it.startsWith("Buraco") }).containsExactly("Buraco em 300 metros.")
     }
 
     @Test

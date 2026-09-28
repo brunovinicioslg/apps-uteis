@@ -8,6 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -27,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.brunovinicioslg.ladeira.app.AppContainer
+import io.github.brunovinicioslg.ladeira.app.R
 import io.github.brunovinicioslg.ladeira.app.appContainer
 import io.github.brunovinicioslg.ladeira.app.drive.NavigationService
 import io.github.brunovinicioslg.ladeira.app.settings.AppSettings
@@ -35,8 +39,9 @@ import io.github.brunovinicioslg.ladeira.app.ui.map.MapPosition
 import io.github.brunovinicioslg.ladeira.app.ui.theme.LadeiraTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-enum class Screen { DRIVE, MAPS, LICENSES }
+enum class Screen { DRIVE, MAPS, LICENSES, POINTS }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,12 +62,30 @@ private fun LadeiraRoot() {
     val settings by remember { container.settingsRepository.settings }.collectAsStateWithLifecycle(initialValue = null)
     val scope = rememberCoroutineScope()
     var screen by rememberSaveable { mutableStateOf(Screen.DRIVE) }
-    BackHandler(enabled = screen != Screen.DRIVE) { screen = if (screen == Screen.LICENSES) Screen.MAPS else Screen.DRIVE }
+    // "My points" opens from the driving screen and from Maps: back returns where it came from.
+    var pointsFrom by rememberSaveable { mutableStateOf(Screen.DRIVE) }
+    val openPoints: (Screen) -> Unit = { from ->
+        pointsFrom = from
+        screen = Screen.POINTS
+    }
+    BackHandler(enabled = screen != Screen.DRIVE) {
+        screen = when (screen) {
+            Screen.LICENSES -> Screen.MAPS
+            Screen.POINTS -> pointsFrom
+            else -> Screen.DRIVE
+        }
+    }
+    val points by container.userPoints.points.collectAsStateWithLifecycle()
 
     val current = settings ?: return
     val update: ((AppSettings) -> AppSettings) -> Unit = { transform -> scope.launch { container.settingsRepository.update(transform) } }
     when (screen) {
-        Screen.DRIVE -> DriveRoute(container, current, update, onOpenMaps = { screen = Screen.MAPS })
+        Screen.DRIVE -> DriveRoute(
+            container, current, update,
+            onOpenMaps = { screen = Screen.MAPS },
+            pendingMarks = points.count { it.needsType },
+            onOpenPoints = { openPoints(Screen.DRIVE) },
+        )
         Screen.MAPS -> {
             val regions by container.regionStore.regions.collectAsStateWithLifecycle()
             val importState by container.regionImporter.state.collectAsStateWithLifecycle()
@@ -82,9 +105,78 @@ private fun LadeiraRoot() {
                 onVoiceChange = { enabled -> update { it.copy(voiceEnabled = enabled) } },
                 onOpenLicenses = { screen = Screen.LICENSES },
                 onBack = { screen = Screen.DRIVE },
+                pointsCount = points.size,
+                onOpenPoints = { openPoints(Screen.MAPS) },
             )
         }
         Screen.LICENSES -> LicensesScreen(onBack = { screen = Screen.MAPS })
+        Screen.POINTS -> PointsRoute(container, onBack = { screen = pointsFrom })
+    }
+}
+
+@Composable
+private fun PointsRoute(container: AppContainer, onBack: () -> Unit) {
+    val context = LocalContext.current
+    val points by container.userPoints.points.collectAsStateWithLifecycle()
+    var message by remember { mutableStateOf<PointsMessage?>(null) }
+    val store = container.userPoints
+    val exporter = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/geo+json")) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        container.applicationScope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                try {
+                    context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(store.export().toByteArray()) } != null
+                } catch (e: IOException) {
+                    false
+                }
+            }
+            message = if (ok) PointsMessage.Exported else PointsMessage.ExportFailed
+        }
+    }
+    val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        container.applicationScope.launch {
+            message = withContext(Dispatchers.IO) {
+                try {
+                    // A list of points is small; a huge file is not one.
+                    val text = context.contentResolver.openInputStream(uri)?.use { it.readAtMost(MAX_POINTS_FILE_BYTES) }?.decodeToString()
+                    when (val added = text?.let(store::import)) {
+                        null -> PointsMessage.ImportFailed
+                        0 -> PointsMessage.ImportedNothing
+                        else -> PointsMessage.Imported(added)
+                    }
+                } catch (e: IllegalArgumentException) {
+                    PointsMessage.ImportFailed
+                } catch (e: IOException) {
+                    PointsMessage.ImportFailed
+                }
+            }
+        }
+    }
+    PointsScreen(
+        points = points,
+        message = message,
+        onSave = { point -> container.applicationScope.launch(Dispatchers.IO) { store.update(point) } },
+        onDelete = { id -> container.applicationScope.launch(Dispatchers.IO) { store.delete(id) } },
+        // GeoJSON has no MIME type every file manager knows: any file can be picked; the store checks it.
+        onImport = { importer.launch(arrayOf("*/*")) },
+        onExport = { exporter.launch("ladeira-pontos.geojson") },
+        onMessageShown = { message = null },
+        onBack = onBack,
+    )
+}
+
+private const val MAX_POINTS_FILE_BYTES = 5_000_000
+
+/** The whole stream, or null when it is longer than [limit] bytes. */
+private fun InputStream.readAtMost(limit: Int): ByteArray? {
+    val out = ByteArrayOutputStream()
+    val buffer = ByteArray(8_192)
+    while (true) {
+        val n = read(buffer)
+        if (n < 0) return out.toByteArray()
+        if (out.size() + n > limit) return null
+        out.write(buffer, 0, n)
     }
 }
 
@@ -94,6 +186,8 @@ private fun DriveRoute(
     settings: AppSettings,
     update: ((AppSettings) -> AppSettings) -> Unit,
     onOpenMaps: () -> Unit,
+    pendingMarks: Int,
+    onOpenPoints: () -> Unit,
 ) {
     val context = LocalContext.current
     val status by container.driveSession.status.collectAsStateWithLifecycle()
@@ -142,6 +236,9 @@ private fun DriveRoute(
         onVehicleChange = { vehicle -> update { it.copy(vehicle = vehicle) } },
         onOpenMaps = onOpenMaps,
         onRecenter = { following = true },
+        onMark = { NavigationService.markHere(context) },
+        pendingMarks = pendingMarks,
+        onOpenPoints = onOpenPoints,
         onOpenGpsSettings = { context.openSettings(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) },
         onOpenAppSettings = {
             context.openSettings(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))

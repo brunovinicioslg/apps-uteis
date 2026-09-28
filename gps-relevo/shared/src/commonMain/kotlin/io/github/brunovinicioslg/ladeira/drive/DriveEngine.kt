@@ -14,6 +14,7 @@ import io.github.brunovinicioslg.ladeira.profile.SlopeKind
 import io.github.brunovinicioslg.ladeira.profile.VehicleProfile
 import io.github.brunovinicioslg.ladeira.road.Poi
 import io.github.brunovinicioslg.ladeira.road.RoadNetwork
+import io.github.brunovinicioslg.ladeira.road.UserPoints
 
 /** Where road data comes from (a downloaded region package on the phone). */
 fun interface RoadSource {
@@ -83,6 +84,12 @@ class DriveEngine(private val source: RoadSource, profile: VehicleProfile, priva
             alerts.setProfile(value)
         }
 
+    /** Points the user marked, all of them; those near the vehicle join the region's points. */
+    var userPois: List<Poi> = emptyList()
+
+    /** A point just marked where the vehicle is: not to be announced right after "marked". */
+    fun markKnown(poi: Poi, nowMillis: Long) = alerts.markKnown(poi, nowMillis)
+
     /** Forgets the loaded roads, e.g. after a region was added or removed; the next fix reloads them. */
     fun invalidate() {
         network = null
@@ -103,7 +110,8 @@ class DriveEngine(private val source: RoadSource, profile: VehicleProfile, priva
             ?: return DriveUpdate(DriveState(DriveState.Status.OFF_ROAD, fix.position, speedKmh), emptyList())
 
         val path = Lookahead.follow(net, match.position, config.lookaheadM)
-        val road = alerts.analyze(path, net.pois)
+        val pois = UserPoints.merge(net.pois, UserPoints.near(userPois, fix.position, config.lookaheadM + USER_POI_MARGIN_M))
+        val road = alerts.analyze(path, pois)
         val newAlerts = alerts.evaluate(path, road, fix.speedMps ?: 0.0, fix.timeMillis)
         val edge = match.position.edge
         val profilePoints = SlopeDetector.smooth(SlopeDetector.resample(path.profile()))
@@ -148,5 +156,6 @@ class DriveEngine(private val source: RoadSource, profile: VehicleProfile, priva
 
     private companion object {
         const val GRADE_WINDOW_M = 100.0
+        const val USER_POI_MARGIN_M = 1_000.0
     }
 }

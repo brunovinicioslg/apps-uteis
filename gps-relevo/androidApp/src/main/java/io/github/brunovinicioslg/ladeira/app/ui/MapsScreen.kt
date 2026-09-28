@@ -57,6 +57,8 @@ fun MapsScreen(
     onVoiceChange: (Boolean) -> Unit,
     onOpenLicenses: () -> Unit,
     onBack: () -> Unit,
+    pointsCount: Int = 0,
+    onOpenPoints: () -> Unit = {},
 ) {
     var deleting by rememberSaveable { mutableStateOf<String?>(null) }
     Scaffold(
@@ -93,6 +95,15 @@ fun MapsScreen(
                     }
                     Text(stringResource(R.string.maps_import_help), style = MaterialTheme.typography.bodySmall)
                     ImportResults(importState, onDismissResults)
+                }
+            }
+            item { HorizontalDivider() }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.points_summary), style = MaterialTheme.typography.bodyMedium)
+                    OutlinedButton(onClick = onOpenPoints, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.points_open, pointsCount))
+                    }
                 }
             }
             item { HorizontalDivider() }

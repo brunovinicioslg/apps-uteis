@@ -77,11 +77,17 @@ class AlertEngine(private var profile: VehicleProfile) {
         val poiLead = min(MAX_POI_LEAD_M, max(MIN_POI_LEAD_M, speedMps * POI_LEAD_SECONDS))
         for ((poi, distance) in road.pois) {
             if (distance > poiLead) continue
-            val key = "poi:${poi.type}:${(poi.position.lat * 1e5).toLong()}:${(poi.position.lon * 1e5).toLong()}"
-            if (markAnnounced(key, nowMillis)) result += Alert.PoiAhead(poi, distance)
+            if (markAnnounced(poiKey(poi), nowMillis)) result += Alert.PoiAhead(poi, distance)
         }
         return result
     }
+
+    /** Treats [poi] as already announced: a point the user just marked where the vehicle is. */
+    fun markKnown(poi: Poi, nowMillis: Long) {
+        markAnnounced(poiKey(poi), nowMillis)
+    }
+
+    private fun poiKey(poi: Poi) = "poi:${poi.type}:${(poi.position.lat * 1e5).toLong()}:${(poi.position.lon * 1e5).toLong()}"
 
     private fun markAnnounced(key: String, now: Long): Boolean {
         if (key in announced) return false

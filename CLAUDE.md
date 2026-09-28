@@ -39,7 +39,9 @@ Dentro da pasta do app (ex.: `lanterna/`):
 ```
 
 Pacote de dados do Ladeira (em `gps-relevo/`, depois de `.\gradlew.bat :tools:installDist`):
-`tools/build/install/tools/bin/tools build --bbox sul,oeste,norte,leste --out build/data/regiao.ldrp` e
+`tools/build/install/tools/bin/tools build --bbox sul,oeste,norte,leste --out build/data/regiao.ldrp` (área pequena, pelo Overpass) ou
+`... build --pbf minas-gerais.osm.pbf --out build/data/minas-gerais.ldrp [--bbox ...]` (estado inteiro, com `JAVA_OPTS=-Xmx16g`;
+o arquivo do estado vem de `download.openstreetmap.fr/extracts/south-america/brazil/southeast/`), `... info --package x.ldrp` e
 `... profile --package build/data/regiao.ldrp --at lat,lon --heading graus --vehicle CAR|TRUCK` para ver o que o app avisaria.
 `... track --package ... --at lat,lon --heading graus --out trajeto.csv` gera um trajeto simulado (uma posição por segundo) e
 `... drive --package ... --track trajeto.csv --vehicle TRUCK` mostra o que o app falaria ao longo dele.
@@ -47,7 +49,8 @@ Pacote de dados do Ladeira (em `gps-relevo/`, depois de `.\gradlew.bat :tools:in
 Ladeira no emulador (quase sem espaço): `.\gradlew.bat :androidApp:assembleDebug -Pabi=x86_64` gera um APK de 28 MB em vez de 64 MB.
 As regiões ficam em `files/regions/<nome>/{roads.ldrp,map.pmtiles}` (copiar com `adb push` para `/data/local/tmp` e `run-as`).
 GPS simulado: `adb emu geo fix <lon> <lat> <altitude> 8 <nós>` (o emulador informa a velocidade, mas a direção sempre 0°).
-Mapa: `pmtiles extract https://build.protomaps.com/AAAAMMDD.pmtiles regiao.pmtiles --bbox=oeste,sul,leste,norte --maxzoom=15`.
+Mapa: `pmtiles extract https://build.protomaps.com/AAAAMMDD.pmtiles regiao.pmtiles --bbox=oeste,sul,leste,norte --maxzoom=15`
+(para um estado, `--region=estado.geojson` com o contorno; MG até o zoom 15 = 585 MB, zoom 14 = 325 MB).
 
 Emulador sem janela (Git Bash): `ANDROID_AVD_HOME="$USERPROFILE/.android/avd" emulator -avd Medium_Phone_API_36.1 -no-window -no-audio -no-boot-anim`.
 No Git Bash, caminhos do aparelho com `adb` precisam de `MSYS_NO_PATHCONV=1` (senão `/sdcard` vira caminho do Windows).

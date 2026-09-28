@@ -11,6 +11,14 @@
     <string name="action_stop">Parar</string>
     <string name="action_maps">Mapas e ajustes</string>
     <string name="action_recenter">Centralizar</string>
+    <string name="action_mark">Marcar aqui</string>
+    <string name="mark_done">Ponto marcado.</string>
+    <string name="mark_no_position">Sem posição do GPS para marcar.</string>
+    <plurals name="points_pending">
+        <item quantity="one">%1$d ponto marcado sem tipo: escolher agora</item>
+        <item quantity="many">%1$d pontos marcados sem tipo: escolher agora</item>
+        <item quantity="other">%1$d pontos marcados sem tipo: escolher agora</item>
+    </plurals>
     <string name="action_gps_settings">Ligar GPS</string>
     <string name="action_open_settings">Abrir configurações</string>
     <string name="status_ready">Pronto para dirigir</string>
@@ -67,6 +75,33 @@
     <string name="nav_channel_name">Navegação</string>
     <string name="nav_channel_description">Mostra que o Ladeira está usando o GPS enquanto você dirige.</string>
     <string name="nav_notification_title">Ladeira ativo</string>
+
+    <!-- The user's points -->
+    <string name="points_title">Meus pontos</string>
+    <string name="points_summary">Radares, buracos e outros pontos que você marcou. Exporte a lista para guardar ou compartilhar.</string>
+    <string name="points_open">Meus pontos (%1$d)</string>
+    <string name="points_empty">Nenhum ponto marcado. Durante a viagem, toque em Marcar aqui (na tela ou na notificação) ao passar por um radar, buraco ou lombada. O tipo você escolhe depois, com o carro parado.</string>
+    <string name="points_import">Importar</string>
+    <string name="points_export">Exportar</string>
+    <string name="points_needs_type">Escolha o tipo</string>
+    <string name="points_edit">Editar ponto</string>
+    <string name="points_marked_at">Marcado em %1$s</string>
+    <string name="points_one_direction">Só no sentido em que foi marcado</string>
+    <string name="points_one_direction_short">Um sentido</string>
+    <string name="points_both_directions">Dois sentidos</string>
+    <string name="points_limit_label">Limite (km/h)</string>
+    <string name="points_note_label">Observação</string>
+    <string name="points_save">Salvar</string>
+    <string name="points_delete_confirm">Apagar este ponto?</string>
+    <plurals name="points_imported">
+        <item quantity="one">%1$d ponto novo importado.</item>
+        <item quantity="many">%1$d pontos novos importados.</item>
+        <item quantity="other">%1$d pontos novos importados.</item>
+    </plurals>
+    <string name="points_import_nothing">Nenhum ponto novo no arquivo.</string>
+    <string name="points_import_failed">O arquivo não é uma lista de pontos (GeoJSON).</string>
+    <string name="points_exported">Lista salva.</string>
+    <string name="points_export_failed">Não foi possível salvar o arquivo.</string>
 
     <!-- Maps and settings -->
     <string name="maps_title">Mapas e ajustes</string>

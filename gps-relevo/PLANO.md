@@ -8,7 +8,13 @@ GPS que funciona **sem internet** e mostra a **inclinação das vias**, avisando
 
 ## Status (28/09/2026)
 
-**Primeira versão do app funcionando no emulador** (102 testes automáticos: 57 do núcleo, 7 da ferramenta, 38 do app).
+**Primeira versão do app funcionando no emulador** (122 testes automáticos: 63 do núcleo, 10 da ferramenta, 49 do app).
+
+**Minas Gerais inteira** gerada a partir do arquivo do OpenStreetMap:
+- vias com relevo: 510 mil km, 2,2 milhões de trechos, 7.689 radares e lombadas, **137 MB**, em 4 minutos;
+- mapa até o zoom 15, recortado pelo contorno do estado: **585 MB**;
+- a BR-040 dá exatamente os mesmos avisos que no pacote feito pelo Overpass;
+- abrir o pacote leva 63 ms e conferir o arquivo inteiro 1,3 s no computador (o app confere ao importar, lendo por partes).
 
 **App Android** (`androidApp/`):
 - mapa offline (MapLibre + arquivo PMTiles da região), claro e escuro, em português;
@@ -18,6 +24,7 @@ GPS que funciona **sem internet** e mostra a **inclinação das vias**, avisando
 - avisos por voz em português, uma vez cada, abaixando a música enquanto fala; alertas que chegam antes da voz estar pronta esperam por ela;
 - perfis: carro, caminhão, moto, bicicleta, a pé (sem voz);
 - tela Mapas e ajustes: importar regiões (arquivos `.ldrp` e `.pmtiles`), ver tamanho e problemas, apagar, ligar ou desligar a voz, licenças;
+- **marcar pontos:** botão "Marcar aqui" na tela e na notificação, confirmado por voz; guarda a posição e o sentido, e o tipo (radar com limite, buraco, lombada…) é escolhido depois em "Meus pontos". Os pontos marcados são avisados como os do mapa, só no sentido marcado, e substituem o ponto do mapa no mesmo lugar. Exportar e importar em GeoJSON;
 - idioma do app escolhido à parte nas configurações do Android 13+.
 
 **Teste no emulador** (trajeto simulado de 8 km pela BR-040 sentido BH, a 72 km/h):
@@ -38,11 +45,13 @@ GPS que funciona **sem internet** e mostra a **inclinação das vias**, avisando
 - motor de direção (`DriveEngine`): junta tudo a cada posição do GPS, recarrega as vias conforme o veículo anda e procura de novo a cada 300 m quando está fora das regiões baixadas.
 
 **Ferramenta de dados** (`tools/`):
-- baixa as vias do OpenStreetMap (Overpass, em pedaços pequenos) e o relevo (AWS Terrain Tiles);
+- lê as vias de um estado inteiro do arquivo `.osm.pbf` do OpenStreetMap (em duas passadas, guardando só os nós das vias) ou baixa uma área pequena pelo Overpass;
+- baixa o relevo (AWS Terrain Tiles) em paralelo e processa as vias ordenadas por posição, para reaproveitar os blocos de relevo;
 - monta a malha, com pontes e viadutos interpolados em linha reta;
 - gera o pacote;
 - `track` gera um trajeto simulado pela via, para tocar no GPS do emulador;
-- `drive` passa um trajeto pelo mesmo motor do app e mostra o que ele falaria e quando.
+- `drive` passa um trajeto pelo mesmo motor do app e mostra o que ele falaria e quando;
+- `info` abre e confere um pacote como o app faz e mede o tempo.
 
 Validação com dados reais (sul de BH, 514 km de vias, pacote de 0,2 MB), na BR-040:
 
@@ -54,9 +63,9 @@ Validação com dados reais (sul de BH, 514 km de vias, pacote de 0,2 MB), na BR
 Inclinações máximas entre 5% e 8,8%, plausíveis para uma rodovia de serra.
 
 **Falta:**
-1. Pacote de Minas Gerais inteiro: trocar o Overpass pelo arquivo do OpenStreetMap (Geofabrik) processado localmente; mapa PMTiles de MG.
-2. Baixar regiões dentro do app (hoje é por importação de arquivo); hospedar os pacotes no GitHub Releases.
-3. Marcar radares e buracos pelo app; gravar trajetos com altitude.
+1. Baixar regiões dentro do app (hoje é por importação de arquivo); hospedar os pacotes no GitHub Releases. Os arquivos de MG já existem.
+2. Gravar trajetos com altitude (GPX); marcar como "não existe mais" um radar do mapa.
+3. Os outros estados: o mesmo comando, com o arquivo de cada um.
 4. Testar dirigindo de verdade (S22 e Redmi): GPS real, tela desligada por muito tempo, Bluetooth do carro.
 5. Tamanho: o APK universal tem 51 MB (o MapLibre traz código para 4 tipos de processador); na Play o pacote AAB entrega só o necessário (cerca de 20 MB).
 6. Verificar no Android 16 em aparelho real a regra nova de áudio em segundo plano: o emulador registra que a voz "seria silenciada" quando o app está em segundo plano, mas hoje ainda fala.

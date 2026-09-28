@@ -25,6 +25,7 @@ application {
 dependencies {
     implementation(project(":shared"))
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.osmpbf)
 
     testImplementation(kotlin("test"))
     testImplementation(platform(libs.junit.bom))
