@@ -8,20 +8,41 @@ GPS que funciona **sem internet** e mostra a **inclinação das vias**, avisando
 
 ## Status (28/09/2026)
 
-**Núcleo pronto** (`shared/`, Kotlin Multiplatform, pronto para o iOS), com 46 testes:
+**Primeira versão do app funcionando no emulador** (102 testes automáticos: 57 do núcleo, 7 da ferramenta, 38 do app).
+
+**App Android** (`androidApp/`):
+- mapa offline (MapLibre + arquivo PMTiles da região), claro e escuro, em português;
+- GPS em segundo plano: serviço de localização em primeiro plano, continua com a tela desligada, notificação com botão Parar;
+- reconhece a via, desenha a estrada à frente colorida pela inclinação (verde, amarelo, laranja, vermelho) e gira o mapa no sentido da viagem;
+- painel: velocidade, inclinação atual, altitude, próxima subida ou descida, próximo radar com limite, placa de velocidade da via;
+- avisos por voz em português, uma vez cada, abaixando a música enquanto fala; alertas que chegam antes da voz estar pronta esperam por ela;
+- perfis: carro, caminhão, moto, bicicleta, a pé (sem voz);
+- tela Mapas e ajustes: importar regiões (arquivos `.ldrp` e `.pmtiles`), ver tamanho e problemas, apagar, ligar ou desligar a voz, licenças;
+- idioma do app escolhido à parte nas configurações do Android 13+.
+
+**Teste no emulador** (trajeto simulado de 8 km pela BR-040 sentido BH, a 72 km/h):
+- ficou na pista certa o tempo todo, mesmo com o emulador informando a direção errada (sempre 0°);
+- falou: "Descida longa em 200 metros. 1,7 quilômetros com 6 por cento. Use o freio motor." (caminhão) e "Radar em 300 metros. Limite de 110.";
+- com a tela desligada, continuou falando os radares;
+- o botão Parar da notificação encerra o serviço e desliga o GPS.
+
+**Núcleo** (`shared/`, Kotlin Multiplatform, pronto para o iOS):
 - matemática geográfica;
 - modelo da malha viária;
-- pacote offline compacto por células (o celular lê só a região ao redor), resistente a arquivo corrompido: 2.000 casos de fuzzing;
+- pacote offline compacto por células (o celular lê só a região ao redor), resistente a arquivo corrompido: 2.000 casos de fuzzing, e verificação completa na importação;
 - detecção de subidas e descidas por veículo, com suavização do terreno e junção de trechos interrompidos;
 - previsão da via à frente sem rota (segue a mesma via ou a continuação mais natural e para em cruzamentos em T);
 - map matching (reconhece a via mesmo com uma via marginal a 15 m e ruído de GPS de 8 m, e ignora viadutos que passam por cima);
 - motor de avisos que fala uma única vez, com antecedência proporcional à velocidade;
-- radares no sentido certo.
+- radares no sentido certo;
+- motor de direção (`DriveEngine`): junta tudo a cada posição do GPS, recarrega as vias conforme o veículo anda e procura de novo a cada 300 m quando está fora das regiões baixadas.
 
-**Ferramenta de dados** (`tools/`), com 7 testes:
+**Ferramenta de dados** (`tools/`):
 - baixa as vias do OpenStreetMap (Overpass, em pedaços pequenos) e o relevo (AWS Terrain Tiles);
 - monta a malha, com pontes e viadutos interpolados em linha reta;
-- gera o pacote.
+- gera o pacote;
+- `track` gera um trajeto simulado pela via, para tocar no GPS do emulador;
+- `drive` passa um trajeto pelo mesmo motor do app e mostra o que ele falaria e quando.
 
 Validação com dados reais (sul de BH, 514 km de vias, pacote de 0,2 MB), na BR-040:
 
@@ -33,10 +54,12 @@ Validação com dados reais (sul de BH, 514 km de vias, pacote de 0,2 MB), na BR
 Inclinações máximas entre 5% e 8,8%, plausíveis para uma rodovia de serra.
 
 **Falta:**
-1. Pacote de Minas Gerais inteiro: trocar o Overpass pelo arquivo do OpenStreetMap (Geofabrik) processado localmente.
-2. Mapa vetorial offline (PMTiles).
-3. App Android: mapa, GPS em segundo plano, painel, avisos por voz, marcação de radares e buracos, gravação de trajetos.
-4. Testar dirigindo.
+1. Pacote de Minas Gerais inteiro: trocar o Overpass pelo arquivo do OpenStreetMap (Geofabrik) processado localmente; mapa PMTiles de MG.
+2. Baixar regiões dentro do app (hoje é por importação de arquivo); hospedar os pacotes no GitHub Releases.
+3. Marcar radares e buracos pelo app; gravar trajetos com altitude.
+4. Testar dirigindo de verdade (S22 e Redmi): GPS real, tela desligada por muito tempo, Bluetooth do carro.
+5. Tamanho: o APK universal tem 51 MB (o MapLibre traz código para 4 tipos de processador); na Play o pacote AAB entrega só o necessário (cerca de 20 MB).
+6. Verificar no Android 16 em aparelho real a regra nova de áudio em segundo plano: o emulador registra que a voz "seria silenciada" quando o app está em segundo plano, mas hoje ainda fala.
 
 ## Decisões tomadas
 

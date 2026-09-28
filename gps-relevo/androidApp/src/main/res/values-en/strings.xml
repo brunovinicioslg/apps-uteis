@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+
+    <!-- Driving screen -->
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_maps">Maps and settings</string>
+    <string name="action_recenter">Recenter</string>
+    <string name="action_gps_settings">Turn on GPS</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="status_ready">Ready to drive</string>
+    <string name="status_waiting_gps">Waiting for GPS signal…</string>
+    <string name="status_gps_off">GPS is turned off.</string>
+    <string name="status_no_map_data">No installed map covers this place.</string>
+    <string name="status_off_road">Not on a known road.</string>
+    <string name="no_regions_title">No maps installed</string>
+    <string name="no_regions_text">Import the region files (.ldrp and .pmtiles) in Maps and settings.</string>
+    <string name="permission_location_needed">Ladeira needs your precise location to know which road you are on.</string>
+    <string name="permission_precise_needed">Turn on precise location for Ladeira in the settings.</string>
+    <string name="speed_unit">km/h</string>
+    <string name="speed_limit_description">Speed limit: %1$d km/h</string>
+    <string name="unnamed_road">Unnamed road</string>
+    <string name="grade_flat">Flat</string>
+    <string name="grade_up">Climbing %1$s</string>
+    <string name="grade_down">Descending %1$s</string>
+    <string name="elevation">Elevation %1$s m</string>
+    <string name="next_item">%1$s in %2$s</string>
+    <string name="now_item">%1$s now</string>
+    <string name="slope_detail">%1$s at %2$s</string>
+    <string name="poi_limit">limit %1$d km/h</string>
+
+    <string name="kind_climb">Climb</string>
+    <string name="kind_descent">Descent</string>
+    <string name="kind_long_descent">Long descent</string>
+
+    <string name="poi_speed_camera">Speed camera</string>
+    <string name="poi_red_light_camera">Red light camera</string>
+    <string name="poi_speed_bump">Speed bump</string>
+    <string name="poi_pothole">Pothole</string>
+    <string name="poi_dangerous_curve">Dangerous curve</string>
+    <string name="poi_flooding">Flooding spot</string>
+    <string name="poi_toll">Toll</string>
+    <string name="poi_roadwork">Roadwork</string>
+    <string name="poi_other">Warning</string>
+
+    <string name="vehicle_car">Car</string>
+    <string name="vehicle_truck">Truck</string>
+    <string name="vehicle_motorcycle">Motorcycle</string>
+    <string name="vehicle_bicycle">Bicycle</string>
+    <string name="vehicle_walking">Walking</string>
+
+    <!-- Voice alerts: written to be read aloud -->
+    <string name="speech_ahead">%1$s in %2$s.</string>
+    <string name="speech_slope_detail">%1$s at %2$s percent.</string>
+    <string name="speech_engine_brake">Use engine braking.</string>
+    <string name="speech_limit">Limit %1$d.</string>
+    <string name="speech_meters">%1$s meters</string>
+    <string name="speech_one_km">1 kilometer</string>
+    <string name="speech_km">%1$s kilometers</string>
+
+    <!-- Notification -->
+    <string name="nav_channel_name">Navigation</string>
+    <string name="nav_channel_description">Shows that Ladeira is using GPS while you drive.</string>
+    <string name="nav_notification_title">Ladeira is on</string>
+
+    <!-- Maps and settings -->
+    <string name="maps_title">Maps and settings</string>
+    <string name="maps_regions">Installed regions</string>
+    <string name="maps_none">No regions installed.</string>
+    <string name="maps_import">Import files</string>
+    <string name="maps_importing">Importing…</string>
+    <string name="maps_import_help">Each region has two files with the same name: the roads with elevation (.ldrp) and the map (.pmtiles). Select both at once.</string>
+    <string name="maps_imported">Imported: %1$s</string>
+    <string name="maps_import_failed">Could not import %1$s: %2$s</string>
+    <string name="maps_error_unknown_type">the file name must end in .ldrp or .pmtiles</string>
+    <string name="maps_error_invalid">the file is corrupt or not made for this app</string>
+    <string name="maps_error_io">not enough space, or the file could not be read</string>
+    <string name="maps_size">%1$s MB</string>
+    <string name="maps_missing_roads">The roads file (.ldrp) is missing: no climb or descent warnings.</string>
+    <string name="maps_missing_map">The map file (.pmtiles) is missing: the map stays blank.</string>
+    <string name="maps_invalid_roads">The roads file is corrupt.</string>
+    <string name="maps_invalid_map">The map file is corrupt.</string>
+    <string name="maps_delete_title">Delete %1$s?</string>
+    <string name="maps_delete_text">The files of this region will be removed from the phone.</string>
+    <string name="settings_voice">Voice alerts</string>
+    <string name="settings_voice_summary">Speaks the climbs, descents, speed cameras and potholes ahead.</string>
+    <string name="settings_voice_unavailable">The phone\'s text-to-speech is not available. Install or enable a speech engine in the Android settings.</string>
+    <string name="about_title">About</string>
+    <string name="about_text">Version %1$s. Free, no ads and no data collection: everything stays on the phone. Open source under the GPL-3.0 license. The alerts are an aid: always watch the road and the signs.</string>
+    <string name="about_licenses">Third-party licenses</string>
+    <string name="map_attribution">Map: © OpenStreetMap contributors · Protomaps. Elevation: Mapzen Terrain Tiles.</string>
+</resources>

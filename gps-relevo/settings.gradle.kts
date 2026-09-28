@@ -22,4 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ladeira"
 
-include(":shared", ":tools")
+include(":shared", ":tools", ":androidApp")

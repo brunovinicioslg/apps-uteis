@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Region files are large and can be imported again; only the settings are backed up. -->
+<full-backup-content>
+    <include domain="file" path="datastore/" />
+</full-backup-content>

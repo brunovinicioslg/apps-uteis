@@ -157,6 +157,20 @@ class RoadPackageReader(private val source: RandomAccessSource) {
 
     val cellCount: Int get() = index.size
 
+    /**
+     * Parses every cell, so a damaged file is rejected when it is installed rather than on the road.
+     * Returns the number of edges; throws [IllegalArgumentException] on corruption.
+     */
+    fun verify(): Int {
+        var edges = 0
+        for ((offset, length) in index.values) {
+            val r = ByteReader(source.read(offset, length))
+            repeat(r.count()) { readEdge(r); edges++ }
+            repeat(r.count()) { readPoi(r) }
+        }
+        return edges
+    }
+
     /** Everything within [radiusM] of [center]. */
     fun load(center: LatLon, radiusM: Double): RoadNetwork {
         val reach = radiusM + RoadPackage.MAX_EDGE_LENGTH_M

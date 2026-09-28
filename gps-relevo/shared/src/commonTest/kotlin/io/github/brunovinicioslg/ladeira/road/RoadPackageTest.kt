@@ -106,6 +106,17 @@ class RoadPackageTest {
     }
 
     @Test
+    fun verifyReadsTheWholeFile() {
+        val b = randomNetwork(11)
+        val bytes = RoadPackage.write(b.edges, b.pois)
+        assertEquals(b.edges.size, RoadPackageReader(ByteArraySource(bytes)).verify())
+        // Damage inside the last cell's data: the header still parses, only a full read notices.
+        val damaged = bytes.copyOf().also { it[it.size - 3] = 0xFF.toByte(); it[it.size - 2] = 0xFF.toByte(); it[it.size - 1] = 0xFF.toByte() }
+        val reader = RoadPackageReader(ByteArraySource(damaged))
+        assertFailsWith<IllegalArgumentException> { reader.verify() }
+    }
+
+    @Test
     fun varintsRoundTrip() {
         val values = listOf(0L, 1L, -1L, 63L, -64L, 1L shl 40, -(1L shl 40), Long.MAX_VALUE / 2, Int.MIN_VALUE.toLong())
         val w = ByteWriter()

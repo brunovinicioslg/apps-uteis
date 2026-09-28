@@ -1,0 +1,10 @@
+{
+  "name": "ladeira-map-style",
+  "private": true,
+  "description": "Generates Ladeira's offline MapLibre styles from the Protomaps basemap layers.",
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "@protomaps/basemaps": "5.7.2"
+  }
+}

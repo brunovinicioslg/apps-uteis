@@ -1,9 +1,12 @@
 package io.github.brunovinicioslg.ladeira.tools
 
+import io.github.brunovinicioslg.ladeira.alerts.Alert
 import io.github.brunovinicioslg.ladeira.alerts.AlertEngine
+import io.github.brunovinicioslg.ladeira.drive.DriveEngine
 import io.github.brunovinicioslg.ladeira.geo.Geo
 import io.github.brunovinicioslg.ladeira.geo.LatLon
 import io.github.brunovinicioslg.ladeira.lookahead.Lookahead
+import io.github.brunovinicioslg.ladeira.matching.GpsFix
 import io.github.brunovinicioslg.ladeira.profile.VehicleProfile
 import io.github.brunovinicioslg.ladeira.road.EdgePosition
 import io.github.brunovinicioslg.ladeira.road.RandomAccessSource
@@ -32,12 +35,17 @@ fun main(args: Array<String>) {
             "build" -> build(options)
             "profile" -> profile(options)
             "find" -> find(options)
+            "track" -> track(options)
+            "drive" -> drive(options)
             else -> {
                 System.err.println(
                     """
                     Usage:
                       build   --bbox south,west,north,east --out region.ldrp [--cache dir] [--zoom 12] [--overpass url]
                       profile --package region.ldrp --at lat,lon --heading degrees [--distance 5000] [--vehicle CAR]
+                      find    --package region.ldrp --road BR-040 [--near lat,lon] [--radius 20000]
+                      track   --package region.ldrp --at lat,lon --heading degrees --out track.csv [--distance 10000] [--speed 72]
+                      drive   --package region.ldrp --track track.csv [--vehicle CAR] [--no-heading true]
                     """.trimIndent(),
                 )
                 exitProcess(2)
@@ -125,6 +133,77 @@ private fun profile(options: Map<String, String>) {
             )
         }
         for ((poi, d) in road.pois) println(String.format(Locale.ROOT, "  %-12s at %5.0f m", poi.type, d))
+    }
+}
+
+/**
+ * Writes a simulated drive along the road graph, one fix per second (lat,lon,elevation,bearing,speed
+ * in m/s), for playing back into an emulator's GPS.
+ */
+private fun track(options: Map<String, String>) {
+    val file = File(requireNotNull(options["package"]) { "--package is required" })
+    val (lat, lon) = requireNotNull(options["at"]) { "--at lat,lon is required" }.split(",").map { it.trim().toDouble() }
+    val heading = requireNotNull(options["heading"]) { "--heading is required" }.toDouble()
+    val out = File(requireNotNull(options["out"]) { "--out is required" })
+    val distance = options["distance"]?.toDouble() ?: 10_000.0
+    val speed = (options["speed"]?.toDouble() ?: 72.0) / 3.6
+    val at = LatLon(lat, lon)
+    RandomAccessFile(file, "r").use { raf ->
+        val network = RoadPackageReader(FileSource(raf)).load(at, distance + 1_000)
+        val candidate = network.candidates(at, 60.0).firstOrNull() ?: throw IllegalArgumentException("No road within 60 m")
+        val forward = Geo.angleDifference(candidate.edge.bearingAt(candidate.offset), heading) <= 90
+        val path = Lookahead.follow(network, EdgePosition(candidate.edge, candidate.offset, forward), distance)
+        val lines = generateSequence(0.0) { it + speed }.takeWhile { it <= path.length }.mapNotNull { d ->
+            val (step, offset) = path.locate(d) ?: return@mapNotNull null
+            val p = step.edge.pointAt(offset)
+            val bearing = Geo.normalizeDegrees(step.edge.bearingAt(offset) + if (step.forward) 0.0 else 180.0)
+            String.format(Locale.ROOT, "%.6f,%.6f,%.1f,%.0f,%.1f", p.lat, p.lon, step.edge.elevationAt(offset) ?: 0.0, bearing, speed)
+        }.toList()
+        out.writeText(lines.joinToString("\n", postfix = "\n"))
+        println(String.format(Locale.ROOT, "Track %s: %d fixes, %.1f km", out.name, lines.size, path.length / 1000))
+    }
+}
+
+/**
+ * Replays a track through the same engine the app runs and prints what it would say and when:
+ * reproduces field reports without a phone. `--no-heading true` drops the GPS heading, as the
+ * emulator does.
+ */
+private fun drive(options: Map<String, String>) {
+    val file = File(requireNotNull(options["package"]) { "--package is required" })
+    val track = File(requireNotNull(options["track"]) { "--track is required" })
+    val vehicle = VehicleProfile.valueOf(options["vehicle"] ?: "CAR")
+    val noHeading = options["no-heading"] == "true"
+    RandomAccessFile(file, "r").use { raf ->
+        val reader = RoadPackageReader(FileSource(raf))
+        val engine = DriveEngine({ center, radius -> reader.load(center, radius) }, vehicle)
+        var traveled = 0.0
+        var previous: LatLon? = null
+        track.readLines().filter { it.isNotBlank() }.forEachIndexed { i, line ->
+            val (lat, lon, _, bearing, speed) = line.split(",").map { it.trim().toDouble() }
+            val position = LatLon(lat, lon)
+            previous?.let { traveled += Geo.distance(it, position) }
+            previous = position
+            val update = engine.update(
+                GpsFix(position, accuracyM = 5.0, speedMps = speed, bearingDegrees = if (noHeading) 0.0 else bearing, timeMillis = i * 1_000L),
+            )
+            val state = update.state
+            if (i % 25 == 0) {
+                val next = state.next?.let { (s, k) -> String.format(Locale.ROOT, "%s %.0f..%.0f", k, s.start, s.end) }
+                val current = state.current?.let { (s, k) -> String.format(Locale.ROOT, "%s %.0f..%.0f", k, s.start, s.end) }
+                println(String.format(Locale.ROOT, "%5.0f m  %-9s current=%s next=%s", traveled, state.status, current, next))
+            }
+            for (alert in update.alerts) {
+                val text = when (alert) {
+                    is Alert.SlopeAhead -> String.format(
+                        Locale.ROOT, "%s in %.0f m: %.0f m at %.1f%%", alert.kind, alert.distance, alert.slope.end - maxOf(0.0, alert.slope.start),
+                        alert.slope.averageGradePercent,
+                    )
+                    is Alert.PoiAhead -> String.format(Locale.ROOT, "%s in %.0f m", alert.poi.type, alert.distance)
+                }
+                println(String.format(Locale.ROOT, "%5.0f m  ALERT %s", traveled, text))
+            }
+        }
     }
 }
 

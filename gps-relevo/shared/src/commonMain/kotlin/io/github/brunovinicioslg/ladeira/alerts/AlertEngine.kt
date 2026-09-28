@@ -37,9 +37,12 @@ class AlertEngine(private var profile: VehicleProfile) {
 
     private val announced = HashMap<String, Long>()
 
-    /** Slopes are re-detected on every update and their ends drift by a few meters, so they are
-     * de-duplicated by where they end rather than by an exact key. */
-    private data class AnnouncedSlope(val end: LatLon, val kind: SlopeKind, val time: Long)
+    /**
+     * Slopes are re-detected on every update and their ends drift by a few meters, so they are
+     * de-duplicated by where they end rather than by an exact key. Not by kind: a long descent
+     * becomes a plain descent once most of it is behind, and must not be announced again.
+     */
+    private data class AnnouncedSlope(val end: LatLon, val climb: Boolean, val time: Long)
 
     private val announcedSlopes = mutableListOf<AnnouncedSlope>()
 
@@ -65,9 +68,9 @@ class AlertEngine(private var profile: VehicleProfile) {
             val inside = slope.start <= START_TOLERANCE_M && slope.end > 0
             if (distance > slopeLead && !inside) continue
             val end = path.pointAt(slope.end) ?: continue
-            val known = announcedSlopes.any { it.kind == kind && Geo.distance(it.end, end) <= SAME_SLOPE_M }
+            val known = announcedSlopes.any { it.climb == slope.isClimb && Geo.distance(it.end, end) <= SAME_SLOPE_M }
             if (!known) {
-                announcedSlopes += AnnouncedSlope(end, kind, nowMillis)
+                announcedSlopes += AnnouncedSlope(end, slope.isClimb, nowMillis)
                 result += Alert.SlopeAhead(slope, kind, distance)
             }
         }

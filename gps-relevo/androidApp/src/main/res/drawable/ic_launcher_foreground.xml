@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Hillside -->
+    <path
+        android:fillColor="#FFFACC15"
+        android:pathData="M30,74L78,74L78,42Z" />
+    <!-- Road climbing the hill, with its center line -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M28.6,71.9L76.6,39.9L79.4,44.1L31.4,76.1Z M39.7,67.0L43.8,64.2L44.3,65.0L40.2,67.8Z M51.7,59.0L55.8,56.2L56.3,57.0L52.2,59.8Z M63.7,51.0L67.8,48.2L68.3,49.0L64.2,51.8Z" />
+</vector>
