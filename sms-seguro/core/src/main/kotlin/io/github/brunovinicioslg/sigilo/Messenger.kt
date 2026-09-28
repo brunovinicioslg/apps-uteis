@@ -24,8 +24,11 @@ sealed interface Received {
     /** A contact sent their keys; a session now exists and our replies will be encrypted. */
     data object InviteAccepted : Received
 
-    /** An invite with a different identity than we knew; needs the user's confirmation. */
-    class InviteWithNewIdentity(val bundle: KeyBundle, val identity: IdentityKey) : Received
+    /**
+     * An invite with a different identity than we knew; needs the user's confirmation. Keep
+     * [envelope]: after [SessionManager.trustIdentity], [Messenger.open] accepts it.
+     */
+    class InviteWithNewIdentity(val envelope: ByteArray, val bundle: KeyBundle, val identity: IdentityKey) : Received
 
     /** The message is kept; it can be opened after the user accepts [identity]. */
     class IdentityChanged(val envelope: ByteArray, val identity: IdentityKey) : Received
@@ -79,7 +82,7 @@ class Messenger(
             KIND_INVITE -> {
                 val bundle = KeyBundle.decode(r.rest())
                 val changed = sessions.acceptBundle(sender, bundle)
-                if (changed == null) Received.InviteAccepted else Received.InviteWithNewIdentity(bundle, changed)
+                if (changed == null) Received.InviteAccepted else Received.InviteWithNewIdentity(envelope, bundle, changed)
             }
             KIND_MESSAGE, KIND_PREKEY_MESSAGE -> when (val opened = sessions.decrypt(sender, Sealed(kind == KIND_PREKEY_MESSAGE, r.rest()))) {
                 is Opened.Plaintext -> Received.Message(Content.decode(opened.bytes), acknowledgeSetup = kind == KIND_PREKEY_MESSAGE)

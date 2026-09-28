@@ -33,7 +33,7 @@ Dentro da pasta do app (ex.: `lanterna/`):
 .\gradlew.bat test lint assembleDebug      # lanterna/: testes unitários, lint e APK de depuração
 .\gradlew.bat :shared:jvmTest :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # trena/
 .\gradlew.bat :shared:jvmTest :tools:test :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # gps-relevo/
-.\gradlew.bat :core:test                   # sms-seguro/ (protocolo com libsignal real; licença AGPL-3.0)
+.\gradlew.bat :core:test :core:lint :app:testDebugUnitTest :app:lintDebug :app:assembleDebug   # sms-seguro/ (AGPL-3.0)
 .\gradlew.bat connectedDebugAndroidTest    # testes instrumentados (emulador ou aparelho conectado)
 ```
 
@@ -52,3 +52,10 @@ Emulador sem janela (Git Bash): `ANDROID_AVD_HOME="$USERPROFILE/.android/avd" em
 No Git Bash, caminhos do aparelho com `adb` precisam de `MSYS_NO_PATHCONV=1` (senão `/sdcard` vira caminho do Windows).
 
 Aparelhos de teste do usuário: Galaxy S22 (ARCore + profundidade, barômetro) e Redmi Note 12S (sem ARCore, sem barômetro, HyperOS). Emulador local: `Medium_Phone` (API 36.1).
+
+Sigilo (`sms-seguro/`):
+- Precisa do NDK 30.0.16248370 em `Sdk/ndk/` só para remover os símbolos de depuração da libsignal (senão o APK passa de 100 MB).
+- `-Pabi=x86_64` para o emulador; `-PallowScreenshots` libera capturas de tela (o app as bloqueia) só para testar a interface.
+- Sempre testar também o APK de publicação (R8): `assembleRelease`, `zipalign` e `apksigner` com a chave de depuração, e um convite aceito no emulador. Foi assim que apareceu a quebra da libsignal pelo R8.
+- "Segundo celular" no computador: `.\gradlew.bat :peer:installDist`, depois `peer/build/install/peer/bin/peer invite|send|ack|receive --state pasta ...`. Os SMS entram no emulador com `adb emu sms send <número> <texto>`; os que o app envia aparecem no log (`adb logcat -s SigiloSms`, só em depuração, sempre cifrados).
+- O emulador tem só 6 GB de dados e fica perto do mínimo: desinstale antes de reinstalar (`adb uninstall`), e para voltar ao Ladeira ou ao Alumia reinstale-os.

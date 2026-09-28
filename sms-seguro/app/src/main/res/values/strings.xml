@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="app_name" translatable="false">Sigilo</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="back">Voltar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Apagar</string>
+    <string name="accept">Aceitar</string>
+    <string name="decline">Recusar</string>
+    <string name="more">Mais opções</string>
+
+    <!-- Notifications -->
+    <string name="channel_messages">Mensagens</string>
+    <string name="channel_messages_description">Avisos de mensagens recebidas.</string>
+    <string name="notif_new_message">Nova mensagem</string>
+    <string name="notif_new_messages">Novas mensagens: %1$d</string>
+    <string name="notif_mark_read">Marcar como lida</string>
+    <string name="notif_invite">Quer conversar com criptografia</string>
+    <string name="notif_key_changed">A chave de segurança mudou</string>
+    <string name="notif_mms">MMS recebido</string>
+
+    <!-- First run -->
+    <string name="setup_title">Bem-vindo ao Sigilo</string>
+    <string name="setup_intro">O Sigilo é um app de SMS que também conversa com criptografia de ponta a ponta com quem tem o Sigilo. Sem servidor e sem internet: as conversas ficam só nos celulares.</string>
+    <string name="setup_password_title">Senha para abrir o app</string>
+    <string name="setup_password_text">Com senha, ninguém lê suas conversas mesmo com o celular desbloqueado. Não há como recuperar uma senha esquecida.</string>
+    <string name="password_label">Senha</string>
+    <string name="password_confirm_label">Repita a senha</string>
+    <string name="password_mismatch">As senhas não são iguais.</string>
+    <string name="password_too_short">Use pelo menos 4 caracteres.</string>
+    <string name="setup_with_password">Usar esta senha</string>
+    <string name="setup_without_password">Continuar sem senha</string>
+    <string name="setup_working">Preparando a criptografia…</string>
+    <string name="default_title">Defina o Sigilo como app de SMS</string>
+    <string name="default_text">O Android só deixa o app de SMS padrão receber e enviar mensagens. Suas mensagens atuais continuam onde estão e aparecem no Sigilo.</string>
+    <string name="default_button">Definir como padrão</string>
+
+    <!-- Lock -->
+    <string name="lock_title">O Sigilo está bloqueado</string>
+    <string name="unlock">Desbloquear</string>
+    <string name="wrong_password">Senha incorreta.</string>
+    <string name="wait_seconds">Muitas tentativas. Tente de novo em %1$d s.</string>
+    <string name="unavailable_title">Não foi possível abrir</string>
+    <string name="unavailable_text">A chave das conversas está presa ao chip de segurança deste celular e não pode ser aberta aqui (por exemplo, após restaurar um backup de outro aparelho).</string>
+
+    <!-- Conversation list -->
+    <string name="no_conversations">Nenhuma conversa ainda.</string>
+    <string name="new_conversation">Nova conversa</string>
+    <string name="settings">Ajustes</string>
+    <string name="encrypted">Criptografada</string>
+    <string name="unread_count_description">Não lidas: %1$d</string>
+
+    <!-- New conversation -->
+    <string name="new_conversation_hint">Número ou nome</string>
+    <string name="contacts_permission">Mostrar meus contatos</string>
+    <string name="start_with_number">Conversar com %1$s</string>
+
+    <!-- Conversation -->
+    <string name="message_hint">Mensagem</string>
+    <string name="message_hint_encrypted">Mensagem criptografada</string>
+    <string name="send">Enviar</string>
+    <string name="sms_count">%1$d SMS</string>
+    <string name="menu_encrypt">Ativar criptografia</string>
+    <string name="menu_resend_invite">Reenviar convite</string>
+    <string name="menu_safety">Número de segurança</string>
+    <string name="menu_timer">Mensagens temporárias</string>
+    <string name="menu_block">Bloquear número</string>
+    <string name="menu_unblock">Desbloquear número</string>
+    <string name="menu_delete_conversation">Apagar conversa</string>
+    <string name="delete_conversation_title">Apagar esta conversa?</string>
+    <string name="delete_conversation_text">Todas as mensagens dela serão apagadas deste celular.</string>
+    <string name="delete_message_title">Apagar esta mensagem?</string>
+    <string name="encrypt_confirm_title">Ativar criptografia?</string>
+    <string name="encrypt_confirm_text">O Sigilo vai enviar suas chaves públicas em cerca de 17 SMS, uma única vez. O contato precisa ter o Sigilo instalado e aceitar.</string>
+    <string name="invite_banner">Convite para conversa criptografada. Aceitar envia cerca de 16 SMS, uma única vez.</string>
+    <string name="invite_sent_banner">Convite enviado. A conversa fica criptografada quando o contato aceitar.</string>
+    <string name="key_changed_banner">A chave de segurança deste contato mudou: ele pode ter reinstalado o app, ou alguém tenta se passar por ele. As mensagens novas esperam até você aceitar. Se puder, compare o número de segurança antes.</string>
+    <string name="key_changed_accept">Aceitar nova chave</string>
+    <string name="blocked_banner">Número bloqueado: as mensagens dele não chegam.</string>
+    <string name="status_pending">Enviando</string>
+    <string name="status_sent">Enviada</string>
+    <string name="status_delivered">Entregue</string>
+    <string name="status_failed">Não enviada</string>
+    <string name="today">Hoje</string>
+    <string name="yesterday">Ontem</string>
+
+    <!-- Events inside a conversation -->
+    <string name="info_invite_sent">Convite de criptografia enviado</string>
+    <string name="info_invite_received">Convite de criptografia recebido</string>
+    <string name="info_encryption_on">Conversa criptografada de ponta a ponta</string>
+    <string name="info_key_changed">A chave de segurança mudou</string>
+    <string name="info_key_accepted">Nova chave de segurança aceita</string>
+    <string name="info_timer_on">Mensagens temporárias: %1$s</string>
+    <string name="info_timer_off">Mensagens temporárias desativadas</string>
+    <string name="info_unreadable">Chegou uma mensagem criptografada que não pôde ser aberta. Peça ao contato um novo convite.</string>
+    <string name="info_unsupported">Mensagem de uma versão mais nova do Sigilo. Atualize o app para vê-la.</string>
+    <string name="info_mms">MMS recebido. Abrir MMS chega na próxima versão do Sigilo.</string>
+    <string name="info_invite_declined">Convite recusado</string>
+
+    <!-- Disappearing messages -->
+    <string name="timer_title">Mensagens temporárias</string>
+    <string name="timer_text">As mensagens novas somem nos dois celulares depois deste tempo (as recebidas contam a partir da leitura).</string>
+    <string name="timer_off">Desligado</string>
+    <string name="timer_30s">30 segundos</string>
+    <string name="timer_5m">5 minutos</string>
+    <string name="timer_1h">1 hora</string>
+    <string name="timer_8h">8 horas</string>
+    <string name="timer_1d">1 dia</string>
+    <string name="timer_1w">1 semana</string>
+
+    <!-- Safety number -->
+    <string name="safety_title">Número de segurança</string>
+    <string name="safety_text">Compare estes números com os que aparecem no celular do contato, pessoalmente ou numa ligação. Se forem iguais, ninguém está no meio da conversa.</string>
+    <string name="safety_verified">Verificado</string>
+    <string name="safety_mark_verified">Marcar como verificado</string>
+    <string name="safety_unmark">Desmarcar verificação</string>
+    <string name="safety_none">Ainda não há chave deste contato. Ative a criptografia primeiro.</string>
+
+    <!-- Settings -->
+    <string name="settings_password">Senha</string>
+    <string name="settings_password_on">O app pede a senha para abrir.</string>
+    <string name="settings_password_off">O app abre sem senha.</string>
+    <string name="settings_password_set">Definir senha</string>
+    <string name="settings_password_change">Trocar senha</string>
+    <string name="settings_password_remove">Remover senha</string>
+    <string name="settings_password_saved">Senha salva.</string>
+    <string name="settings_password_removed">Senha removida.</string>
+    <string name="settings_auto_lock">Bloquear automaticamente</string>
+    <string name="auto_lock_immediately">Ao sair do app</string>
+    <string name="auto_lock_minutes">%1$d min depois de sair</string>
+    <string name="settings_lock_now">Bloquear agora</string>
+    <string name="settings_notification_content">Mostrar o texto de SMS comuns nas notificações</string>
+    <string name="settings_notification_content_summary">Mensagens criptografadas nunca aparecem nas notificações.</string>
+    <string name="settings_blocked">Números bloqueados</string>
+    <string name="settings_about">Sobre</string>
+    <string name="about_text">Versão %1$s. Grátis e de código aberto (AGPL-3.0). Criptografia do Signal (libsignal): PQXDH com chaves pós-quânticas e double ratchet. Sem servidor: as conversas ficam só nos celulares.</string>
+</resources>

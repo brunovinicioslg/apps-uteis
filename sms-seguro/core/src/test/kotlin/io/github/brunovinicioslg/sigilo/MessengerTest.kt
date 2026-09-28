@@ -5,6 +5,7 @@ import io.github.brunovinicioslg.sigilo.wire.Content
 import io.github.brunovinicioslg.sigilo.wire.MalformedException
 import java.util.zip.Deflater
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
@@ -35,6 +36,22 @@ class MessengerTest {
         assertEquals(3_600, replyText.expireSeconds)
         val timer = deliver(bob, alice, bob.messenger.composeTimerChange(alice.number, 86_400, now = 3_000_000))
         assertEquals(86_400, assertIs<Content.TimerChange>(assertIs<Received.Message>(timer.single()).content).expireSeconds)
+    }
+
+    @Test
+    fun reinviteFromAReinstalledPhoneWaitsForConfirmation() {
+        val alice = Phone("+5531911110000")
+        val bob = Phone("+5531922220000")
+        connect(alice, bob)
+        deliver(bob, alice, bob.messenger.composeText(alice.number, "Oi", 0, now = 1_000))
+        // Alice reinstalls: new identity, same number. Her new invite must not be taken silently.
+        val aliceAgain = Phone(alice.number)
+        val held = assertIs<Received.InviteWithNewIdentity>(deliver(aliceAgain, bob, aliceAgain.messenger.composeInvite()).single())
+        assertContentEquals(aliceAgain.store.identityKeyPair.publicKey.serialize(), held.identity.serialize())
+        bob.sessions.trustIdentity(alice.number, held.identity)
+        assertEquals(Received.InviteAccepted, bob.messenger.open(alice.number, held.envelope))
+        val text = deliver(bob, aliceAgain, bob.messenger.composeText(alice.number, "Bem-vinda de volta", 0, now = 2_000))
+        assertEquals("Bem-vinda de volta", assertIs<Content.Text>(assertIs<Received.Message>(text.single()).content).body)
     }
 
     @Test

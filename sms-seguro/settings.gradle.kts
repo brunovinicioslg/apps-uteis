@@ -26,4 +26,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "sigilo"
 
-include(":core")
+include(":core", ":app", ":peer")

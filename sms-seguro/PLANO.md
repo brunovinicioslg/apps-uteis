@@ -13,42 +13,49 @@ Mensageiro com **visual parecido com o do WhatsApp** que usa **SMS como transpor
 
 ## Status (28/09/2026)
 
-**Núcleo pronto** (`core/`), com 22 testes usando a criptografia real (libsignal 0.103, oficial do Signal, licença AGPL-3.0; o app inteiro fica sob AGPL-3.0):
-- **Protocolo:**
-  - PQXDH, com acordo de chaves pós-quântico (ML-KEM-1024);
-  - double ratchet;
-  - ratchet pós-quântico (SPQR).
-- **Convite** com o cartão de chaves públicas: por SMS ou QR code.
-- **Mensagens entregues em qualquer ordem**, perdidas ou duplicadas: todas as que chegam abrem corretamente e só uma vez.
-- **Adulteração:** qualquer mudança em mensagem comum é rejeitada (500 de 500). Nas mensagens de preparação, o conteúdo lido nunca sai alterado.
-- **Troca de chave** (reinstalação ou possível impostor) detectada; a mensagem fica guardada até o usuário confirmar.
-- **Número de segurança** de 60 dígitos, igual nos dois aparelhos só quando não há ninguém no meio.
-- **Transporte próprio por SMS:**
-  - texto "SG1:" + Base64, só com caracteres GSM-7 básicos (160 por SMS, sem conversão pela operadora);
-  - partes montadas em qualquer ordem;
-  - resistente a lixo: 12.000 casos de fuzzing, e um deles revelou e fixou uma falha que derrubaria o app.
+**Primeira versão do app funcionando no emulador** (48 testes automáticos: 23 do núcleo, 25 do app).
 
-**Custo em SMS medido:**
+**App Android** (`app/`):
+- **app de SMS padrão completo** para o Android: recebe e envia SMS comuns, grava-os no banco de SMS do sistema (como todo app de SMS), importa o histórico existente, confirma entrega (✓ enviada, ✓✓ entregue), "responder com mensagem" ao recusar uma ligação, abrir conversa a partir de links `sms:`;
+- **conversas criptografadas**: convite por SMS (17 SMS), aceite com um toque (16 SMS, uma vez), confirmação automática (1 SMS); depois, uma mensagem curta ocupa 1 ou 2 SMS e o app mostra quantos antes de enviar;
+- mensagens criptografadas **nunca** vão para o banco de SMS do sistema;
+- **senha para abrir** (opcional): Argon2id + chave presa ao chip de segurança (Keystore/StrongBox); espera crescente após 5 senhas erradas; bloqueio automático ao sair do app (na hora, 1, 5 ou 30 min);
+- **SMS recebidos com o app bloqueado** esperam numa fila (os criptografados continuam cifrados) e são abertos ao desbloquear; a notificação não mostra nada além de "Novas mensagens";
+- **banco criptografado** SQLCipher (AES-256) com mensagens e estado do protocolo Signal; apagar sobrescreve os dados;
+- **mensagens temporárias** (30 s a 1 semana), iguais nos dois celulares, somem da tela na hora certa;
+- **chave do contato mudou**: mensagens seguradas até o usuário aceitar; número de segurança de 60 dígitos para comparar;
+- **bloqueio de números** na lista oficial do Android (vale também para ligações);
+- privacidade: sem capturas de tela nem prévia em apps recentes, notificações de conversas criptografadas sem remetente nem texto, nada no backup do Android.
+
+**Teste no emulador** (com um "segundo celular" no computador, `peer/`, que injeta SMS no emulador):
+- SMS comum recebido, respondido e entregue;
+- troca de chaves completa, mensagens criptografadas nos dois sentidos, texto com acentos;
+- mensagem temporária de 30 s sumindo nos dois lados;
+- mensagem criptografada chegando com o app bloqueado e aberta depois da senha;
+- **versão de publicação (R8)**: o teste revelou que o R8 quebrava a libsignal (ela chama o Java por nome, via JNI); corrigido com regras de preservação e testado de novo.
+
+**Falta:**
+1. **MMS**: hoje o app só registra que chegou um MMS. Baixar e mostrar imagens, e enviar MMS.
+2. Pareamento por **QR code** (sem os 17 SMS do convite) e verificação do número de segurança por QR.
+3. Escolha do chip em aparelhos com dois chips; resposta rápida pela notificação; teclado sem aprendizado.
+4. SMS de dados binários (mensagem curta em 1 SMS sempre).
+5. Backup local criptografado para trocar de celular.
+6. **Teste entre os dois celulares reais e operadoras** (S22 × Redmi).
+7. Auditoria externa.
+
+**Custo em SMS medido** (no emulador e nos testes):
 
 | Tipo | SMS |
 |---|---|
 | Convite (uma vez por contato) | 17 |
-| Primeira mensagem (prepara a sessão) | 16 |
+| Aceitar o convite (uma vez) | 16 |
 | Confirmação automática (uma vez) | 1 |
-| Mensagem curta ("Tudo bem?") | 2 |
+| Mensagem curta (até ~20 caracteres) | 1 |
 | Mensagem média (76 caracteres) | 2 |
 
-O protocolo ocupa ~90 bytes por mensagem, 37 deles do ratchet pós-quântico, e sobram 112 bytes úteis por SMS de texto.
-
-**Otimização prevista:** SMS de dados binários (140 bytes por SMS) deixaria mensagens curtas em 1 SMS. Depende da operadora e será testado com os 2 chips; o texto fica como alternativa automática.
+O protocolo ocupa **90 bytes** por mensagem (medido: constante), 37 deles do ratchet pós-quântico; sobram 112 bytes por SMS de texto.
 
 Detalhe técnico registrado: a libsignal usa ordens diferentes de endereços em `SessionBuilder` (contato, local) e `SessionCipher` (local, contato). O código centraliza isso em duas funções.
-
-**Falta:**
-1. App Android: app de SMS padrão, banco criptografado (SQLCipher + Keystore) com os estados da libsignal, interface estilo WhatsApp, senha, mensagens temporárias, bloqueio.
-2. SMS de dados binários.
-3. Teste entre os dois celulares e operadoras.
-4. Auditoria externa.
 
 ## Limitações que nenhuma solução contorna
 

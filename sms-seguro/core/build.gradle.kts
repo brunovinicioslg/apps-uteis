@@ -2,6 +2,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.android.lint)
+}
+
+lint {
+    warningsAsErrors = true
+    abortOnError = true
+    // About Android 4.3 and older; the app requires Android 8, which lint cannot see from here.
+    disable += "TrulyRandom"
 }
 
 // Protocol, message format and SMS transport logic, free of Android so it runs in plain JVM tests.
@@ -19,8 +27,8 @@ kotlin {
 }
 
 dependencies {
-    // Compiled against the desktop build; the Android app brings libsignal-android (same classes,
-    // phone native libraries) so the 150 MB desktop jar never reaches the APK.
+    // Compiled against the desktop build; the Android app brings libsignal-android (phone native
+    // libraries) and leaves the desktop ones out of the APK (see the app's packaging excludes).
     compileOnly(libs.libsignal.client)
     testImplementation(libs.libsignal.client)
 
