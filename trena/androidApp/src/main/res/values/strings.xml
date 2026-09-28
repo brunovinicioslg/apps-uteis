@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="app_name" translatable="false">Mede Aí</string>
+    <string name="back">Voltar</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="camera_permission_button">Permitir câmera</string>
+
+    <!-- Home -->
+    <string name="tool_ar_title">Medir com a câmera (AR)</string>
+    <string name="tool_ar_summary">Em desenvolvimento: chega na próxima versão.</string>
+    <string name="tool_photo_title">Medir por foto</string>
+    <string name="tool_photo_summary">Use um cartão ou uma folha A4 como referência. Funciona em qualquer celular.</string>
+    <string name="tool_tilt_title">Medir por inclinação</string>
+    <string name="tool_tilt_summary">Distância e altura de objetos, mirando com a câmera.</string>
+    <string name="tool_level_title">Nível</string>
+    <string name="tool_level_summary">Nível de bolha para superfícies e bordas.</string>
+    <string name="units_title">Unidades</string>
+    <string name="units_metric">Métrico (cm, m)</string>
+    <string name="units_imperial">Imperial (pés, polegadas)</string>
+    <string name="about_title">Sobre</string>
+    <string name="about_text">Versão %1$s. Grátis, sem anúncios, sem acesso à internet e sem coleta de dados. Código aberto sob a licença GPL-3.0. As medidas são estimativas: não substituem uma trena em medições críticas.</string>
+    <string name="about_source">Ver o código-fonte</string>
+
+    <!-- Level -->
+    <string name="level_waiting">Lendo o sensor…</string>
+    <string name="level_no_sensor">Este aparelho não tem sensor de inclinação.</string>
+    <string name="level_ok">Nivelado</string>
+    <string name="level_flat_axes">Lados: %1$s · Frente e trás: %2$s</string>
+    <string name="level_upright_hint">Inclinação da borda do celular em relação à horizontal ou à vertical</string>
+    <string name="level_hint">Deite o celular sobre a superfície ou apoie-o pela borda.</string>
+
+    <!-- Tilt -->
+    <string name="tilt_camera_rationale">Para medir por inclinação, o Mede Aí mostra a imagem da câmera enquanto você mira. Nada é gravado.</string>
+    <string name="tilt_step_base">1. Mire a cruz na base do objeto, onde ele toca o chão, e toque em Marcar base.</string>
+    <string name="tilt_step_top">2. Sem mudar a altura do celular, mire no topo do objeto e toque em Marcar topo.</string>
+    <string name="tilt_step_done">Medição concluída.</string>
+    <string name="tilt_result_distance">Distância: %1$s</string>
+    <string name="tilt_result_height">Altura: %1$s</string>
+    <string name="tilt_no_sensor">Sem sensor de inclinação</string>
+    <string name="tilt_aim_lower">Mire mais para baixo</string>
+    <string name="tilt_aim_invalid">Mire no topo do objeto</string>
+    <string name="tilt_mark_base">Marcar base</string>
+    <string name="tilt_mark_top">Marcar topo</string>
+    <string name="tilt_restart">Recomeçar</string>
+    <string name="tilt_camera_height">Altura do celular: %1$s (alterar)</string>
+    <string name="tilt_height_dialog_title">Altura do celular</string>
+    <string name="tilt_height_dialog_text">Segure o celular como vai segurar ao medir e meça, uma vez, a altura dele até o chão. Quanto mais exata essa altura, melhor a medição.</string>
+
+    <!-- Photo -->
+    <string name="photo_intro">Coloque um cartão (de banco ou documento) ou uma folha A4 sobre a superfície que quer medir e fotografe de frente. Depois marque os cantos da referência e toque em dois pontos para medir.</string>
+    <string name="photo_take">Tirar foto</string>
+    <string name="photo_pick">Escolher da galeria</string>
+    <string name="photo_load_failed">Não foi possível abrir a foto. Tente outra.</string>
+    <string name="reference_card">Cartão</string>
+    <string name="reference_a4">Folha A4</string>
+    <string name="reference_letter">Folha carta</string>
+    <string name="reference_custom">Outra medida</string>
+    <string name="reference_card_name">do cartão</string>
+    <string name="reference_a4_name">da folha A4</string>
+    <string name="reference_letter_name">da folha carta</string>
+    <string name="reference_custom_name">do objeto de referência</string>
+    <string name="photo_step_corners">Toque nos 4 cantos %1$s (%2$d de 4). Arraste para ajustar.</string>
+    <string name="photo_step_invalid">Os cantos não formam um retângulo. Arraste cada um para um canto da referência.</string>
+    <string name="photo_step_measure">Toque em dois pontos para medir. Vale só para pontos na mesma superfície %1$s.</string>
+    <string name="photo_undo">Desfazer</string>
+    <string name="photo_clear">Limpar medidas</string>
+    <string name="photo_new">Nova foto</string>
+    <string name="reference_custom_title">Tamanho da referência</string>
+    <string name="reference_custom_text">Informe a largura e a altura de um objeto retangular que aparece na foto.</string>
+    <string name="reference_width_cm">Largura (cm)</string>
+    <string name="reference_height_cm">Altura (cm)</string>
+</resources>

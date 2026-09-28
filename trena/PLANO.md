@@ -6,6 +6,31 @@
 
 Medir **distâncias, alturas e áreas** apontando a câmera e marcando pontos na tela.
 
+## Status (28/09/2026)
+
+**Pronto e verificado no emulador (Android 16):**
+- **Lógica compartilhada** (`shared/`, Kotlin Multiplatform, pronta para o iOS), com 40 testes e milhares de casos aleatórios:
+  - distância, trechos, área de polígonos em qualquer posição no espaço (com aviso de contorno torto ou cruzado);
+  - retângulo por 3 pontos, altura e ângulos;
+  - unidades métricas e imperiais com vírgula em português;
+  - medida por inclinação;
+  - correção de perspectiva para foto (homografia);
+  - nível de bolha.
+- **App Android**, com 17 testes de tela e de configurações:
+  - **Nível:** a bolha vai para o lado mais alto e troca sozinha entre modo superfície e modo borda;
+  - **Medir por inclinação:** câmera com mira; mediu 2,43 m (esperado 2,42 m) e 100,0 cm (esperado 100,0 cm) com o sensor simulado;
+  - **Medir por foto:** com uma foto de teste contendo um cartão e uma linha de 10 cm, mediu **10,0 cm**; arrastar um ponto até a metade deu **5,0 cm**, com lupa durante o arraste.
+- Um bug de uso encontrado e corrigido no teste: a foto "pulava" quando a instrução mudava de tamanho.
+
+**Falta:**
+- **modo AR** (ARCore), que depende do Galaxy S22 para desenvolver e testar;
+- precisão real dos modos alternativos no Redmi Note 12S;
+- histórico e compartilhamento de medidas.
+
+Limitações conhecidas:
+- no modo foto, a referência precisa estar no mesmo plano do que se mede, e a foto deve ser tirada de frente (inclinação de até ~30°);
+- se o sistema encerrar o app, a foto é reaberta, mas os pontos marcados se perdem.
+
 ## Viabilidade e precisão (expectativa honesta)
 
 - **Android:** ARCore ("Google Play Services para RA"), que só funciona em aparelhos certificados. Muitos celulares baratos não têm → **modos alternativos** (abaixo).

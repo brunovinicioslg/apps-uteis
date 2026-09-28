@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">Back</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="camera_permission_button">Allow camera</string>
+
+    <!-- Home -->
+    <string name="tool_ar_title">Measure with the camera (AR)</string>
+    <string name="tool_ar_summary">In development: coming in the next version.</string>
+    <string name="tool_photo_title">Measure from a photo</string>
+    <string name="tool_photo_summary">Use a card or an A4 sheet as a reference. Works on any phone.</string>
+    <string name="tool_tilt_title">Measure by tilt</string>
+    <string name="tool_tilt_summary">Distance and height of objects, aiming with the camera.</string>
+    <string name="tool_level_title">Level</string>
+    <string name="tool_level_summary">Bubble level for surfaces and edges.</string>
+    <string name="units_title">Units</string>
+    <string name="units_metric">Metric (cm, m)</string>
+    <string name="units_imperial">Imperial (feet, inches)</string>
+    <string name="about_title">About</string>
+    <string name="about_text">Version %1$s. Free, no ads, no internet access and no data collection. Open source under the GPL-3.0 license. Measurements are estimates: they do not replace a tape measure for critical work.</string>
+    <string name="about_source">View source code</string>
+
+    <!-- Level -->
+    <string name="level_waiting">Reading the sensor…</string>
+    <string name="level_no_sensor">This device has no tilt sensor.</string>
+    <string name="level_ok">Level</string>
+    <string name="level_flat_axes">Sides: %1$s · Front and back: %2$s</string>
+    <string name="level_upright_hint">Tilt of the phone\'s edge from horizontal or vertical</string>
+    <string name="level_hint">Lay the phone on the surface or stand it on its edge.</string>
+
+    <!-- Tilt -->
+    <string name="tilt_camera_rationale">To measure by tilt, Mede Aí shows the camera image while you aim. Nothing is recorded.</string>
+    <string name="tilt_step_base">1. Aim the cross at the base of the object, where it touches the floor, and tap Mark base.</string>
+    <string name="tilt_step_top">2. Without changing the phone\'s height, aim at the top of the object and tap Mark top.</string>
+    <string name="tilt_step_done">Measurement complete.</string>
+    <string name="tilt_result_distance">Distance: %1$s</string>
+    <string name="tilt_result_height">Height: %1$s</string>
+    <string name="tilt_no_sensor">No tilt sensor</string>
+    <string name="tilt_aim_lower">Aim lower</string>
+    <string name="tilt_aim_invalid">Aim at the top of the object</string>
+    <string name="tilt_mark_base">Mark base</string>
+    <string name="tilt_mark_top">Mark top</string>
+    <string name="tilt_restart">Start over</string>
+    <string name="tilt_camera_height">Phone height: %1$s (change)</string>
+    <string name="tilt_height_dialog_title">Phone height</string>
+    <string name="tilt_height_dialog_text">Hold the phone the way you will while measuring and measure its height above the floor once. The more exact this height, the better the measurement.</string>
+
+    <!-- Photo -->
+    <string name="photo_intro">Place a card (bank or ID card) or an A4 sheet on the surface you want to measure and take the photo straight on. Then mark the reference\'s corners and tap two points to measure.</string>
+    <string name="photo_take">Take photo</string>
+    <string name="photo_pick">Choose from gallery</string>
+    <string name="photo_load_failed">Could not open the photo. Try another one.</string>
+    <string name="reference_card">Card</string>
+    <string name="reference_a4">A4 sheet</string>
+    <string name="reference_letter">Letter sheet</string>
+    <string name="reference_custom">Other size</string>
+    <string name="reference_card_name">the card</string>
+    <string name="reference_a4_name">the A4 sheet</string>
+    <string name="reference_letter_name">the letter sheet</string>
+    <string name="reference_custom_name">the reference object</string>
+    <string name="photo_step_corners">Tap the 4 corners of %1$s (%2$d of 4). Drag to adjust.</string>
+    <string name="photo_step_invalid">The corners do not form a rectangle. Drag each one to a corner of the reference.</string>
+    <string name="photo_step_measure">Tap two points to measure. Only points on the same surface as %1$s are valid.</string>
+    <string name="photo_undo">Undo</string>
+    <string name="photo_clear">Clear measurements</string>
+    <string name="photo_new">New photo</string>
+    <string name="reference_custom_title">Reference size</string>
+    <string name="reference_custom_text">Enter the width and height of a rectangular object in the photo.</string>
+    <string name="reference_width_cm">Width (cm)</string>
+    <string name="reference_height_cm">Height (cm)</string>
+</resources>
