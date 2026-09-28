@@ -21,3 +21,6 @@ play-service-account*.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Jogos Java do usuário: arquivos de terceiros, nunca vão para o repositório público.
+javagames/

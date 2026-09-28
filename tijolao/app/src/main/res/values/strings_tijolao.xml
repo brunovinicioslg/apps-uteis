@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tijolão's own screens (the emulator's strings are in strings.xml, from JL-Mod). -->
+<resources>
+    <string name="tijolao_title" translatable="false">Tijolão</string>
+    <string name="tijolao_more">More options</string>
+    <plurals name="tijolao_search_hint">
+        <item quantity="one">Search %1$d game</item>
+        <item quantity="other">Search %1$d games</item>
+    </plurals>
+    <string name="tijolao_sort_rating">Top rated</string>
+    <string name="tijolao_sort_name">A–Z</string>
+    <string name="tijolao_sort_recent">Recent</string>
+    <string name="tijolao_recent">Recently played</string>
+    <string name="tijolao_no_games">No games in this build.</string>
+    <string name="tijolao_play">Play</string>
+    <string name="tijolao_game_settings">Game settings</string>
+    <string name="tijolao_delete_progress">Delete progress</string>
+    <string name="tijolao_delete_progress_confirm">Delete the saved progress of %1$s? This cannot be undone.</string>
+    <string name="tijolao_delete">Delete</string>
+    <string name="tijolao_preparing">Getting the game ready (first time only)…</string>
+    <string name="tijolao_open_failed">This game could not be opened.</string>
+    <string name="tijolao_rate_it">Rate it</string>
+    <string name="tijolao_your_rating">Your rating</string>
+    <string name="tijolao_stars_description">%1$d of 5 stars</string>
+    <string name="tijolao_screen">Screen %1$s</string>
+    <string name="tijolao_screen_any">Any screen</string>
+    <string name="tijolao_landscape">Landscape</string>
+    <string name="tijolao_size">%1$s MB</string>
+    <string name="tijolao_emulator_settings">Emulator settings</string>
+    <string name="tijolao_imported_games">Add your own games (.jar)</string>
+    <string name="tijolao_about">About</string>
+    <plurals name="tijolao_about_text">
+        <item quantity="one">Tijolão %1$s, with %2$d game. Built on JL-Mod (J2ME Loader), Apache 2.0 license. The games belong to their authors; this build is for personal use only.</item>
+        <item quantity="other">Tijolão %1$s, with %2$d games. Built on JL-Mod (J2ME Loader), Apache 2.0 license. The games belong to their authors; this build is for personal use only.</item>
+    </plurals>
+</resources>

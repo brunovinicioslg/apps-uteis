@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tijolao_more">Mais opções</string>
+    <plurals name="tijolao_search_hint">
+        <item quantity="one">Buscar em %1$d jogo</item>
+        <item quantity="other">Buscar entre %1$d jogos</item>
+    </plurals>
+    <string name="tijolao_sort_rating">Mais bem avaliados</string>
+    <string name="tijolao_sort_name">A–Z</string>
+    <string name="tijolao_sort_recent">Recentes</string>
+    <string name="tijolao_recent">Jogados recentemente</string>
+    <string name="tijolao_no_games">Nenhum jogo nesta versão.</string>
+    <string name="tijolao_play">Jogar</string>
+    <string name="tijolao_game_settings">Ajustes do jogo</string>
+    <string name="tijolao_delete_progress">Apagar progresso</string>
+    <string name="tijolao_delete_progress_confirm">Apagar o progresso salvo de %1$s? Não dá para desfazer.</string>
+    <string name="tijolao_delete">Apagar</string>
+    <string name="tijolao_preparing">Preparando o jogo (só na primeira vez)…</string>
+    <string name="tijolao_open_failed">Não foi possível abrir este jogo.</string>
+    <string name="tijolao_rate_it">Dê sua nota</string>
+    <string name="tijolao_your_rating">Sua nota</string>
+    <string name="tijolao_stars_description">%1$d de 5 estrelas</string>
+    <string name="tijolao_screen">Tela %1$s</string>
+    <string name="tijolao_screen_any">Qualquer tela</string>
+    <string name="tijolao_landscape">Tela deitada</string>
+    <string name="tijolao_size">%1$s MB</string>
+    <string name="tijolao_emulator_settings">Ajustes do emulador</string>
+    <string name="tijolao_imported_games">Adicionar seus jogos (.jar)</string>
+    <string name="tijolao_about">Sobre</string>
+    <plurals name="tijolao_about_text">
+        <item quantity="one">Tijolão %1$s, com %2$d jogo. Feito sobre o JL-Mod (J2ME Loader), licença Apache 2.0. Os jogos pertencem aos seus autores; esta versão é só para uso pessoal.</item>
+        <item quantity="other">Tijolão %1$s, com %2$d jogos. Feito sobre o JL-Mod (J2ME Loader), licença Apache 2.0. Os jogos pertencem aos seus autores; esta versão é só para uso pessoal.</item>
+    </plurals>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Tijolão declares no Bluetooth permission. JSR-82 games ask for it through LocalDevice, which
+         gets a refusal and throws BluetoothStateException, as on a phone without Bluetooth; the
+         calls below are only reached after that check. -->
+    <issue id="MissingPermission">
+        <ignore path="src/main/java/javax/bluetooth/**" />
+        <ignore path="src/main/java/org/microemu/cldc/btl2cap/**" />
+        <ignore path="src/main/java/org/microemu/cldc/btspp/**" />
+        <ignore path="src/main/java/com/nokia/mid/ui/SoftNotificationImpl.java" />
+    </issue>
+    <!-- Nor notifications: Nokia's SoftNotification from a game is dropped by Android 13+. -->
+    <issue id="NotificationPermission">
+        <ignore path="src/main/java/com/nokia/mid/ui/SoftNotificationImpl.java" />
+    </issue>
+</lint>

@@ -9,6 +9,7 @@ Plano geral e decisões: [PLANO.md](PLANO.md). Cada pasta tem seu `PLANO.md` com
 | `trena/` | Mede Aí | `io.github.brunovinicioslg.medeai` |
 | `gps-relevo/` | Ladeira | `io.github.brunovinicioslg.ladeira` |
 | `sms-seguro/` | Sigilo | `io.github.brunovinicioslg.sigilo` |
+| `tijolao/` | Tijolão (uso pessoal, fork do JL-Mod) | `io.github.brunovinicioslg.tijolao` |
 
 ## Convenções
 
