@@ -28,6 +28,7 @@ import org.microemu.microedition.io.ConnectionImplementation;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.bluetooth.LocalDevice;
 import javax.bluetooth.UUID;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
@@ -78,6 +79,9 @@ public class Connection implements ConnectionImplementation, StreamConnectionNot
 		connUuid = new javax.bluetooth.UUID(uuid, false);
 		java.util.UUID btUuid = connUuid.uuid;
 
+		// Asks for the Bluetooth permissions and to turn Bluetooth on, like LocalDevice does:
+		// some games connect without calling it first.
+		LocalDevice.getLocalDevice();
 		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if (adapter.isDiscovering()) {
 			adapter.cancelDiscovery();

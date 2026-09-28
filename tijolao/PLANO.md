@@ -43,6 +43,7 @@ Jogar os jogos Java (J2ME) dos celulares antigos num Android atual sem configura
 4. **Jogar**: conversão na primeira vez, configuração automática de tela e orientação, processo separado para o jogo.
 5. **Por jogo**: ajustes do JL-Mod e "apagar progresso" (os saves).
 6. **Adicionar outros `.jar`** pelo seletor de arquivos do sistema (sem permissão de armazenamento).
+7. **Multiplayer por Bluetooth** (JSR-82) entre dois celulares com o Tijolão: permissão "Dispositivos por perto" pedida só quando um jogo usa Bluetooth. No emulador, o lado que cria a partida funciona (Snake 3: permissão, ligar Bluetooth, ficar visível, "esperando outro jogador"); entrar na partida só dá para testar com dois aparelhos.
 
 ### Sugestões para depois
 
@@ -58,5 +59,6 @@ Jogar os jogos Java (J2ME) dos celulares antigos num Android atual sem configura
 - [x] Os jogos mais bem avaliados aparecem primeiro (ordem padrão).
 - [x] Nenhum jogo no repositório público.
 - [x] APK de publicação (R8) testado: catálogo, jogo 2D, M3G, Mascot Capsule, ajustes, importação.
-- [x] Sem permissões de internet, armazenamento, localização, microfone ou Bluetooth.
+- [x] Sem permissões de internet, armazenamento, localização (Android 12+) ou microfone. Bluetooth só quando um jogo pede.
+- [ ] Partida por Bluetooth entre o S22 e o Redmi (um jogo L2CAP, ex.: PES, e um SPP, ex.: Rally Pro Contest).
 - [ ] Testado no Galaxy S22 e no Redmi Note 12S.

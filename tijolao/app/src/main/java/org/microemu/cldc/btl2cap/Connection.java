@@ -30,6 +30,7 @@ import java.io.OutputStream;
 
 import javax.bluetooth.L2CAPConnection;
 import javax.bluetooth.L2CAPConnectionNotifier;
+import javax.bluetooth.LocalDevice;
 import javax.bluetooth.UUID;
 
 public class Connection implements ConnectionImplementation, L2CAPConnectionNotifier {
@@ -78,6 +79,9 @@ public class Connection implements ConnectionImplementation, L2CAPConnectionNoti
 		connUuid = new javax.bluetooth.UUID(uuid, false);
 		java.util.UUID btUuid = connUuid.uuid;
 
+		// Asks for the Bluetooth permissions and to turn Bluetooth on, like LocalDevice does:
+		// some games connect without calling it first.
+		LocalDevice.getLocalDevice();
 		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if (adapter.isDiscovering()) {
 			adapter.cancelDiscovery();

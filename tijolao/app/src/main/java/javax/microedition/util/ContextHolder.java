@@ -21,12 +21,12 @@ package javax.microedition.util;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Looper;
 import android.os.Vibrator;
 import android.view.Display;
 import android.view.WindowManager;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,8 +38,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import javax.microedition.lcdui.keyboard.VirtualKeyboard;
 import javax.microedition.shell.AppClassLoader;
@@ -54,8 +56,12 @@ public class ContextHolder {
 	private static VirtualKeyboard vk;
 	private static WeakReference<MicroActivity> currentActivity;
 	private static Vibrator vibrator;
-	private static final ArrayList<ActivityResultListener> resultListeners = new ArrayList<>();
+	// Changed by game threads, read by the UI thread.
+	private static final List<ActivityResultListener> resultListeners = new CopyOnWriteArrayList<>();
 	private static boolean vibrationEnabled;
+	private static final int PERMISSION_REQUEST_CODE = 0x7140;
+	private static final Object PERMISSION_REQUEST_LOCK = new Object();
+	private static volatile CountDownLatch pendingPermissionAnswer;
 
 	public static Context getAppContext() {
 		return EmulatorApplication.getInstance();
@@ -139,28 +145,46 @@ public class ContextHolder {
 	}
 
 	public static boolean requestPermission(String permission) {
-		MicroActivity context = currentActivity.get();
-		if (context == null) {
-			return false;
-		}
-		if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(context, new String[]{permission}, 0);
-			return false;
-		} else {
-			return true;
-		}
+		return requestPermissions(new String[]{permission});
 	}
 
+	/**
+	 * Asks the user for the permissions and, on a game thread, waits for the answer. Games ask as
+	 * they did on phones (e.g. LocalDevice.getLocalDevice()) and take "no" as "not available", so
+	 * answering before the user did made every first try fail.
+	 */
 	public static boolean requestPermissions(String[] permissions) {
 		MicroActivity context = currentActivity.get();
 		if (context == null) {
 			return false;
 		}
-		if (!hasPermissions(context, permissions)) {
+		if (hasPermissions(context, permissions)) {
+			return true;
+		}
+		if (Looper.myLooper() == Looper.getMainLooper()) {
+			// The UI thread cannot wait for the dialog it has to show.
 			ActivityCompat.requestPermissions(context, permissions, 0);
 			return false;
-		} else {
-			return true;
+		}
+		synchronized (PERMISSION_REQUEST_LOCK) { // one dialog at a time
+			CountDownLatch answer = new CountDownLatch(1);
+			pendingPermissionAnswer = answer;
+			ActivityCompat.requestPermissions(context, permissions, PERMISSION_REQUEST_CODE);
+			try {
+				answer.await();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				return false;
+			}
+			return hasPermissions(context, permissions);
+		}
+	}
+
+	public static void notifyOnPermissionsResult(int requestCode) {
+		CountDownLatch answer = pendingPermissionAnswer;
+		if (requestCode == PERMISSION_REQUEST_CODE && answer != null) {
+			pendingPermissionAnswer = null;
+			answer.countDown();
 		}
 	}
 

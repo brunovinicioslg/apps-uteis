@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <!-- Tijolão declares no Bluetooth permission. JSR-82 games ask for it through LocalDevice, which
-         gets a refusal and throws BluetoothStateException, as on a phone without Bluetooth; the
-         calls below are only reached after that check. -->
+    <!-- Bluetooth permissions are asked for at run time by LocalDevice.getLocalDevice(), which every
+         Bluetooth path goes through first (including Connector.open for btspp/btl2cap); a refusal
+         throws BluetoothStateException, as on a phone without Bluetooth. -->
     <issue id="MissingPermission">
         <ignore path="src/main/java/javax/bluetooth/**" />
         <ignore path="src/main/java/org/microemu/cldc/btl2cap/**" />

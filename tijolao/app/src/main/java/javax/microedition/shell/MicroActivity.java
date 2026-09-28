@@ -648,6 +648,12 @@ public class MicroActivity extends AppCompatActivity {
 		ContextHolder.notifyOnActivityResult(requestCode, resultCode, data);
 	}
 
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		ContextHolder.notifyOnPermissionsResult(requestCode);
+	}
+
 	public String getAppName() {
 		return appName;
 	}

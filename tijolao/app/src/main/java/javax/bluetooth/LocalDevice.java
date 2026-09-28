@@ -34,7 +34,8 @@ public class LocalDevice implements ActivityResultListener {
 	private static Hashtable<String, String> properties;
 	private volatile boolean lock = false;
 	private boolean cancelled = false;
-	private Object monitor = new Object();
+	private boolean enableAnswered = false;
+	private final Object monitor = new Object();
 
 	static {
 		properties = new Hashtable<>();
@@ -65,21 +66,28 @@ public class LocalDevice implements ActivityResultListener {
 			permissionsGranted = ContextHolder.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION);
 		}
 		if (!permissionsGranted) {
+			ContextHolder.removeActivityResultListener(this);
 			throw new BluetoothStateException();
 		}
 		if (!DiscoveryAgent.adapter.isEnabled()) {
 			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			ContextHolder.getActivity().startActivityForResult(enableBtIntent, 2);
 			synchronized (monitor) {
-				try {
-					monitor.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				ContextHolder.getActivity().startActivityForResult(enableBtIntent, 2);
+				// Until the user answers "turn Bluetooth on?" (onActivityResult).
+				while (!enableAnswered) {
+					try {
+						monitor.wait();
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+						cancelled = true;
+						break;
+					}
 				}
 			}
-			if (cancelled)
+			if (cancelled) {
+				ContextHolder.removeActivityResultListener(this);
 				throw new BluetoothStateException();
-			cancelled = false;
+			}
 		}
 	}
 
@@ -127,6 +135,7 @@ public class LocalDevice implements ActivityResultListener {
 			synchronized (monitor) {
 				if (resultCode != Activity.RESULT_OK)
 					cancelled = true;
+				enableAnswered = true;
 				monitor.notifyAll();
 			}
 		}
