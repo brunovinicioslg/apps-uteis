@@ -31,7 +31,7 @@ Comportamento da plataforma a conhecer: se o sistema encerrar o processo à for�
 
 ## Viabilidade
 
-- **Android:** total. Para rodar em segundo plano, o Android **exige uma notificação fixa** (serviço em primeiro plano); não existe forma permitida de ficar invisível.
+- **Android:** total. Para rodar em segundo plano, o app precisa de um serviço em primeiro plano, que sempre publica uma notificação fixa. O app não pode escondê-la sozinho: se o canal for criado sem importância, o Android sobe a notificação de volta. **O usuário pode desligá-la** (permissão de notificações ou o canal "Chacoalhar"), e o serviço continua rodando. No Android 13+ o app aparece só na lista de apps ativos.
 - **iOS:** o chacoalhar só funciona com o app aberto, e a Apple recusa novos apps de lanterna sem diferencial forte (regra 4.3(b)). **Recomendação: somente Android.**
 
 ## Funcionalidades
@@ -48,7 +48,7 @@ Comportamento da plataforma a conhecer: se o sistema encerrar o processo à for�
 4. **Retorno tátil:** vibração curta ao ligar e padrão diferente ao desligar.
 5. **Desligamento automático:** temporizador (1, 5, 10 ou 30 min, ou nunca) e bateria abaixo de X%.
 6. **Serviço em segundo plano:**
-   - notificação fixa com botões "Ligar/Desligar" e "Desativar chacoalhar";
+   - notificação fixa com botões "Ligar/Desligar" e "Desativar chacoalhar". A chave "Notificação fixa" no app leva à tela do Android que a esconde ou mostra (29/09/2026, a pedido do usuário: a notificação incomodava);
    - também fica ativo enquanto o app mantém a lanterna acesa, porque o Android apaga a luz se o processo que a acendeu for encerrado;
    - inicia sozinho quando o celular liga;
    - volta a funcionar depois de atualizações do app.
@@ -62,7 +62,7 @@ Comportamento da plataforma a conhecer: se o sistema encerrar o processo à for�
    | Tecla lateral (Samsung, "pressionar 2x") e toque nas costas (Pixel) | O sistema abre o app; uma tela invisível alterna a lanterna e fecha na hora. Instruções no app. |
    | Segurar volume com a tela desligada | **Experimental.** Só é possível com Serviço de Acessibilidade, que a Play aceita com restrições. Entra numa versão para GitHub/F-Droid e só vai para a Play se passar na revisão. |
 8. **Tela principal:** botão grande de liga/desliga, estado da detecção, **intensidade da lanterna** (Android 13+ em aparelhos que suportam) e configurações.
-9. **Primeiro uso:** explica e pede a permissão de notificações e guia para liberar a otimização de bateria, com instruções por marca.
+9. **Primeiro uso:** guia para liberar a otimização de bateria, com instruções por marca. A permissão de notificações não é mais cobrada: sem ela o chacoalhar funciona do mesmo jeito, e o app só a pede quando você liga a "Notificação fixa".
 
 ### Depois (v1.1+)
 

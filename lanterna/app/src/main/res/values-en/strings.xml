@@ -9,9 +9,6 @@
     <string name="torch_status_busy">The flash is being used by another app</string>
 
     <!-- Main screen: hints -->
-    <string name="notifications_title">Allow notifications</string>
-    <string name="notifications_summary">Android requires a persistent notification for shake detection to work while the app is closed. It also lets you turn the flashlight on without opening the app.</string>
-    <string name="notifications_button">Allow</string>
     <string name="battery_title">Keep the system from stopping shake detection</string>
     <string name="battery_summary_generic">Exempt Alumia from battery optimization so detection does not stop on its own.</string>
     <string name="battery_summary_xiaomi">On the app screen, open Battery saver and choose No restrictions. Also turn on Autostart.</string>
@@ -33,6 +30,9 @@
     <string name="pocket_title">Ignore in a pocket or bag</string>
     <string name="pocket_summary">Uses the proximity sensor.</string>
     <string name="vibrate_title">Vibrate when the gesture toggles the light</string>
+    <string name="notification_row_title">Persistent notification</string>
+    <string name="notification_row_shown">Has buttons to turn the flashlight on and to stop shake detection. To hide it, turn off \"Shake detection\" on the Android page that opens.</string>
+    <string name="notification_row_hidden">Hidden. Shake detection keeps working as usual.</string>
 
     <!-- Main screen: flashlight options -->
     <string name="torch_section_title">Flashlight</string>
@@ -56,7 +56,7 @@
 
     <!-- Notification -->
     <string name="notification_channel_name">Shake detection</string>
-    <string name="notification_channel_description">Persistent notification Android requires for shake detection to run in the background.</string>
+    <string name="notification_channel_description">Shows whether the flashlight is on. It can be turned off: shake detection keeps working.</string>
     <string name="notification_detecting">Shake the phone to turn the flashlight on</string>
     <string name="notification_torch_on">Flashlight on</string>
     <string name="notification_starting">Alumia</string>

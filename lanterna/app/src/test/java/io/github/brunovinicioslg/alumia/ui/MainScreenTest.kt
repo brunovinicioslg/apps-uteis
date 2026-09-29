@@ -26,11 +26,12 @@ class MainScreenTest {
 
     private var settings = Settings()
     private var torchClicks = 0
+    private val notificationRequests = mutableListOf<Boolean>()
 
     private fun show(
         settings: Settings = Settings(),
         torch: TorchState = TorchState.Off,
-        notificationsGranted: Boolean = true,
+        notificationShown: Boolean = true,
         batteryUnrestricted: Boolean = true,
     ) {
         this.settings = settings
@@ -41,7 +42,7 @@ class MainScreenTest {
                         settings = settings,
                         torch = torch,
                         torchMaxLevel = 1,
-                        notificationsGranted = notificationsGranted,
+                        notificationShown = notificationShown,
                         batteryUnrestricted = batteryUnrestricted,
                         sideKeyEnabled = false,
                         manufacturer = Manufacturer.OTHER,
@@ -49,7 +50,7 @@ class MainScreenTest {
                     actions = MainScreenActions(
                         onToggleTorch = { torchClicks++ },
                         onSettingsChange = { transform -> this.settings = transform(this.settings) },
-                        onRequestNotifications = {},
+                        onNotificationChange = { notificationRequests += it },
                         onOpenBatterySettings = {},
                         onSideKeyChange = {},
                         onOpenSourceCode = {},
@@ -117,8 +118,22 @@ class MainScreenTest {
     }
 
     @Test
-    fun `notification hint appears when permission is missing`() {
-        show(notificationsGranted = false)
-        compose.onNodeWithText("Permitir notificações").assertExists()
+    fun `a hidden notification is not nagged about`() {
+        show(notificationShown = false)
+        compose.onNodeWithText("Escondida. O chacoalhar continua funcionando normalmente.").assertExists()
+        compose.onNodeWithText("Permitir notificações").assertDoesNotExist()
+    }
+
+    @Test
+    fun `the notification switch asks to hide or show it`() {
+        show(notificationShown = true)
+        compose.onNodeWithText("Notificação fixa").performClick()
+        assertThat(notificationRequests).containsExactly(false)
+    }
+
+    @Test
+    fun `the notification switch sits with the gesture options`() {
+        show(settings = Settings(detectionEnabled = false))
+        compose.onNodeWithText("Notificação fixa").assertDoesNotExist()
     }
 }

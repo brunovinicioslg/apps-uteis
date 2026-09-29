@@ -11,9 +11,6 @@
     <string name="torch_status_busy">O flash está em uso por outro app</string>
 
     <!-- Main screen: hints -->
-    <string name="notifications_title">Permitir notificações</string>
-    <string name="notifications_summary">O Android exige uma notificação fixa para o chacoalhar funcionar com o app fechado. Por ela você também liga a lanterna sem abrir o app.</string>
-    <string name="notifications_button">Permitir</string>
     <string name="battery_title">Evite que o sistema desligue o chacoalhar</string>
     <string name="battery_summary_generic">Libere o Alumia da otimização de bateria para a detecção não parar sozinha.</string>
     <string name="battery_summary_xiaomi">Na tela do app, abra Economia de bateria e escolha Sem restrições. Ative também o Início automático.</string>
@@ -35,6 +32,9 @@
     <string name="pocket_title">Ignorar no bolso ou na bolsa</string>
     <string name="pocket_summary">Usa o sensor de proximidade.</string>
     <string name="vibrate_title">Vibrar ao ligar e desligar pelo gesto</string>
+    <string name="notification_row_title">Notificação fixa</string>
+    <string name="notification_row_shown">Tem botões para ligar a lanterna e desativar o chacoalhar. Para esconder, desligue \"Chacoalhar\" na tela do Android que abrir.</string>
+    <string name="notification_row_hidden">Escondida. O chacoalhar continua funcionando normalmente.</string>
 
     <!-- Main screen: flashlight options -->
     <string name="torch_section_title">Lanterna</string>
@@ -58,7 +58,7 @@
 
     <!-- Notification -->
     <string name="notification_channel_name">Chacoalhar</string>
-    <string name="notification_channel_description">Notificação fixa exigida pelo Android para o chacoalhar funcionar em segundo plano.</string>
+    <string name="notification_channel_description">Mostra se a lanterna está ligada. Pode ser desligada: o chacoalhar continua funcionando.</string>
     <string name="notification_detecting">Chacoalhe o celular para ligar a lanterna</string>
     <string name="notification_torch_on">Lanterna ligada</string>
     <string name="notification_starting">Alumia</string>

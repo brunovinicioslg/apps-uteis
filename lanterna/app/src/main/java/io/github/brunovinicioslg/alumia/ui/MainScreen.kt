@@ -2,6 +2,7 @@ package io.github.brunovinicioslg.alumia.ui
 
 import android.Manifest
 import android.os.Build
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
@@ -53,6 +54,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -72,7 +74,7 @@ data class MainScreenState(
     val settings: Settings,
     val torch: TorchState,
     val torchMaxLevel: Int,
-    val notificationsGranted: Boolean,
+    val notificationShown: Boolean,
     val batteryUnrestricted: Boolean,
     val sideKeyEnabled: Boolean,
     val manufacturer: Manufacturer,
@@ -81,7 +83,8 @@ data class MainScreenState(
 class MainScreenActions(
     val onToggleTorch: () -> Unit,
     val onSettingsChange: ((Settings) -> Settings) -> Unit,
-    val onRequestNotifications: () -> Unit,
+    /** Asks to show (true) or hide (false) the persistent notification. */
+    val onNotificationChange: (Boolean) -> Unit,
     val onOpenBatterySettings: () -> Unit,
     val onSideKeyChange: (Boolean) -> Unit,
     val onOpenSourceCode: () -> Unit,
@@ -92,29 +95,32 @@ fun MainRoute(viewModel: MainViewModel = viewModel()) {
     val context = LocalContext.current
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val torch by viewModel.torch.collectAsStateWithLifecycle()
-    var notificationsGranted by remember { mutableStateOf(DeviceStatus.notificationsGranted(context)) }
+    val activity = LocalActivity.current
+    var notificationShown by remember { mutableStateOf(DeviceStatus.notificationShown(context)) }
     var batteryUnrestricted by remember { mutableStateOf(DeviceStatus.batteryUnrestricted(context)) }
     var sideKeyEnabled by remember { mutableStateOf(SideKeyShortcut.isEnabled(context)) }
     val manufacturer = remember { DeviceStatus.manufacturer() }
 
     // The user may change these in system settings while the app is in the background.
     LifecycleResumeEffect(Unit) {
-        notificationsGranted = DeviceStatus.notificationsGranted(context)
+        notificationShown = DeviceStatus.notificationShown(context)
         batteryUnrestricted = DeviceStatus.batteryUnrestricted(context)
         sideKeyEnabled = SideKeyShortcut.isEnabled(context)
         onPauseOrDispose { }
     }
 
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        notificationsGranted = granted
-        // Re-posts the service notification now that it can be shown.
-        if (granted) viewModel.ensureServiceRunning()
+        notificationShown = DeviceStatus.notificationShown(context)
+        // Once denied for good, Android no longer shows the question: its settings page is left.
+        val canAskAgain = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && activity != null &&
+            ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.POST_NOTIFICATIONS)
+        if (!granted && !canAskAgain) DeviceStatus.openNotificationSettings(context)
     }
 
     val current = settings ?: return
-    // Also re-runs when notifications get allowed from system settings, so the service re-posts
-    // its notification with current content.
-    LaunchedEffect(current.detectionEnabled, notificationsGranted) {
+    // Also re-runs when the notification gets turned back on, so the service re-posts it with
+    // current content.
+    LaunchedEffect(current.detectionEnabled, notificationShown) {
         if (current.detectionEnabled) viewModel.ensureServiceRunning()
     }
 
@@ -123,7 +129,7 @@ fun MainRoute(viewModel: MainViewModel = viewModel()) {
             settings = current,
             torch = torch,
             torchMaxLevel = viewModel.torchMaxLevel,
-            notificationsGranted = notificationsGranted,
+            notificationShown = notificationShown,
             batteryUnrestricted = batteryUnrestricted,
             sideKeyEnabled = sideKeyEnabled,
             manufacturer = manufacturer,
@@ -131,9 +137,13 @@ fun MainRoute(viewModel: MainViewModel = viewModel()) {
         actions = MainScreenActions(
             onToggleTorch = viewModel::toggleTorch,
             onSettingsChange = viewModel::updateSettings,
-            onRequestNotifications = {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            onNotificationChange = { show ->
+                if (show && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    !DeviceStatus.notificationsGranted(context)
+                ) {
                     notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    DeviceStatus.openNotificationSettings(context)
                 }
             },
             onOpenBatterySettings = { DeviceStatus.openBatterySettings(context, manufacturer) },
@@ -163,16 +173,6 @@ fun MainScreen(state: MainScreenState, actions: MainScreenActions) {
         ) {
             item { TorchButton(state.torch, actions.onToggleTorch) }
 
-            if (!state.notificationsGranted) {
-                item {
-                    HintCard(
-                        title = stringResource(R.string.notifications_title),
-                        text = stringResource(R.string.notifications_summary),
-                        button = stringResource(R.string.notifications_button),
-                        onClick = actions.onRequestNotifications,
-                    )
-                }
-            }
             if (settings.detectionEnabled && !state.batteryUnrestricted) {
                 item {
                     HintCard(
@@ -190,7 +190,7 @@ fun MainScreen(state: MainScreenState, actions: MainScreenActions) {
                 }
             }
 
-            item { DetectionSection(settings, actions.onSettingsChange) }
+            item { DetectionSection(settings, state.notificationShown, actions.onSettingsChange, actions.onNotificationChange) }
             item { TorchSection(settings, state.torchMaxLevel, actions.onSettingsChange) }
             item { ShortcutsSection(state.sideKeyEnabled, actions.onSideKeyChange) }
             item { AboutSection(actions.onOpenSourceCode) }
@@ -241,7 +241,12 @@ private fun TorchButton(torch: TorchState, onClick: () -> Unit) {
 }
 
 @Composable
-private fun DetectionSection(settings: Settings, onChange: ((Settings) -> Settings) -> Unit) {
+private fun DetectionSection(
+    settings: Settings,
+    notificationShown: Boolean,
+    onChange: ((Settings) -> Settings) -> Unit,
+    onNotificationChange: (Boolean) -> Unit,
+) {
     SectionCard {
         SwitchRow(
             title = stringResource(R.string.detection_title),
@@ -292,6 +297,13 @@ private fun DetectionSection(settings: Settings, onChange: ((Settings) -> Settin
             summary = null,
             checked = settings.vibrate,
             onCheckedChange = { value -> onChange { it.copy(vibrate = value) } },
+        )
+        // Only the user can turn it off (in Android's settings), and the gesture keeps working.
+        SwitchRow(
+            title = stringResource(R.string.notification_row_title),
+            summary = stringResource(if (notificationShown) R.string.notification_row_shown else R.string.notification_row_hidden),
+            checked = notificationShown,
+            onCheckedChange = onNotificationChange,
         )
     }
 }
