@@ -55,6 +55,10 @@ Mapa: `pmtiles extract https://build.protomaps.com/AAAAMMDD.pmtiles regiao.pmtil
 Emulador sem janela (Git Bash): `ANDROID_AVD_HOME="$USERPROFILE/.android/avd" emulator -avd Medium_Phone_API_36.1 -no-window -no-audio -no-boot-anim`.
 No Git Bash, caminhos do aparelho com `adb` precisam de `MSYS_NO_PATHCONV=1` (senão `/sdcard` vira caminho do Windows).
 
+APKs para os celulares do usuário: pasta `celular/` (fora do Git, tem os jogos do Tijolão e os mapas), com `LEIA-ME.txt`.
+Versões de publicação (`assembleRelease`, `-Pabi=arm64-v8a` onde existe) assinadas com a chave de depuração do PC
+(`apksigner sign --ks %USERPROFILE%\.android\debug.keystore --ks-pass pass:android`); o Tijolão usa a chave própria dele.
+
 Aparelhos de teste do usuário: Galaxy S22 (ARCore + profundidade, barômetro) e Redmi Note 12S (sem ARCore, sem barômetro, HyperOS). Emulador local: `Medium_Phone` (API 36.1).
 
 Sigilo (`sms-seguro/`):
