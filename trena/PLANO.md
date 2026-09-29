@@ -22,8 +22,16 @@ Medir **distâncias, alturas e áreas** apontando a câmera e marcando pontos na
   - **Medir por foto:** com uma foto de teste contendo um cartão e uma linha de 10 cm, mediu **10,0 cm**; arrastar um ponto até a metade deu **5,0 cm**, com lupa durante o arraste.
 - Um bug de uso encontrado e corrigido no teste: a foto "pulava" quando a instrução mudava de tamanho.
 
+**Modo AR (ARCore), pronto para testar no Galaxy S22:**
+- mira central: o ponto vai para o plano detectado sob a mira, senão para a profundidade (no S22), senão para um ponto de textura;
+- modos Distância, Trechos e Área (fecha o contorno ao mirar no primeiro ponto), com a medida ao vivo até a mira, desfazer e limpar;
+- os pontos são âncoras do ARCore: a medida se corrige sozinha enquanto o celular aprende o ambiente;
+- avisos de pouca luz, movimento rápido, falta de textura e distância acima de 5 m;
+- em celular sem ARCore (Redmi Note 12S) ou com falha interna do ARCore, a tela explica e indica foto ou inclinação, sem fechar o app;
+- o emulador do Android não roda o ARCore (ele expõe as câmeras com números que o ARCore não reconhece), então só o caminho de erro foi visto rodando; a lógica das medidas tem testes automáticos.
+
 **Falta:**
-- **modo AR** (ARCore), que depende do Galaxy S22 para desenvolver e testar;
+- testar o modo AR no Galaxy S22 com uma trena de verdade (distância, área de uma mesa, parede);
 - precisão real dos modos alternativos no Redmi Note 12S;
 - histórico e compartilhamento de medidas.
 

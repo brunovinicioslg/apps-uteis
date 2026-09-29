@@ -49,7 +49,8 @@ class ScreensTest {
         assertThat(opened).isEqualTo(Tool.PHOTO)
         compose.onNodeWithText("Nível").performClick()
         assertThat(opened).isEqualTo(Tool.LEVEL)
-        compose.onNodeWithText("Medir com a câmera (AR)").assertIsNotEnabled()
+        compose.onNodeWithText("Medir com a câmera (AR)").performClick()
+        assertThat(opened).isEqualTo(Tool.AR)
         compose.onNodeWithText("Imperial (pés, polegadas)").performClick()
         assertThat(units).isEqualTo(UnitSystem.IMPERIAL)
     }

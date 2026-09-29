@@ -8,6 +8,11 @@
         android:name="android.hardware.sensor.accelerometer"
         android:required="false" />
 
+    <!-- AR is optional: phones without ARCore install the app and use the other modes. -->
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
@@ -20,6 +25,10 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.MedeAi">
+
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="optional" />
 
         <activity
             android:name=".ui.MainActivity"

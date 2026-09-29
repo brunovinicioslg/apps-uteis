@@ -7,7 +7,37 @@
 
     <!-- Home -->
     <string name="tool_ar_title">Measure with the camera (AR)</string>
-    <string name="tool_ar_summary">In development: coming in the next version.</string>
+    <string name="tool_ar_summary">Distances, paths and areas by marking points with the crosshair. Needs Google Play Services for AR.</string>
+    <string name="ar_camera_rationale">To measure with augmented reality, Mede Aí uses the camera to recognize the room. Nothing is recorded.</string>
+    <string name="ar_unsupported">This phone does not support augmented reality (ARCore). Use the photo or tilt measurements.</string>
+    <string name="ar_install_declined">Measuring with augmented reality needs Google Play Services for AR. Come back to this screen to try again.</string>
+    <string name="ar_mode_distance">Distance</string>
+    <string name="ar_mode_path">Path</string>
+    <string name="ar_mode_area">Area</string>
+    <string name="ar_add">Add point</string>
+    <string name="ar_close">Close outline</string>
+    <string name="ar_undo">Undo</string>
+    <string name="ar_clear">Clear</string>
+    <string name="ar_mark_first">Aim at the start and tap Add point</string>
+    <plurals name="ar_path_total">
+        <item quantity="one">Total %1$s (%2$d stretch)</item>
+        <item quantity="other">Total %1$s (%2$d stretches)</item>
+    </plurals>
+    <string name="ar_area_result">Area %1$s · perimeter %2$s</string>
+    <string name="ar_area_need_points">Mark the corners: at least 3 points</string>
+    <string name="ar_status_move">Move the phone slowly to recognize the room.</string>
+    <string name="ar_status_light">Too dark: turn on a light or move somewhere brighter.</string>
+    <string name="ar_status_slow">Move the phone more slowly.</string>
+    <string name="ar_status_features">Aim at something with texture (plain white walls are hard).</string>
+    <string name="ar_status_failed">Augmented reality stopped working on this phone. Use the photo or tilt measurements.</string>
+    <string name="ar_status_camera">Another app is using the camera.</string>
+    <string name="ar_status_lost">Recognizing the room again… move the phone slowly.</string>
+    <string name="ar_status_find">Aim at the floor or a wall and move the phone slowly.</string>
+    <string name="ar_status_aim">Aim at a recognized surface.</string>
+    <string name="ar_status_far">Far: beyond 5 m the measurement loses precision.</string>
+    <string name="ar_status_close">Tap to close the outline.</string>
+    <string name="ar_outline_crossed">The outline’s sides cross: the area is not valid.</string>
+    <string name="ar_disclaimer">Typical error 1% to 3%. Not a replacement for a tape measure in critical measurements.</string>
     <string name="tool_photo_title">Measure from a photo</string>
     <string name="tool_photo_summary">Use a card or an A4 sheet as a reference. Works on any phone.</string>
     <string name="tool_tilt_title">Measure by tilt</string>

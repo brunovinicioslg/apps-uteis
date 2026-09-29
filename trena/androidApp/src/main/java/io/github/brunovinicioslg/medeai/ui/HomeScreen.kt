@@ -49,12 +49,7 @@ fun HomeScreen(settings: AppSettings, onOpen: (Tool) -> Unit, onUnitSystemChange
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                ToolCard(
-                    title = stringResource(R.string.tool_ar_title),
-                    summary = stringResource(R.string.tool_ar_summary),
-                    enabled = false,
-                    onClick = {},
-                )
+                ToolCard(stringResource(R.string.tool_ar_title), stringResource(R.string.tool_ar_summary)) { onOpen(Tool.AR) }
             }
             item {
                 ToolCard(stringResource(R.string.tool_photo_title), stringResource(R.string.tool_photo_summary)) { onOpen(Tool.PHOTO) }

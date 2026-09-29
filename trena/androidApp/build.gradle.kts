@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.exifinterface)
+    implementation(libs.arcore)
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(platform(libs.compose.bom))

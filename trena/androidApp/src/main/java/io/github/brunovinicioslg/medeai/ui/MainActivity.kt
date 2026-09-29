@@ -16,13 +16,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.brunovinicioslg.medeai.appContainer
 import io.github.brunovinicioslg.medeai.settings.AppSettings
+import io.github.brunovinicioslg.medeai.ui.ar.ArScreen
 import io.github.brunovinicioslg.medeai.ui.level.LevelScreen
 import io.github.brunovinicioslg.medeai.ui.photo.PhotoScreen
 import io.github.brunovinicioslg.medeai.ui.theme.MedeAiTheme
 import io.github.brunovinicioslg.medeai.ui.tilt.TiltScreen
 import kotlinx.coroutines.launch
 
-enum class Tool { HOME, PHOTO, TILT, LEVEL }
+enum class Tool { HOME, AR, PHOTO, TILT, LEVEL }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +54,7 @@ private fun MedeAiRoot() {
             onOpen = { tool = it },
             onUnitSystemChange = { system -> update { it.copy(unitSystem = system) } },
         )
+        Tool.AR -> ArScreen(unitSystem = current.unitSystem, onBack = goHome)
         Tool.PHOTO -> PhotoScreen(unitSystem = current.unitSystem, onBack = goHome)
         Tool.TILT -> TiltScreen(
             settings = current,

@@ -8,7 +8,38 @@
 
     <!-- Home -->
     <string name="tool_ar_title">Medir com a câmera (AR)</string>
-    <string name="tool_ar_summary">Em desenvolvimento: chega na próxima versão.</string>
+    <string name="tool_ar_summary">Distâncias, trechos e áreas marcando pontos com a mira. Precisa do Google Play Services para RA.</string>
+    <string name="ar_camera_rationale">Para medir com realidade aumentada, o Mede Aí usa a câmera para reconhecer o ambiente. Nada é gravado.</string>
+    <string name="ar_unsupported">Este celular não tem suporte à realidade aumentada (ARCore). Use as medidas por foto ou por inclinação.</string>
+    <string name="ar_install_declined">Para medir com realidade aumentada é preciso instalar o Google Play Services para RA. Volte a esta tela para tentar de novo.</string>
+    <string name="ar_mode_distance">Distância</string>
+    <string name="ar_mode_path">Trechos</string>
+    <string name="ar_mode_area">Área</string>
+    <string name="ar_add">Marcar ponto</string>
+    <string name="ar_close">Fechar contorno</string>
+    <string name="ar_undo">Desfazer</string>
+    <string name="ar_clear">Limpar</string>
+    <string name="ar_mark_first">Mire no início e toque em Marcar ponto</string>
+    <plurals name="ar_path_total">
+        <item quantity="one">Total %1$s (%2$d trecho)</item>
+        <item quantity="many">Total %1$s (%2$d trechos)</item>
+        <item quantity="other">Total %1$s (%2$d trechos)</item>
+    </plurals>
+    <string name="ar_area_result">Área %1$s · perímetro %2$s</string>
+    <string name="ar_area_need_points">Marque os cantos: pelo menos 3 pontos</string>
+    <string name="ar_status_move">Mova o celular devagar para reconhecer o ambiente.</string>
+    <string name="ar_status_light">Pouca luz: acenda uma luz ou vá para um lugar mais claro.</string>
+    <string name="ar_status_slow">Mova o celular mais devagar.</string>
+    <string name="ar_status_features">Aponte para algo com textura (paredes lisas e brancas são difíceis).</string>
+    <string name="ar_status_failed">A realidade aumentada parou de funcionar neste celular. Use as medidas por foto ou por inclinação.</string>
+    <string name="ar_status_camera">A câmera está sendo usada por outro app.</string>
+    <string name="ar_status_lost">Reconhecendo o ambiente de novo… mova o celular devagar.</string>
+    <string name="ar_status_find">Aponte para o chão ou para uma parede e mova o celular devagar.</string>
+    <string name="ar_status_aim">Mire numa superfície reconhecida.</string>
+    <string name="ar_status_far">Longe: acima de 5 m a medida perde precisão.</string>
+    <string name="ar_status_close">Toque para fechar o contorno.</string>
+    <string name="ar_outline_crossed">Os lados do contorno se cruzam: a área não vale.</string>
+    <string name="ar_disclaimer">Erro típico de 1% a 3%. Não substitui uma trena em medições críticas.</string>
     <string name="tool_photo_title">Medir por foto</string>
     <string name="tool_photo_summary">Use um cartão ou uma folha A4 como referência. Funciona em qualquer celular.</string>
     <string name="tool_tilt_title">Medir por inclinação</string>
