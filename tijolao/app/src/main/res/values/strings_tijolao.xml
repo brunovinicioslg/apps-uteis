@@ -29,6 +29,8 @@
     <string name="tijolao_emulator_settings">Emulator settings</string>
     <string name="tijolao_imported_games">Add your own games (.jar)</string>
     <string name="tijolao_about">About</string>
+    <!-- Keypad type (VirtualKeyboard.TYPE_CLASSIC), in the game's "switch layout" list. -->
+    <string name="pref_vk_type_classic">Classic phone</string>
     <plurals name="tijolao_about_text">
         <item quantity="one">Tijolão %1$s, with %2$d game. Built on JL-Mod (J2ME Loader), Apache 2.0 license. The games belong to their authors; this build is for personal use only.</item>
         <item quantity="other">Tijolão %1$s, with %2$d games. Built on JL-Mod (J2ME Loader), Apache 2.0 license. The games belong to their authors; this build is for personal use only.</item>

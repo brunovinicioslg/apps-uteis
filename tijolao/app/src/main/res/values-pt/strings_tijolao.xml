@@ -27,6 +27,7 @@
     <string name="tijolao_emulator_settings">Ajustes do emulador</string>
     <string name="tijolao_imported_games">Adicionar seus jogos (.jar)</string>
     <string name="tijolao_about">Sobre</string>
+    <string name="pref_vk_type_classic">Celular clássico</string>
     <plurals name="tijolao_about_text">
         <item quantity="one">Tijolão %1$s, com %2$d jogo. Feito sobre o JL-Mod (J2ME Loader), licença Apache 2.0. Os jogos pertencem aos seus autores; esta versão é só para uso pessoal.</item>
         <item quantity="other">Tijolão %1$s, com %2$d jogos. Feito sobre o JL-Mod (J2ME Loader), licença Apache 2.0. Os jogos pertencem aos seus autores; esta versão é só para uso pessoal.</item>

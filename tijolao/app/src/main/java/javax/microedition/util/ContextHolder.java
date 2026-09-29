@@ -21,7 +21,9 @@ package javax.microedition.util;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Looper;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Display;
 import android.view.WindowManager;
@@ -260,6 +262,21 @@ public class ContextHolder {
 			return;
 		}
 		vibrator.vibrate(duration);
+	}
+
+	/** A short, crisp click for a key of the classic keypad (a long buzz feels mushy there). */
+	public static void vibrateKeyClick() {
+		if (vibrator == null) {
+			vibrator = (Vibrator) getAppContext().getSystemService(Context.VIBRATOR_SERVICE);
+		}
+		if (vibrator == null || !vibrator.hasVibrator()) {
+			return;
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
+		} else {
+			vibrator.vibrate(VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE));
+		}
 	}
 
 	public static void setVibration(boolean vibrationEnabled) {

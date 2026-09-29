@@ -424,6 +424,11 @@ public class MicroActivity extends AppCompatActivity {
 			if (vk != null) {
 				boolean visible = vk.getLayoutEditMode() != VirtualKeyboard.LAYOUT_EOF;
 				menu.findItem(R.id.action_layout_edit_finish).setVisible(visible);
+				// The classic keypad is laid out as a whole, around the game.
+				boolean movable = !vk.isClassic();
+				menu.findItem(R.id.action_layout_edit_mode).setVisible(movable);
+				menu.findItem(R.id.action_layout_scale_mode).setVisible(movable);
+				menu.findItem(R.id.action_hide_buttons).setVisible(movable);
 			}
 		} else {
 			menu.setGroupVisible(R.id.action_group_canvas, false);

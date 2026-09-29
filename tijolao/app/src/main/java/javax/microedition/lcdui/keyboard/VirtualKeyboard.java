@@ -79,6 +79,8 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	private static final int TYPE_ARR_NUM = 4;
 	private static final int TYPE_NUMBERS = 5;
 	private static final int TYPE_ARROWS = 6;
+	/** A phone of the time around the game, not over it: see {@link ClassicKeypad}. */
+	public static final int TYPE_CLASSIC = 7;
 
 	private static final float PHONE_KEY_ROWS = 5;
 	private static final float PHONE_KEY_SCALE_X = 2.0f;
@@ -119,6 +121,17 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	private static final float SCALE_SNAP_RADIUS = 0.05f;
 
 	private static final int FEEDBACK_DURATION = 50;
+
+	/** The key behind each part of the classic keypad; the red key opens the emulator's menu. */
+	private static final int[] CLASSIC_KEYS = {
+			KEY_NUM1, KEY_NUM2, KEY_NUM3,
+			KEY_NUM4, KEY_NUM5, KEY_NUM6,
+			KEY_NUM7, KEY_NUM8, KEY_NUM9,
+			KEY_STAR, KEY_NUM0, KEY_POUND,
+			KEY_SOFT_LEFT, KEY_SOFT_RIGHT, KEY_D, KEY_MENU,
+			KEY_FIRE, KEY_UP, KEY_UP_RIGHT, KEY_RIGHT, KEY_DOWN_RIGHT,
+			KEY_DOWN, KEY_DOWN_LEFT, KEY_LEFT, KEY_UP_LEFT,
+	};
 
 	private final float[] keyScales = {
 			1, 1,
@@ -188,6 +201,11 @@ public class VirtualKeyboard implements Overlay, Runnable {
 			Math.min(ContextHolder.getDisplayWidth(), ContextHolder.getDisplayHeight()) / 6.0f;
 	private float snapRadius;
 	private int layoutVariant;
+	/** The classic keypad's current layout, rebuilt (on any thread) when the screen changes. */
+	private volatile ClassicSkin.Frame classicFrame;
+	/** Main thread only, as is painting. */
+	private ClassicSkin classicSkin;
+	private final boolean[] classicPressed = new boolean[ClassicKeypad.PARTS];
 
 	public VirtualKeyboard(ProfileModel settings) {
 		this.settings = settings;
@@ -445,6 +463,16 @@ public class VirtualKeyboard implements Overlay, Runnable {
 				setSnap(KEY_D, KEY_NUM9, RectSnap.EXT_EAST, false);
 				setSnap(KEY_MENU, SCREEN, RectSnap.INT_NORTHEAST, false);
 			}
+			case TYPE_CLASSIC -> {
+				// Laid out by ClassicKeypad instead of by snapping; A, B and C have no place on it.
+				Arrays.fill(keyScales, 1);
+				for (int key = 0; key < KEYBOARD_SIZE; key++) {
+					setSnap(key, SCREEN, RectSnap.INT_NORTHWEST, false);
+				}
+				for (int key : CLASSIC_KEYS) {
+					keypad[key].visible = true;
+				}
+			}
 			case TYPE_ARROWS -> {
 				Arrays.fill(keyScales, 1);
 
@@ -490,6 +518,9 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	}
 
 	public void setLayout(int variant) {
+		if (variant == TYPE_CLASSIC && layoutEditMode != LAYOUT_EOF) {
+			setLayoutEditMode(LAYOUT_EOF);
+		}
 		resetLayout(variant);
 		if (variant == TYPE_CUSTOM) {
 			try {
@@ -502,10 +533,14 @@ public class VirtualKeyboard implements Overlay, Runnable {
 		}
 		layoutVariant = variant;
 		onLayoutChanged(variant);
-		for (int group = 0; group < keyScaleGroups.length; group++) {
-			resizeKeyGroup(group);
+		if (isClassic()) {
+			layoutClassic();
+		} else {
+			for (int group = 0; group < keyScaleGroups.length; group++) {
+				resizeKeyGroup(group);
+			}
+			snapKeys();
 		}
-		snapKeys();
 		overlayView.postInvalidate();
 		if (target != null && target.isShown()) {
 			target.updateSize();
@@ -807,6 +842,50 @@ public class VirtualKeyboard implements Overlay, Runnable {
 		return layoutVariant == TYPE_PHONE || layoutVariant == TYPE_PHONE_ARROWS;
 	}
 
+	/** The classic keypad: beside or below the game, never over it, and not movable. */
+	public boolean isClassic() {
+		return layoutVariant == TYPE_CLASSIC;
+	}
+
+	/** Where the game goes when the classic keypad takes the rest of the screen. */
+	public RectF getClassicScreenArea(float width, float height) {
+		ClassicKeypad.Box area = ClassicKeypad.gameArea(width, height,
+				settings.screenWidth, settings.screenHeight);
+		return new RectF(area.left, area.top, area.right, area.bottom);
+	}
+
+	private void layoutClassic() {
+		RectF screen = this.screen;
+		if (screen == null) {
+			return; // not sized yet: resize() comes
+		}
+		ClassicKeypad.Box game = new ClassicKeypad.Box(
+				virtualScreen.left, virtualScreen.top, virtualScreen.right, virtualScreen.bottom);
+		classicFrame = new ClassicSkin.Frame(ClassicKeypad.layout(screen.width(), screen.height(), game));
+		obscuresVirtualScreen = false;
+		overlayView.postInvalidate();
+	}
+
+	private VirtualKey keyAt(float x, float y) {
+		if (isClassic()) {
+			ClassicSkin.Frame frame = classicFrame;
+			int part = frame == null ? ClassicKeypad.NONE : frame.keypad.partAt(x, y);
+			return part == ClassicKeypad.NONE ? null : keypad[CLASSIC_KEYS[part]];
+		}
+		for (VirtualKey key : keypad) {
+			if (key.contains(x, y)) {
+				return key;
+			}
+		}
+		return null;
+	}
+
+	/** Whether a finger that pressed this key is still on it. */
+	private boolean isStillOn(VirtualKey key, float x, float y) {
+		// On the classic pad the directions touch each other, so the key under the finger decides.
+		return isClassic() ? keyAt(x, y) == key : key.contains(x, y);
+	}
+
 	private void highlightGroup(int group) {
 		for (VirtualKey aKeypad : keypad) {
 			aKeypad.selected = false;
@@ -823,6 +902,9 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	}
 
 	public void setLayoutEditMode(int mode) {
+		if (isClassic() && mode != LAYOUT_EOF) {
+			return; // its keys are not moved one by one (the menu does not offer it)
+		}
 		layoutEditMode = mode;
 		editedIndex = -1;
 		highlightGroup(-1);
@@ -850,6 +932,10 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	public void resize(RectF screen, float left, float top, float right, float bottom) {
 		this.screen = screen;
 		virtualScreen.set(left, top, right, bottom);
+		if (isClassic()) {
+			layoutClassic();
+			return;
+		}
 		snapRadius = keyScales[0];
 		for (int i = 1; i < keyScales.length; i++) {
 			if (keyScales[i] < snapRadius) {
@@ -888,6 +974,20 @@ public class VirtualKeyboard implements Overlay, Runnable {
 
 	@Override
 	public void paint(CanvasWrapper g) {
+		if (isClassic()) {
+			// Always shown and solid: it is beside the game, so transparency does not apply.
+			ClassicSkin.Frame frame = classicFrame;
+			if (frame != null) {
+				if (classicSkin == null) {
+					classicSkin = new ClassicSkin(ContextHolder.getAppContext());
+				}
+				for (int part = 0; part < CLASSIC_KEYS.length; part++) {
+					classicPressed[part] = keypad[CLASSIC_KEYS[part]].selected;
+				}
+				classicSkin.paint(g.getCanvas(), frame, classicPressed);
+			}
+			return;
+		}
 		if (visible && (layoutEditMode != LAYOUT_EOF || settings.vkAlpha > 0)) {
 			for (VirtualKey key : keypad) {
 				if (key.visible) {
@@ -901,17 +1001,15 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	public boolean pointerPressed(int pointer, float x, float y) {
 		switch (layoutEditMode) {
 			case LAYOUT_EOF -> {
-				if (pointer > associatedKeys.length) {
+				if (pointer >= associatedKeys.length) {
 					return false;
 				}
-				for (VirtualKey key : keypad) {
-					if (key.contains(x, y)) {
-						vibrate();
-						associatedKeys[pointer] = key;
-						key.onDown();
-						overlayView.postInvalidate();
-						break;
-					}
+				VirtualKey key = keyAt(x, y);
+				if (key != null) {
+					vibrate();
+					associatedKeys[pointer] = key;
+					key.onDown();
+					overlayView.postInvalidate();
 				}
 			}
 			case LAYOUT_KEYS -> {
@@ -959,15 +1057,15 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	public boolean pointerDragged(int pointer, float x, float y) {
 		switch (layoutEditMode) {
 			case LAYOUT_EOF -> {
-				if (pointer > associatedKeys.length) {
+				if (pointer >= associatedKeys.length) {
 					return false;
 				}
 				VirtualKey aKey = associatedKeys[pointer];
 				if (aKey == null) {
 					pointerPressed(pointer, x, y);
-				} else if (!aKey.contains(x, y)) {
+				} else if (!isStillOn(aKey, x, y)) {
 					associatedKeys[pointer] = null;
-					aKey.onUp();
+					aKey.onSlideOff();
 					overlayView.postInvalidate();
 					pointerPressed(pointer, x, y);
 				}
@@ -1045,7 +1143,7 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	@Override
 	public boolean pointerReleased(int pointer, float x, float y) {
 		if (layoutEditMode == LAYOUT_EOF) {
-			if (pointer > associatedKeys.length) {
+			if (pointer >= associatedKeys.length) {
 				return false;
 			}
 			VirtualKey key = associatedKeys[pointer];
@@ -1148,7 +1246,14 @@ public class VirtualKeyboard implements Overlay, Runnable {
 	}
 
 	private void vibrate() {
-		if (settings.vkFeedback) ContextHolder.vibrateKey(FEEDBACK_DURATION);
+		if (!settings.vkFeedback) {
+			return;
+		}
+		if (isClassic()) {
+			ContextHolder.vibrateKeyClick();
+		} else {
+			ContextHolder.vibrateKey(FEEDBACK_DURATION);
+		}
 	}
 
 	public void setView(View view) {
@@ -1305,6 +1410,11 @@ public class VirtualKeyboard implements Overlay, Runnable {
 			handler.removeCallbacks(this);
 			target.postKeyReleased(keyCode);
 		}
+
+		/** The finger slid off while pressing: for most keys, the same as lifting it. */
+		void onSlideOff() {
+			onUp();
+		}
 	}
 
 	private class DualKey extends VirtualKey {
@@ -1365,6 +1475,13 @@ public class VirtualKeyboard implements Overlay, Runnable {
 					activity.openOptionsMenu();
 				}
 			}
+		}
+
+		/** Sliding off the menu key changes one's mind: no menu. */
+		@Override
+		void onSlideOff() {
+			selected = false;
+			handler.removeCallbacks(this);
 		}
 
 		@Override

@@ -5,7 +5,8 @@ Emulador de jogos Java (J2ME) para Android, com uma biblioteca de jogos embutida
 - Biblioteca com busca (ignora acentos) e três ordens: **mais bem avaliados**, A–Z e recentes, além de uma fileira "jogados recentemente".
 - Avaliação de 1 a 5 estrelas, guardada só no celular. Tocar de novo na mesma estrela tira a nota.
 - Cada jogo abre na melhor versão que existe e já configurado: tamanho de tela certo e tela deitada nos jogos feitos para 320x240.
-- Jogos 3D (M3G/JSR-184 e Mascot Capsule v3), som MIDI e teclado virtual.
+- Jogos 3D (M3G/JSR-184 e Mascot Capsule v3) e som MIDI.
+- **Teclado de celular clássico**, abaixo do jogo (em pé) ou dos lados (deitado), sem cobrir a tela: teclas de função, direcional redondo com OK no centro, verde e vermelha, e o teclado numérico com as letras. A tecla vermelha abre o menu (segurar: sair). Os teclados antigos continuam em menu do jogo → Teclado virtual → Alterar layout dos botões.
 - Outros `.jar` podem ser adicionados pelo menu ⋮ → "Adicionar seus jogos (.jar)".
 - **Multiplayer por Bluetooth** (35 jogos da coleção: PES, Real Football, Tekken, Snake 3, Pokémon…) entre dois celulares com o Tijolão. Um cria a partida e o outro entra.
 - Sem internet: o app não tem essa permissão e não envia nada.
@@ -23,6 +24,7 @@ O JDK é o JBR do Android Studio. Em PowerShell, na pasta `tijolao/`:
 ```powershell
 $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 .\gradlew.bat -p buildSrc test                                         # testes do montador do catálogo
+.\gradlew.bat :app:testEmulatorDebugUnitTest -PgamesLimit=1           # testes do teclado clássico
 .\gradlew.bat :app:assembleEmulatorRelease -Pabi=arm64-v8a             # APK para celulares (todos os jogos, ~400 MB)
 .\gradlew.bat :app:assembleEmulatorDebug -Pabi=x86_64 "-PgamesOnly=crazy taxi,tetris"   # teste no emulador
 ```
@@ -66,6 +68,7 @@ Mudanças em relação ao JL-Mod 0.87.1:
 - `Canvas.isShown()` responde "visível" entre `setCurrent()` e o aparecimento da tela, como nos celulares. Sem isso, o Crazy Taxi 3D fechava ao abrir.
 - Compila com o NDK 30 (sem `LOCAL_ARM_NEON`, correções de tipo no M3G). O TinySoundFont (MIT) vem incluído no código.
 - Bluetooth: o pedido de permissão espera a sua resposta (antes, a primeira tentativa sempre falhava), a conexão sempre passa pelo pedido de permissão e de ligar o Bluetooth, e a espera por "ligar o Bluetooth?" não acorda antes da resposta.
+- Teclado "Celular clássico" (`ClassicKeypad`/`ClassicSkin`), o padrão dos jogos: o jogo ocupa a largura toda em pé e a altura toda deitado, e o teclado fica no espaço que sobra. O direcional reconhece o toque pelo ângulo (setas com 60°, diagonais com 30°), e a vibração é um clique curto. Jogos abertos antes passam para ele uma vez, menos os que tiveram o teclado trocado.
 - `minSdk 26`.
 
 Para os recursos do emulador (shaders, bancos de som SF2/DLS, skins, propriedades do Mascot Capsule), veja o [README do JL-Mod](https://github.com/woesss/JL-Mod#readme). Tudo isso continua disponível em ⋮ → "Ajustes do emulador" e nos ajustes de cada jogo.

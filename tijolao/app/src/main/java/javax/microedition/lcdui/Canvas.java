@@ -311,15 +311,25 @@ public abstract class Canvas extends Displayable {
 		// has the same aspect ratio as the actual screen of the device.
 		int scaledDisplayWidth;
 		int scaledDisplayHeight;
+		// where the area given to the game starts on the real screen
+		int areaLeft = settings.screenPadding;
+		int areaTop = settings.screenPadding;
 
 		SkinLayer skinLayer = SkinLayer.getInstance();
+		VirtualKeyboard vk = ContextHolder.getVk();
 		if (skinLayer != null && skinLayer.hasDisplayFrame()) {
 			skinLayer.resize(virtualScreen, 0, 0, displayWidth, displayHeight);
 			scaledDisplayWidth = (int) virtualScreen.width();
 			scaledDisplayHeight = (int) virtualScreen.height();
+		} else if (vk != null && vk.isClassic()) {
+			// the classic keypad takes the rest of the screen, below or beside the game
+			RectF area = vk.getClassicScreenArea(displayWidth, displayHeight);
+			areaLeft = (int) area.left;
+			areaTop = (int) area.top;
+			scaledDisplayWidth = (int) area.width();
+			scaledDisplayHeight = (int) area.height();
 		} else {
 			scaledDisplayWidth = displayWidth - settings.screenPadding * 2;
-			VirtualKeyboard vk = ContextHolder.getVk();
 			boolean isPhoneSkin = vk != null && vk.isPhone();
 
 			// if phone keyboard layout is active, then scale down the virtual screen
@@ -418,8 +428,8 @@ public abstract class Canvas extends Displayable {
 			onX += virtualScreen.left;
 			onY += virtualScreen.top;
 		} else {
-			onX += settings.screenPadding;
-			onY += settings.screenPadding;
+			onX += areaLeft;
+			onY += areaTop;
 		}
 
 		// calculate the maximum height

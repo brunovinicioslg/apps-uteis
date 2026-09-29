@@ -30,7 +30,7 @@ Jogar os jogos Java (J2ME) dos celulares antigos num Android atual sem configura
 
 **Falta verificar nos aparelhos reais (Galaxy S22 e Redmi Note 12S):**
 - desempenho e som;
-- teclado virtual na tela real;
+- teclado clássico na tela real (tamanho das teclas, vibração, diagonais do direcional);
 - jogos pesados em 3D.
 
 ## Funcionalidades
@@ -44,6 +44,7 @@ Jogar os jogos Java (J2ME) dos celulares antigos num Android atual sem configura
 5. **Por jogo**: ajustes do JL-Mod e "apagar progresso" (os saves).
 6. **Adicionar outros `.jar`** pelo seletor de arquivos do sistema (sem permissão de armazenamento).
 7. **Multiplayer por Bluetooth** (JSR-82) entre dois celulares com o Tijolão: permissão "Dispositivos por perto" pedida só quando um jogo usa Bluetooth. No emulador, o lado que cria a partida funciona (Snake 3: permissão, ligar Bluetooth, ficar visível, "esperando outro jogador"); entrar na partida só dá para testar com dois aparelhos.
+8. **Teclado de celular clássico** (29/09/2026), o padrão: abaixo do jogo em pé e dos lados deitado, sem cobrir a tela. Teclas de função, direcional redondo de 5 direções (toque pelo ângulo: setas 60°, diagonais 30°), verde (SEND) e vermelha (abre o menu; segurar: sair), números com letras, corpo grafite e clique de vibração. Geometria em `ClassicKeypad` (7 testes), desenho em `ClassicSkin`. Conferido no emulador em pé e deitado: setas, OK, menu pela vermelha, troca de teclado nos dois sentidos (inclusive saindo do modo de edição).
 
 ### Sugestões para depois
 
