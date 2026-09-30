@@ -9,6 +9,7 @@ Plano geral e decisões: [PLANO.md](PLANO.md). Cada pasta tem seu `PLANO.md` com
 | `trena/` | Mede Aí | `io.github.brunovinicioslg.medeai` |
 | `gps-relevo/` | Ladeira | `io.github.brunovinicioslg.ladeira` |
 | `sms-seguro/` | Sigilo | `io.github.brunovinicioslg.sigilo` |
+| `bloqueador/` | Sossego (bloqueador de chamadas) | `io.github.brunovinicioslg.sossego` |
 | `tijolao/` | Tijolão (uso pessoal, fork do JL-Mod) | `io.github.brunovinicioslg.tijolao` |
 
 ## Convenções
@@ -34,7 +35,7 @@ Dentro da pasta do app (ex.: `lanterna/`):
 .\gradlew.bat test lint assembleDebug      # lanterna/: testes unitários, lint e APK de depuração
 .\gradlew.bat :shared:jvmTest :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # trena/
 .\gradlew.bat :shared:jvmTest :tools:test :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # gps-relevo/
-.\gradlew.bat :core:test :core:lint :app:testDebugUnitTest :app:lintDebug :app:assembleDebug   # sms-seguro/ (AGPL-3.0)
+.\gradlew.bat :core:test :core:lint :app:testDebugUnitTest :app:lintDebug :app:assembleDebug   # sms-seguro/ (AGPL-3.0) e bloqueador/
 .\gradlew.bat connectedDebugAndroidTest    # testes instrumentados (emulador ou aparelho conectado)
 ```
 
@@ -67,3 +68,8 @@ Sigilo (`sms-seguro/`):
 - Sempre testar também o APK de publicação (R8): `assembleRelease`, `zipalign` e `apksigner` com a chave de depuração, e um convite aceito no emulador. Foi assim que apareceu a quebra da libsignal pelo R8.
 - "Segundo celular" no computador: `.\gradlew.bat :peer:installDist`, depois `peer/build/install/peer/bin/peer invite|send|ack|receive --state pasta ...`. Os SMS entram no emulador com `adb emu sms send <número> <texto>`; os que o app envia aparecem no log (`adb logcat -s SigiloSms`, só em depuração, sempre cifrados).
 - O emulador tem só 6 GB de dados e fica perto do mínimo: desinstale antes de reinstalar (`adb uninstall`), e para voltar ao Ladeira ou ao Alumia reinstale-os.
+
+Sossego (`bloqueador/`):
+- `minSdk 29` (o papel de filtro de chamadas só existe a partir do Android 10).
+- No emulador, ligações de verdade: `adb emu gsm call <número>`; o papel sem a tela do sistema: `adb shell cmd role add-role-holder android.app.role.CALL_SCREENING io.github.brunovinicioslg.sossego`; resultado no log (`SCREENING_COMPLETED`).
+- Robolectric não estabiliza um campo de texto dentro de um diálogo em telas de 411dp ou mais: os testes do diálogo de número usam a tela padrão (`ListDialogTest`). No aparelho funciona.

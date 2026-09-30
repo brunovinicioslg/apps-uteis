@@ -8,6 +8,7 @@ Quatro apps **gratuitos e de código aberto**, primeiro para **Android (Google P
 | [trena/](trena/) | **Mede Aí** | Mede Aí – Trena pela Câmera | `io.github.brunovinicioslg.medeai` | [trena/PLANO.md](trena/PLANO.md) |
 | [gps-relevo/](gps-relevo/) | **Ladeira** | Ladeira – GPS Subida e Descida | `io.github.brunovinicioslg.ladeira` | [gps-relevo/PLANO.md](gps-relevo/PLANO.md) |
 | [sms-seguro/](sms-seguro/) | **Sigilo** | Sigilo – SMS Criptografado | `io.github.brunovinicioslg.sigilo` | [sms-seguro/PLANO.md](sms-seguro/PLANO.md) |
+| [bloqueador/](bloqueador/) | **Sossego** | Sossego – Bloqueio de Chamadas | `io.github.brunovinicioslg.sossego` | [bloqueador/PLANO.md](bloqueador/PLANO.md) |
 | [tijolao/](tijolao/) | **Tijolão** | (não vai para a loja: uso pessoal) | `io.github.brunovinicioslg.tijolao` | [tijolao/PLANO.md](tijolao/PLANO.md) |
 
 ---

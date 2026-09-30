@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="app_name" translatable="false">Sossego</string>
+
+    <string name="tab_home">Início</string>
+    <string name="tab_lists">Listas</string>
+    <string name="tab_history">Histórico</string>
+
+    <!-- Setup -->
+    <string name="setup_title">Ative o Sossego</string>
+    <string name="setup_text">Para bloquear chamadas, o Android precisa deixar o Sossego filtrar suas ligações. Ele não ouve as chamadas e não usa internet.</string>
+    <string name="setup_button">Ativar</string>
+    <string name="setup_denied">Sem essa permissão, o Sossego não consegue bloquear chamadas.</string>
+    <string name="no_telephony_title">Este aparelho não recebe ligações</string>
+    <string name="no_telephony_text">O Android deste aparelho não tem o filtro de chamadas.</string>
+
+    <!-- Status -->
+    <string name="status_on">Bloqueando: %1$s</string>
+    <string name="status_off">Bloqueio desligado</string>
+    <string name="status_off_text">Todas as chamadas tocam normalmente.</string>
+    <string name="status_schedule">Pelo horário, até %1$s.</string>
+
+    <!-- Modes -->
+    <string name="mode_title">O que bloquear</string>
+    <string name="mode_off">Desligado</string>
+    <string name="mode_off_summary">Nenhuma chamada é bloqueada.</string>
+    <string name="mode_blocklist">Lista negra</string>
+    <string name="mode_blocklist_summary">Só os números da lista negra e os filtros ligados.</string>
+    <string name="mode_allowlist">Só lista branca</string>
+    <string name="mode_allowlist_summary">Todos, menos a lista branca e seus contatos.</string>
+    <string name="mode_block_all">Bloquear tudo</string>
+    <string name="mode_block_all_summary">Todas as chamadas, inclusive de contatos.</string>
+    <string name="block_all_confirm_title">Bloquear todas as chamadas?</string>
+    <string name="block_all_confirm_text">Ninguém vai conseguir te ligar, nem família e contatos, até você mudar o modo. Ligações para emergência (190, 192, 193…) continuam funcionando.</string>
+    <string name="block_all_confirm_button">Bloquear tudo</string>
+
+    <!-- Hints -->
+    <string name="hint_allow">Permitir</string>
+    <string name="hint_decline_title">Contatos ainda tocam</string>
+    <string name="hint_decline_text">O Android não mostra ao filtro as ligações de contatos. Para recusá-las também, permita que o Sossego veja quando o celular toca e recuse a chamada. Elas podem tocar por um instante antes de cair.</string>
+    <string name="decline_denied">Sem essa permissão, as ligações de contatos continuam tocando.</string>
+    <string name="hint_contacts_title">Proteja seus contatos</string>
+    <string name="hint_contacts_text">Com acesso aos contatos, o Sossego confere cada número e nunca bloqueia quem você salvou, em qualquer celular.</string>
+    <string name="contacts_denied">Sem acesso aos contatos, o Sossego confia no Android para não filtrá-los.</string>
+    <string name="open_settings">Abrir</string>
+    <string name="battery_title">Evite que o sistema desligue o bloqueio</string>
+    <string name="battery_summary_xiaomi">Na tela do app, abra Economia de bateria e escolha Sem restrições. Ative também o Início automático.</string>
+    <string name="battery_summary_samsung">Na tela do app, abra Bateria e escolha Irrestrito.</string>
+    <string name="battery_button">Abrir configurações</string>
+
+    <!-- Filters -->
+    <string name="filters_title">Filtros da lista negra</string>
+    <string name="filter_telemarketing">Telemarketing (0303)</string>
+    <string name="filter_telemarketing_summary">Pela Anatel, telemarketing só pode ligar de números 0303.</string>
+    <string name="filter_hidden">Números ocultos</string>
+    <string name="filter_hidden_summary">Chamadas sem número (privado ou desconhecido).</string>
+    <string name="filter_international">Ligações do exterior</string>
+    <string name="filter_international_summary">Números de fora do Brasil.</string>
+    <string name="repeat_title">Deixar passar quem insiste</string>
+    <string name="repeat_summary">Se o mesmo número ligar de novo em até 3 minutos, a segunda chamada toca. Útil em emergências.</string>
+
+    <!-- When blocking -->
+    <string name="action_title">Ao bloquear</string>
+    <string name="action_what">O que fazer com a chamada</string>
+    <string name="action_reject">Recusar</string>
+    <string name="action_silence">Silenciar</string>
+    <string name="action_reject_summary">Recusada sem tocar. Pode cair na caixa postal da operadora.</string>
+    <string name="action_silence_summary">Chega sem som e vira chamada perdida.</string>
+    <string name="keep_log_title">Registrar no histórico do telefone</string>
+    <string name="keep_log_summary">A chamada bloqueada aparece no app Telefone.</string>
+    <string name="notifications_title">Notificações</string>
+    <string name="notify_none">Nenhuma</string>
+    <string name="notify_each">A cada bloqueio</string>
+    <string name="notify_daily">Resumo do dia</string>
+    <string name="notifications_denied">Sem permissão de notificações, o Sossego fica em silêncio.</string>
+
+    <!-- Schedule -->
+    <string name="schedule_title">Outro modo num horário</string>
+    <string name="schedule_summary">Por exemplo, só a lista branca à noite.</string>
+    <string name="schedule_start">Início %1$s</string>
+    <string name="schedule_end">Fim %1$s</string>
+    <string name="schedule_days">Dias</string>
+    <string name="schedule_mode">Modo no horário</string>
+
+    <!-- Other -->
+    <string name="system_blocked_title">Números bloqueados do Android</string>
+    <string name="system_blocked_summary">Bloqueia também contatos, sem o modo Bloquear tudo.</string>
+    <string name="system_blocked_unavailable">Este celular não abriu a tela de números bloqueados. Procure por ela no app Telefone.</string>
+    <string name="about_title">Sobre</string>
+    <string name="about_text">Versão %1$s. Grátis, sem anúncios, sem internet e sem coleta de dados. Código aberto sob a licença GPL-3.0.</string>
+    <string name="about_source">Ver o código-fonte</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Salvar</string>
+    <string name="menu_more">Mais opções</string>
+
+    <!-- Lists -->
+    <string name="list_block_count">Lista negra (%1$d)</string>
+    <string name="list_allow_count">Lista branca (%1$d)</string>
+    <string name="list_empty">Nenhum número. Toque em + para adicionar.</string>
+    <string name="list_contacts_title">E os contatos?</string>
+    <string name="list_contacts_note">O Android não mostra ao filtro as ligações de quem está nos seus contatos. Para bloquear um contato, use os números bloqueados do Android ou o modo Bloquear tudo.</string>
+    <string name="list_add">Adicionar número</string>
+    <string name="list_add_block">Bloquear número</string>
+    <string name="list_add_allow">Liberar número</string>
+    <string name="list_edit_title">Editar número</string>
+    <string name="list_prefix">Começa com %1$s</string>
+    <string name="list_delete">Apagar %1$s</string>
+    <string name="entry_number">Número</string>
+    <string name="entry_number_hint" tools:ignore="TypographyDashes">(11) 98765-4321</string>
+    <string name="entry_prefix">Todos que começam com esse número</string>
+    <string name="entry_prefix_hint">Ex.: 0303, 4003 ou +1</string>
+    <string name="entry_name">Nome (opcional)</string>
+    <string name="entry_pick_contact">Escolher dos contatos</string>
+    <string name="entry_pick_failed">Nenhum app de contatos encontrado.</string>
+    <string name="entry_invalid">Digite um número.</string>
+    <string name="added_block">Adicionado à lista negra.</string>
+    <string name="added_allow">Adicionado à lista branca.</string>
+    <string name="moved_block">Movido da lista branca para a lista negra.</string>
+    <string name="moved_allow">Movido da lista negra para a lista branca.</string>
+    <string name="already_listed">Esse número já estava na lista.</string>
+    <string name="deleted">Número apagado.</string>
+    <string name="undo">Desfazer</string>
+    <string name="contact_warning_title">Esse número está nos seus contatos</string>
+    <string name="contact_warning_text">O Android não mostra ao Sossego as ligações de contatos, então a lista negra não vai bloquear esse número. Use os números bloqueados do Android, o modo Bloquear tudo, ou apague o contato.</string>
+    <string name="contact_warning_open">Abrir bloqueio do Android</string>
+    <string name="menu_export">Exportar listas</string>
+    <string name="menu_import">Importar listas</string>
+    <string name="export_file_name">sossego-listas.csv</string>
+    <string name="export_done">Listas exportadas.</string>
+    <string name="export_failed">Não foi possível salvar o arquivo.</string>
+    <string name="import_failed">Não foi possível ler o arquivo.</string>
+    <string name="import_nothing">Nenhum número novo no arquivo.</string>
+    <plurals name="import_done">
+        <item quantity="one">%1$d número novo importado.</item>
+        <item quantity="many">%1$d números novos importados.</item>
+        <item quantity="other">%1$d números novos importados.</item>
+    </plurals>
+    <plurals name="import_skipped">
+        <item quantity="one">%1$d linha ignorada.</item>
+        <item quantity="many">%1$d linhas ignoradas.</item>
+        <item quantity="other">%1$d linhas ignoradas.</item>
+    </plurals>
+
+    <!-- History -->
+    <string name="history_empty">Nenhuma chamada bloqueada ainda.</string>
+    <string name="history_clear">Limpar</string>
+    <string name="history_clear_confirm">Apagar todo o histórico de bloqueios?</string>
+    <string name="history_clear_button">Apagar</string>
+    <string name="history_allow">Liberar este número</string>
+    <string name="history_block">Bloquear sempre</string>
+    <string name="history_copy">Copiar número</string>
+    <string name="history_delete">Apagar do histórico</string>
+    <string name="history_silenced">silenciada</string>
+    <string name="number_copied">Número copiado.</string>
+    <string name="caller_hidden">Número oculto</string>
+    <string name="caller_contact">Contato</string>
+    <string name="reason_block_all">Bloquear tudo</string>
+    <string name="reason_block_listed">Lista negra</string>
+    <string name="reason_not_allowed">Fora da lista branca</string>
+    <string name="reason_hidden">Número oculto</string>
+    <string name="reason_telemarketing">Telemarketing</string>
+    <string name="reason_international">Do exterior</string>
+    <string name="reason_allowed">Liberada</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Chamadas bloqueadas</string>
+    <string name="notification_channel_description">Avisos opcionais das chamadas bloqueadas. Sempre em silêncio.</string>
+    <string name="notification_blocked_title">Chamada bloqueada</string>
+    <string name="notification_blocked_text">%1$s · %2$s</string>
+    <plurals name="notification_daily_title">
+        <item quantity="one">%1$d chamada bloqueada hoje</item>
+        <item quantity="many">%1$d chamadas bloqueadas hoje</item>
+        <item quantity="other">%1$d chamadas bloqueadas hoje</item>
+    </plurals>
+    <string name="notification_daily_last">Última: %1$s</string>
+</resources>

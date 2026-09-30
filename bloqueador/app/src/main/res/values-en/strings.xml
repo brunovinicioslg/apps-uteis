@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="tab_home">Home</string>
+    <string name="tab_lists">Lists</string>
+    <string name="tab_history">History</string>
+
+    <!-- Setup -->
+    <string name="setup_title">Turn Sossego on</string>
+    <string name="setup_text">To block calls, Android has to let Sossego screen your calls. It never listens to calls and does not use the internet.</string>
+    <string name="setup_button">Turn on</string>
+    <string name="setup_denied">Without this permission, Sossego cannot block calls.</string>
+    <string name="no_telephony_title">This device does not receive calls</string>
+    <string name="no_telephony_text">Android on this device has no call screening.</string>
+
+    <!-- Status -->
+    <string name="status_on">Blocking: %1$s</string>
+    <string name="status_off">Blocking is off</string>
+    <string name="status_off_text">Every call rings as usual.</string>
+    <string name="status_schedule">By the schedule, until %1$s.</string>
+
+    <!-- Modes -->
+    <string name="mode_title">What to block</string>
+    <string name="mode_off">Off</string>
+    <string name="mode_off_summary">No call is blocked.</string>
+    <string name="mode_blocklist">Block list</string>
+    <string name="mode_blocklist_summary">Only numbers on the block list and the filters that are on.</string>
+    <string name="mode_allowlist">Allow list only</string>
+    <string name="mode_allowlist_summary">Everyone except the allow list and your contacts.</string>
+    <string name="mode_block_all">Block everything</string>
+    <string name="mode_block_all_summary">Every call, contacts included.</string>
+    <string name="block_all_confirm_title">Block every call?</string>
+    <string name="block_all_confirm_text">Nobody will be able to call you, not even family and contacts, until you change the mode. Emergency numbers keep working.</string>
+    <string name="block_all_confirm_button">Block everything</string>
+
+    <!-- Hints -->
+    <string name="hint_allow">Allow</string>
+    <string name="hint_decline_title">Contacts still ring</string>
+    <string name="hint_decline_text">Android does not show contacts\' calls to call screening. To decline them too, let Sossego see when the phone rings and decline the call. They may ring for a moment before ending.</string>
+    <string name="decline_denied">Without this permission, contacts\' calls keep ringing.</string>
+    <string name="hint_contacts_title">Protect your contacts</string>
+    <string name="hint_contacts_text">With access to your contacts, Sossego checks every number and never blocks someone you saved, on any phone.</string>
+    <string name="contacts_denied">Without access to contacts, Sossego relies on Android not to screen them.</string>
+    <string name="open_settings">Open</string>
+    <string name="battery_title">Keep the system from stopping the blocking</string>
+    <string name="battery_summary_xiaomi">On the app page, open Battery saver and choose No restrictions. Also turn on Autostart.</string>
+    <string name="battery_summary_samsung">On the app page, open Battery and choose Unrestricted.</string>
+    <string name="battery_button">Open settings</string>
+
+    <!-- Filters -->
+    <string name="filters_title">Block list filters</string>
+    <string name="filter_telemarketing">Telemarketing (0303)</string>
+    <string name="filter_telemarketing_summary">In Brazil, telemarketing may only call from 0303 numbers.</string>
+    <string name="filter_hidden">Hidden numbers</string>
+    <string name="filter_hidden_summary">Calls without a number (private or unknown).</string>
+    <string name="filter_international">Calls from abroad</string>
+    <string name="filter_international_summary">Numbers from outside Brazil.</string>
+    <string name="repeat_title">Let someone who insists through</string>
+    <string name="repeat_summary">If the same number calls again within 3 minutes, the second call rings. Useful in emergencies.</string>
+
+    <!-- When blocking -->
+    <string name="action_title">When blocking</string>
+    <string name="action_what">What to do with the call</string>
+    <string name="action_reject">Decline</string>
+    <string name="action_silence">Silence</string>
+    <string name="action_reject_summary">Declined without ringing. It may go to the carrier\'s voicemail.</string>
+    <string name="action_silence_summary">Arrives without sound and ends as a missed call.</string>
+    <string name="keep_log_title">Keep in the phone\'s call history</string>
+    <string name="keep_log_summary">The blocked call shows in the Phone app.</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notify_none">None</string>
+    <string name="notify_each">Every block</string>
+    <string name="notify_daily">Daily summary</string>
+    <string name="notifications_denied">Without notification permission, Sossego stays silent.</string>
+
+    <!-- Schedule -->
+    <string name="schedule_title">Another mode at set times</string>
+    <string name="schedule_summary">For example, only the allow list at night.</string>
+    <string name="schedule_start">Start %1$s</string>
+    <string name="schedule_end">End %1$s</string>
+    <string name="schedule_days">Days</string>
+    <string name="schedule_mode">Mode during those times</string>
+
+    <!-- Other -->
+    <string name="system_blocked_title">Android\'s blocked numbers</string>
+    <string name="system_blocked_summary">Blocks contacts too, without Block everything.</string>
+    <string name="system_blocked_unavailable">This phone did not open the blocked numbers page. Look for it in the Phone app.</string>
+    <string name="about_title">About</string>
+    <string name="about_text">Version %1$s. Free, no ads, no internet and no data collection. Open source under the GPL-3.0 license.</string>
+    <string name="about_source">View source code</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="menu_more">More options</string>
+
+    <!-- Lists -->
+    <string name="list_block_count">Block list (%1$d)</string>
+    <string name="list_allow_count">Allow list (%1$d)</string>
+    <string name="list_empty">No numbers. Tap + to add one.</string>
+    <string name="list_contacts_title">What about contacts?</string>
+    <string name="list_contacts_note">Android does not show call screening the calls from people in your contacts. To block a contact, use Android\'s blocked numbers or Block everything.</string>
+    <string name="list_add">Add number</string>
+    <string name="list_add_block">Block number</string>
+    <string name="list_add_allow">Allow number</string>
+    <string name="list_edit_title">Edit number</string>
+    <string name="list_prefix">Starts with %1$s</string>
+    <string name="list_delete">Delete %1$s</string>
+    <string name="entry_number">Number</string>
+    <string name="entry_number_hint" tools:ignore="TypographyDashes">(11) 98765-4321</string>
+    <string name="entry_prefix">Every number starting with this</string>
+    <string name="entry_prefix_hint">E.g. 0303, 4003 or +1</string>
+    <string name="entry_name">Name (optional)</string>
+    <string name="entry_pick_contact">Pick from contacts</string>
+    <string name="entry_pick_failed">No contacts app found.</string>
+    <string name="entry_invalid">Type a number.</string>
+    <string name="added_block">Added to the block list.</string>
+    <string name="added_allow">Added to the allow list.</string>
+    <string name="moved_block">Moved from the allow list to the block list.</string>
+    <string name="moved_allow">Moved from the block list to the allow list.</string>
+    <string name="already_listed">That number was already on the list.</string>
+    <string name="deleted">Number deleted.</string>
+    <string name="undo">Undo</string>
+    <string name="contact_warning_title">This number is in your contacts</string>
+    <string name="contact_warning_text">Android does not show Sossego calls from contacts, so the block list will not block this number. Use Android\'s blocked numbers, Block everything, or delete the contact.</string>
+    <string name="contact_warning_open">Open Android blocking</string>
+    <string name="menu_export">Export lists</string>
+    <string name="menu_import">Import lists</string>
+    <string name="export_file_name">sossego-lists.csv</string>
+    <string name="export_done">Lists exported.</string>
+    <string name="export_failed">Could not save the file.</string>
+    <string name="import_failed">Could not read the file.</string>
+    <string name="import_nothing">No new numbers in the file.</string>
+    <plurals name="import_done">
+        <item quantity="one">%1$d new number imported.</item>
+        <item quantity="other">%1$d new numbers imported.</item>
+    </plurals>
+    <plurals name="import_skipped">
+        <item quantity="one">%1$d line skipped.</item>
+        <item quantity="other">%1$d lines skipped.</item>
+    </plurals>
+
+    <!-- History -->
+    <string name="history_empty">No blocked calls yet.</string>
+    <string name="history_clear">Clear</string>
+    <string name="history_clear_confirm">Delete the whole history of blocked calls?</string>
+    <string name="history_clear_button">Delete</string>
+    <string name="history_allow">Allow this number</string>
+    <string name="history_block">Always block</string>
+    <string name="history_copy">Copy number</string>
+    <string name="history_delete">Delete from history</string>
+    <string name="history_silenced">silenced</string>
+    <string name="number_copied">Number copied.</string>
+    <string name="caller_hidden">Hidden number</string>
+    <string name="caller_contact">Contact</string>
+    <string name="reason_block_all">Block everything</string>
+    <string name="reason_block_listed">Block list</string>
+    <string name="reason_not_allowed">Not on the allow list</string>
+    <string name="reason_hidden">Hidden number</string>
+    <string name="reason_telemarketing">Telemarketing</string>
+    <string name="reason_international">From abroad</string>
+    <string name="reason_allowed">Allowed</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Blocked calls</string>
+    <string name="notification_channel_description">Optional notices about blocked calls. Always silent.</string>
+    <string name="notification_blocked_title">Call blocked</string>
+    <string name="notification_blocked_text">%1$s · %2$s</string>
+    <plurals name="notification_daily_title">
+        <item quantity="one">%1$d call blocked today</item>
+        <item quantity="other">%1$d calls blocked today</item>
+    </plurals>
+    <string name="notification_daily_last">Latest: %1$s</string>
+</resources>

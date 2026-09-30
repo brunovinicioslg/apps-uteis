@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- All optional, asked for only when a feature needs them. -->
+    <!-- Contacts: to be sure they are never blocked by "only the allow list" (and to pick numbers). -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- "Block everything": contacts' calls never reach the call screening, so the app declines
+         them as they start ringing (phone state tells it they ring, answer-calls lets it decline). -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:name=".SossegoApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Sossego">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Bound by the phone for each incoming call once the user makes the app the call screener. -->
+        <service
+            android:name=".screening.SossegoScreeningService"
+            android:exported="true"
+            android:permission="android.permission.BIND_SCREENING_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecom.CallScreeningService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".screening.RingingReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".tile.BlockingTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_notification"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
+    </application>
+</manifest>
