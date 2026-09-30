@@ -30,3 +30,11 @@ celular/
 
 # Pacotes assinados prontos para enviar à Google Play (ver PUBLICAR.md).
 publicar/
+
+# No GitHub vão só os códigos dos programas. Planos, anotações, páginas de apresentação e os textos
+# e imagens da loja ficam só no computador. Exceção: as políticas de privacidade, que a Google Play
+# exige num endereço público.
+*.md
+!lanterna/PRIVACIDADE.md
+!bloqueador/PRIVACIDADE.md
+fastlane/
