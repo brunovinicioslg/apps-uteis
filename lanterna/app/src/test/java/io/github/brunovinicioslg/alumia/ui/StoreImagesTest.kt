@@ -1,6 +1,5 @@
 package io.github.brunovinicioslg.alumia.ui
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +45,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import java.awt.image.BufferedImage
 import java.io.File
+import javax.imageio.ImageIO
 
 /**
  * The Google Play images, drawn from the real screens. Skipped in normal runs; to write them:
@@ -85,7 +86,7 @@ class StoreImagesTest {
             }
         }
         val image = compose.onNodeWithTag(IMAGE).captureToImage()
-        LOCALES.forEach { save(image, "$it/images/icon.png") }
+        LOCALES.forEach { save(image, "$it/images/icon.png", alpha = true) }
     }
 
     @Test
@@ -148,10 +149,16 @@ class StoreImagesTest {
         save(compose.onRoot().captureToImage(), path)
     }
 
-    private fun save(image: ImageBitmap, path: String) {
+    /** Play takes the icon with transparency (32-bit PNG) and the other images without it (24-bit PNG). */
+    private fun save(image: ImageBitmap, path: String, alpha: Boolean = false) {
         val file = File(out, path)
         file.parentFile!!.mkdirs()
-        file.outputStream().use { image.asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, it) }
+        val bitmap = image.asAndroidBitmap()
+        val pixels = IntArray(bitmap.width * bitmap.height)
+        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+        val png = BufferedImage(bitmap.width, bitmap.height, if (alpha) BufferedImage.TYPE_INT_ARGB else BufferedImage.TYPE_INT_RGB)
+        png.setRGB(0, 0, bitmap.width, bitmap.height, pixels, 0, bitmap.width)
+        check(ImageIO.write(png, "png", file)) { "no PNG writer" }
     }
 
     private companion object {
