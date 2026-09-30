@@ -2,9 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
     <string name="app_name" translatable="false">Sossego</string>
 
-    <string name="tab_home">Início</string>
     <string name="tab_lists">Listas</string>
-    <string name="tab_history">Histórico</string>
 
     <!-- Setup -->
     <string name="setup_title">Ative o Sossego</string>
@@ -143,7 +141,6 @@
     </plurals>
 
     <!-- History -->
-    <string name="history_empty">Nenhuma chamada bloqueada ainda.</string>
     <string name="history_clear">Limpar</string>
     <string name="history_clear_confirm">Apagar todo o histórico de bloqueios?</string>
     <string name="history_clear_button">Apagar</string>
@@ -174,4 +171,43 @@
         <item quantity="other">%1$d chamadas bloqueadas hoje</item>
     </plurals>
     <string name="notification_daily_last">Última: %1$s</string>
+
+    <!-- Calling: keypad, recent calls, contacts -->
+    <string name="tab_dialpad">Teclado</string>
+    <string name="tab_recents">Recentes</string>
+    <string name="tab_contacts">Contatos</string>
+    <string name="tab_blocking">Bloqueio</string>
+    <string name="call_to">Ligar para %1$s</string>
+    <string name="dialpad_call">Ligar</string>
+    <string name="dialpad_delete">Apagar</string>
+    <string name="dialpad_paste">Colar</string>
+    <string name="dialpad_allow_contacts">Permita o acesso aos contatos para achá-los pelo teclado.</string>
+    <string name="call_denied">Sem permissão para ligar: o número foi aberto no app Telefone.</string>
+    <string name="call_log_denied">Sem acesso ao registro de chamadas, os Recentes mostram só as bloqueadas.</string>
+    <string name="sim_choose_title">Ligar por qual chip?</string>
+    <string name="recents_permission_title">Veja todas as suas chamadas</string>
+    <string name="recents_permission_text">Permita o acesso ao registro de chamadas para ver aqui as recebidas, perdidas e feitas. Sem ele, aparecem só as bloqueadas.</string>
+    <string name="recents_empty">Nenhuma chamada.</string>
+    <string name="filter_all">Todas</string>
+    <string name="filter_missed">Perdidas</string>
+    <string name="filter_incoming">Recebidas</string>
+    <string name="filter_outgoing">Feitas</string>
+    <string name="filter_blocked">Bloqueadas</string>
+    <string name="kind_incoming">Recebida</string>
+    <string name="kind_outgoing">Feita</string>
+    <string name="kind_missed">Perdida</string>
+    <string name="kind_rejected">Recusada</string>
+    <string name="kind_blocked">Bloqueada</string>
+    <string name="kind_voicemail">Caixa postal</string>
+    <string name="kind_other">Chamada</string>
+    <string name="duration_seconds">%1$d s</string>
+    <string name="duration_minutes">%1$d min</string>
+    <string name="contacts_permission_title">Seus contatos</string>
+    <string name="contacts_permission_text">Permita o acesso aos contatos para ligar por eles e achá-los pelo teclado.</string>
+    <string name="contacts_search">Buscar nos contatos</string>
+    <string name="contacts_empty">Nenhum contato.</string>
+    <string name="contacts_favorites">Favoritos</string>
+    <string name="contacts_all">Todos</string>
+    <string name="contacts_open">Abrir contato</string>
+    <string name="contact_block">Bloquear %1$s</string>
 </resources>

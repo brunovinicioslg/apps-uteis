@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="tab_home">Home</string>
     <string name="tab_lists">Lists</string>
-    <string name="tab_history">History</string>
 
     <!-- Setup -->
     <string name="setup_title">Turn Sossego on</string>
@@ -139,7 +137,6 @@
     </plurals>
 
     <!-- History -->
-    <string name="history_empty">No blocked calls yet.</string>
     <string name="history_clear">Clear</string>
     <string name="history_clear_confirm">Delete the whole history of blocked calls?</string>
     <string name="history_clear_button">Delete</string>
@@ -169,4 +166,43 @@
         <item quantity="other">%1$d calls blocked today</item>
     </plurals>
     <string name="notification_daily_last">Latest: %1$s</string>
+
+    <!-- Calling: keypad, recent calls, contacts -->
+    <string name="tab_dialpad">Keypad</string>
+    <string name="tab_recents">Recents</string>
+    <string name="tab_contacts">Contacts</string>
+    <string name="tab_blocking">Blocking</string>
+    <string name="call_to">Call %1$s</string>
+    <string name="dialpad_call">Call</string>
+    <string name="dialpad_delete">Delete</string>
+    <string name="dialpad_paste">Paste</string>
+    <string name="dialpad_allow_contacts">Allow access to contacts to find them from the keypad.</string>
+    <string name="call_denied">No permission to call: the number was opened in the Phone app.</string>
+    <string name="call_log_denied">Without the call log, Recents show only blocked calls.</string>
+    <string name="sim_choose_title">Call from which SIM?</string>
+    <string name="recents_permission_title">See all your calls</string>
+    <string name="recents_permission_text">Allow access to the call log to see received, missed and made calls here. Without it, only blocked calls show.</string>
+    <string name="recents_empty">No calls.</string>
+    <string name="filter_all">All</string>
+    <string name="filter_missed">Missed</string>
+    <string name="filter_incoming">Received</string>
+    <string name="filter_outgoing">Made</string>
+    <string name="filter_blocked">Blocked</string>
+    <string name="kind_incoming">Received</string>
+    <string name="kind_outgoing">Made</string>
+    <string name="kind_missed">Missed</string>
+    <string name="kind_rejected">Declined</string>
+    <string name="kind_blocked">Blocked</string>
+    <string name="kind_voicemail">Voicemail</string>
+    <string name="kind_other">Call</string>
+    <string name="duration_seconds">%1$d s</string>
+    <string name="duration_minutes">%1$d min</string>
+    <string name="contacts_permission_title">Your contacts</string>
+    <string name="contacts_permission_text">Allow access to contacts to call them and find them from the keypad.</string>
+    <string name="contacts_search">Search contacts</string>
+    <string name="contacts_empty">No contacts.</string>
+    <string name="contacts_favorites">Favorites</string>
+    <string name="contacts_all">All</string>
+    <string name="contacts_open">Open contact</string>
+    <string name="contact_block">Block %1$s</string>
 </resources>

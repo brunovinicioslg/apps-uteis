@@ -35,7 +35,17 @@ Bloquear chamadas indesejadas em silêncio: por padrão o app só bloqueia, sem 
 10. **Exportar e importar** as listas num arquivo `;` que abre em planilha.
 11. **Avisos contextuais:** ativar o filtro, permissões do "Bloquear tudo", acesso aos contatos na lista branca, bateria em Xiaomi e Samsung.
 
-### Fase 2 (planejada): modo Telefone
+### Etapa A: ligar pelo app (feito, 30/09/2026)
+
+Abas: **Teclado · Recentes · Contatos · Bloqueio · Listas**. O app abre na última aba usada (na primeira vez, em Bloqueio).
+
+1. **Teclado:** número formatado enquanto se digita; contatos sugeridos pelas letras (6274 = MARIA) ou pelos dígitos; segurar o 0 põe "+", segurar o 1 liga para a caixa postal; apagar (segurando, apaga tudo); colar; o botão verde sem nada digitado traz de volta o último número discado.
+2. **Recentes:** o registro de chamadas do telefone junto com os bloqueios do app, cada chamada uma vez (o bloqueio substitui a linha que o telefone escreveu, com o motivo). Filtros: todas, perdidas, recebidas, feitas, bloqueadas. Ligar de volta, liberar, bloquear, copiar.
+3. **Contatos:** busca sem acento, favoritos primeiro; cada contato com seus números para ligar ou bloquear, e atalho para editar no app Contatos.
+4. **Ligação:** feita pelo Android (`TelecomManager.placeCall`), aparece na tela de chamada do próprio celular. Dois chips: se o Android estiver em "perguntar sempre", o app pergunta. Sem a permissão de ligar, abre o app Telefone com o número digitado.
+5. **Permissões novas**, pedidas só na hora: fazer ligações, registro de chamadas (a Play aceita para apps de bloqueio, com justificativa), contatos.
+
+### Etapa B (planejada): modo Telefone
 
 O mesmo app como **app Telefone padrão**, opcional: o filtro passa a receber todas as ligações (contatos também), o "Bloquear tudo" deixa de tocar por um instante, e o histórico mostra recebidas, perdidas, recusadas, bloqueadas e feitas. Exige teclado, tela de chamada (recebendo, em andamento, espera, conferência, Bluetooth, sensor de proximidade), contatos e caixa postal. Não substitui a gravação de chamadas do Telefone da Samsung (apps de terceiros não gravam desde o Android 10).
 
@@ -47,8 +57,9 @@ O mesmo app como **app Telefone padrão**, opcional: o filtro passa a receber to
 - [x] Só lista branca: desconhecido recusado, contato toca, quem insiste passa (emulador).
 - [x] Bloquear tudo: desconhecido recusado pelo filtro, contato recusado ao tocar; voltando à lista negra, o contato toca de novo (emulador).
 - [x] Chamadas liberadas não vão para o histórico; as bloqueadas aparecem com o motivo.
-- [x] Testes: 40 do núcleo (números, listas, regras, horário, arquivo) e 41 do app (repositórios, decisão com banco real, respostas, telas). Lint sem avisos.
-- [ ] Testado no Galaxy S22 e no Redmi Note 12S com ligações reais entre os dois (os dois chips).
+- [x] Testes: 53 do núcleo (números, listas, regras, horário, arquivo, teclado, recentes, contatos) e 51 do app (repositórios, decisão com banco real, respostas, telas). Lint sem avisos.
+- [x] Etapa A no emulador: sugestão pelo teclado, ligação para o contato e para número digitado (depuração e publicação/R8), recentes com a ligação feita e o bloqueio com motivo, contatos.
+- [ ] Testado no Galaxy S22 e no Redmi Note 12S com ligações reais entre os dois (os dois chips), inclusive ligar pelo Sossego e escolher o chip.
 - [ ] Redmi (HyperOS): confirmar que o "Bloquear tudo" recusa com o app fechado (pode exigir Início automático).
 
 ## Testes no emulador

@@ -3,12 +3,14 @@ package io.github.brunovinicioslg.sossego.device
 import android.Manifest
 import android.app.role.RoleManager
 import android.content.ActivityNotFoundException
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
+import android.provider.ContactsContract
 import android.provider.Settings
 import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
@@ -78,6 +80,11 @@ object DeviceStatus {
             null
         } ?: return false
         return tryStart(context, intent)
+    }
+
+    /** The contact in the phone's contacts app (to edit it). */
+    fun openContact(context: Context, id: Long) {
+        tryStart(context, Intent(Intent.ACTION_VIEW, ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id)))
     }
 
     fun openUrl(context: Context, url: String) {

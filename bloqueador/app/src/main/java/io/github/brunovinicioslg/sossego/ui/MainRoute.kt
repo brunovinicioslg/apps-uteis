@@ -10,6 +10,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -39,27 +40,34 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
+import androidx.core.content.edit
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.brunovinicioslg.sossego.R
+import io.github.brunovinicioslg.sossego.core.dial.CallKind
+import io.github.brunovinicioslg.sossego.core.dial.RecentsFilter
 import io.github.brunovinicioslg.sossego.core.lists.ListEntry
 import io.github.brunovinicioslg.sossego.core.lists.ListKind
 import io.github.brunovinicioslg.sossego.core.lists.Match
-import io.github.brunovinicioslg.sossego.core.number.PhoneNumbers
 import io.github.brunovinicioslg.sossego.core.rules.Mode
 import io.github.brunovinicioslg.sossego.core.rules.NotifyMode
-import io.github.brunovinicioslg.sossego.data.BlockedCall
 import io.github.brunovinicioslg.sossego.data.ListRepository
+import io.github.brunovinicioslg.sossego.device.Caller
 import io.github.brunovinicioslg.sossego.device.ContactLookup
 import io.github.brunovinicioslg.sossego.device.DeviceStatus
+import io.github.brunovinicioslg.sossego.device.SimOption
 import java.time.LocalDateTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 const val SOURCE_CODE_URL = "https://github.com/brunovinicioslg/apps-uteis"
 
-enum class Tab { HOME, LISTS, HISTORY }
+enum class Tab { DIALPAD, RECENTS, CONTACTS, BLOCKING, LISTS }
+
+/** The tab the app opens on: the last one used, or the blocking settings the first time. */
+private const val UI_PREFS = "ui"
+private const val LAST_TAB = "last_tab"
 
 fun readDevice(context: Context) = DeviceState(
     screeningAvailable = DeviceStatus.screeningAvailable(context),
@@ -79,7 +87,17 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val entries by viewModel.entries.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsStateWithLifecycle()
-    var tab by rememberSaveable { mutableStateOf(Tab.HOME) }
+    val phoneContacts by viewModel.contacts.collectAsStateWithLifecycle()
+    val recents by viewModel.recents.collectAsStateWithLifecycle()
+    val callLogShown by viewModel.callLogShown.collectAsStateWithLifecycle()
+    val uiPrefs = remember { context.getSharedPreferences(UI_PREFS, Context.MODE_PRIVATE) }
+    var tab by rememberSaveable {
+        mutableStateOf(Tab.entries.firstOrNull { it.name == uiPrefs.getString(LAST_TAB, null) } ?: Tab.BLOCKING)
+    }
+    var recentsFilter by rememberSaveable { mutableStateOf(RecentsFilter.ALL) }
+    var simChoice by remember { mutableStateOf<Pair<String, List<SimOption>>?>(null) }
+    var pendingCall by rememberSaveable { mutableStateOf<String?>(null) }
+    val caller = remember { Caller(context.applicationContext) }
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var device by remember { mutableStateOf(readDevice(context)) }
@@ -90,12 +108,19 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
     val contacts = remember { ContactLookup(context.applicationContext) }
 
     LaunchedEffect(openHistoryRequests) {
-        if (openHistoryRequests > 0) tab = Tab.HISTORY
+        if (openHistoryRequests > 0) {
+            tab = Tab.RECENTS
+            recentsFilter = RecentsFilter.BLOCKED
+        }
+    }
+    LaunchedEffect(tab) {
+        uiPrefs.edit { putString(LAST_TAB, tab.name) }
     }
     // The user may change permissions and roles in the system settings meanwhile.
     LifecycleResumeEffect(Unit) {
         device = readDevice(context)
         now = LocalDateTime.now()
+        viewModel.refreshPhoneData()
         onPauseOrDispose { }
     }
     LaunchedEffect(Unit) {
@@ -132,7 +157,45 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
     }
     val contactsPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         device = readDevice(context)
+        viewModel.refreshPhoneData()
         if (!granted) refused(R.string.contacts_denied, arrayOf(Manifest.permission.READ_CONTACTS))
+    }
+    val callLogPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        viewModel.refreshPhoneData()
+        if (!granted) refused(R.string.call_log_denied, arrayOf(Manifest.permission.READ_CALL_LOG))
+    }
+
+    /** Places the call, asking for the SIM when the phone asks every time. */
+    fun placeCall(number: String) {
+        val sims = caller.simChoices()
+        when {
+            sims.isNotEmpty() -> simChoice = number to sims
+            !caller.call(number) -> caller.openInPhoneApp(number)
+        }
+    }
+
+    val callPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        val number = pendingCall ?: return@rememberLauncherForActivityResult
+        pendingCall = null
+        if (granted) {
+            if (number == VOICEMAIL) caller.callVoicemail() else placeCall(number)
+        } else if (number != VOICEMAIL) {
+            // Calling still works: the phone app opens with the number, one tap away.
+            caller.openInPhoneApp(number)
+            message(resources.getString(R.string.call_denied))
+        } else {
+            refused(R.string.call_denied, arrayOf(Manifest.permission.CALL_PHONE))
+        }
+    }
+
+    fun requestCall(number: String) {
+        if (number.isBlank()) return
+        if (caller.canCall()) {
+            if (number == VOICEMAIL) caller.callVoicemail() else placeCall(number)
+        } else {
+            pendingCall = number
+            callPermission.launch(Manifest.permission.CALL_PHONE)
+        }
     }
     val notificationsPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (!granted) message(resources.getString(R.string.notifications_denied))
@@ -228,17 +291,39 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
         readPickedContact = contacts::picked,
         onOpenSystemBlocked = ::openSystemBlocked,
     )
-    val historyActions = HistoryActions(
-        onAllow = { call -> addFromHistory(viewModel, call, ListKind.ALLOW, ::added) },
-        onBlock = { call -> addFromHistory(viewModel, call, ListKind.BLOCK, ::added) },
+    fun addNumber(number: String, list: ListKind, fromContacts: Boolean = false) {
+        val entry = ListEntry.of(list, Match.EXACT, number) ?: return
+        viewModel.addEntry(entry) { result ->
+            added(entry, result)
+            warnIfContact(entry, fromContacts)
+        }
+    }
+
+    val recentsActions = RecentsActions(
+        onCall = ::requestCall,
+        onAllow = { call -> addNumber(call.number, ListKind.ALLOW) },
+        onBlock = { call -> addNumber(call.number, ListKind.BLOCK) },
         onCopy = { call ->
             val clipboard = context.getSystemService(ClipboardManager::class.java)
-            clipboard?.setPrimaryClip(ClipData.newPlainText(resources.getString(R.string.app_name), PhoneNumbers.format(call.key)))
+            clipboard?.setPrimaryClip(ClipData.newPlainText(resources.getString(R.string.app_name), displayNumber(call.number)))
             // Android 13 and later confirm copies on their own.
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) message(resources.getString(R.string.number_copied))
         },
-        onDelete = { call -> viewModel.deleteHistory(call.id) },
+        onDeleteBlock = { call -> call.blockId?.let(viewModel::deleteHistory) },
+        onAllowCallLog = { callLogPermission.launch(Manifest.permission.READ_CALL_LOG) },
     )
+    val contactsActions = ContactsActions(
+        onCall = ::requestCall,
+        onBlock = { number -> addNumber(number, ListKind.BLOCK, fromContacts = true) },
+        onOpenContact = { id -> DeviceStatus.openContact(context, id) },
+        onAllowContacts = { contactsPermission.launch(Manifest.permission.READ_CONTACTS) },
+    )
+    val dialpadActions = DialpadActions(
+        onCall = ::requestCall,
+        onVoicemail = { requestCall(VOICEMAIL) },
+        onAllowContacts = { contactsPermission.launch(Manifest.permission.READ_CONTACTS) },
+    )
+    val lastDialed = recents.firstOrNull { it.kind == CallKind.OUTGOING && it.number.isNotEmpty() }?.number
 
     Scaffold(
         topBar = {
@@ -265,10 +350,10 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
                                 })
                             }
                         }
-                        Tab.HISTORY -> if (!history.isNullOrEmpty()) {
+                        Tab.RECENTS -> if (recentsFilter == RecentsFilter.BLOCKED && !history.isNullOrEmpty()) {
                             TextButton(onClick = { confirmClear = true }) { Text(stringResource(R.string.history_clear)) }
                         }
-                        Tab.HOME -> Unit
+                        Tab.DIALPAD, Tab.CONTACTS, Tab.BLOCKING -> Unit
                     }
                 },
             )
@@ -288,9 +373,11 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         when (tab) {
-            Tab.HOME -> HomeScreen(current, device, now, homeActions, padding)
+            Tab.DIALPAD -> DialpadScreen(phoneContacts, lastDialed, dialpadActions, padding)
+            Tab.RECENTS -> RecentsScreen(recents, callLogShown, recentsFilter, { recentsFilter = it }, recentsActions, padding)
+            Tab.CONTACTS -> ContactsScreen(phoneContacts, contactsActions, padding)
+            Tab.BLOCKING -> HomeScreen(current, device, now, homeActions, padding)
             Tab.LISTS -> ListsScreen(entries.orEmpty(), listsActions, padding)
-            Tab.HISTORY -> HistoryScreen(history.orEmpty(), historyActions, padding)
         }
     }
 
@@ -308,6 +395,24 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
             dismissButton = { TextButton(onClick = { contactWarning = false }) { Text(stringResource(R.string.ok)) } },
         )
     }
+    simChoice?.let { (number, sims) ->
+        AlertDialog(
+            onDismissRequest = { simChoice = null },
+            title = { Text(stringResource(R.string.sim_choose_title)) },
+            text = {
+                Column {
+                    sims.forEach { sim ->
+                        TextButton(onClick = {
+                            simChoice = null
+                            if (!caller.call(number, sim.handle)) caller.openInPhoneApp(number)
+                        }) { Text(sim.label) }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { simChoice = null }) { Text(stringResource(R.string.cancel)) } },
+        )
+    }
     if (confirmClear) {
         AlertDialog(
             onDismissRequest = { confirmClear = false },
@@ -323,16 +428,8 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
     }
 }
 
-private fun addFromHistory(
-    viewModel: MainViewModel,
-    call: BlockedCall,
-    list: ListKind,
-    onDone: (ListEntry, ListRepository.Added) -> Unit,
-) {
-    if (call.key.isEmpty()) return
-    val entry = ListEntry(id = 0, list = list, match = Match.EXACT, pattern = call.key)
-    viewModel.addEntry(entry) { onDone(entry, it) }
-}
+/** Stands for the voicemail in a pending call. */
+private const val VOICEMAIL = "voicemail"
 
 private fun importText(resources: Resources, result: ImportResult.Done): String {
     val added = if (result.added == 0) {
@@ -348,19 +445,22 @@ private fun importText(resources: Resources, result: ImportResult.Done): String 
 private val IMPORT_TYPES = arrayOf("text/*", "application/csv", "application/vnd.ms-excel", "application/octet-stream")
 
 private fun tabTitle(tab: Tab): Int = when (tab) {
-    Tab.HOME -> R.string.app_name
-    Tab.LISTS -> R.string.tab_lists
-    Tab.HISTORY -> R.string.tab_history
+    Tab.BLOCKING -> R.string.app_name
+    else -> tabLabel(tab)
 }
 
 private fun tabLabel(tab: Tab): Int = when (tab) {
-    Tab.HOME -> R.string.tab_home
+    Tab.DIALPAD -> R.string.tab_dialpad
+    Tab.RECENTS -> R.string.tab_recents
+    Tab.CONTACTS -> R.string.tab_contacts
+    Tab.BLOCKING -> R.string.tab_blocking
     Tab.LISTS -> R.string.tab_lists
-    Tab.HISTORY -> R.string.tab_history
 }
 
 private fun tabIcon(tab: Tab): Int = when (tab) {
-    Tab.HOME -> R.drawable.ic_shield
+    Tab.DIALPAD -> R.drawable.ic_dialpad
+    Tab.RECENTS -> R.drawable.ic_history
+    Tab.CONTACTS -> R.drawable.ic_person
+    Tab.BLOCKING -> R.drawable.ic_shield
     Tab.LISTS -> R.drawable.ic_list
-    Tab.HISTORY -> R.drawable.ic_history
 }

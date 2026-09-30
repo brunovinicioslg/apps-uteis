@@ -2,9 +2,7 @@ package io.github.brunovinicioslg.sossego.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -17,9 +15,7 @@ import io.github.brunovinicioslg.sossego.core.lists.Match
 import io.github.brunovinicioslg.sossego.core.rules.BlockAction
 import io.github.brunovinicioslg.sossego.core.rules.Mode
 import io.github.brunovinicioslg.sossego.core.rules.NotifyMode
-import io.github.brunovinicioslg.sossego.core.rules.Reason
 import io.github.brunovinicioslg.sossego.core.rules.Settings
-import io.github.brunovinicioslg.sossego.data.BlockedCall
 import io.github.brunovinicioslg.sossego.ui.theme.SossegoTheme
 import java.time.LocalDateTime
 import org.junit.Rule
@@ -42,7 +38,6 @@ class ScreensTest {
     private var declineRequests = 0
     private val saved = mutableListOf<Triple<ListEntry, ListEntry?, Boolean>>()
     private val deleted = mutableListOf<ListEntry>()
-    private val allowed = mutableListOf<BlockedCall>()
 
     private val ready = DeviceState(screeningEnabled = true, canDeclineContacts = true, contactsGranted = true)
 
@@ -178,22 +173,4 @@ class ScreensTest {
         assertThat(deleted).containsExactly(entry)
     }
 
-    @Test
-    fun `the history offers to allow a blocked number`() {
-        val call = BlockedCall(id = 1, time = System.currentTimeMillis(), key = "1133334444", reason = Reason.NOT_ALLOWED)
-        compose.setContent {
-            SossegoTheme {
-                HistoryScreen(
-                    calls = listOf(call, BlockedCall(id = 2, time = 0, key = "", reason = Reason.BLOCK_ALL)),
-                    actions = HistoryActions(onAllow = { allowed += it }, onBlock = {}, onCopy = {}, onDelete = {}),
-                    contentPadding = PaddingValues(),
-                )
-            }
-        }
-        compose.onNodeWithText("(11) 3333-4444").assertExists()
-        compose.onNodeWithText("Contato").assertExists() // a contact declined by "block everything"
-        compose.onAllNodesWithContentDescription("Mais opções").onFirst().performClick()
-        compose.onNodeWithText("Liberar este número").performClick()
-        assertThat(allowed).containsExactly(call)
-    }
 }
