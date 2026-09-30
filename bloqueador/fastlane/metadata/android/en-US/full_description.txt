@@ -1,0 +1,43 @@
+Sossego ("peace and quiet" in Portuguese) blocks unwanted calls silently. By default it only blocks: the call does not ring, no notification shows up, nothing bothers you.
+
+CHOOSE WHAT TO BLOCK
+• Block list: only the numbers on your list and the filters you turn on.
+• Allow list only: everyone except the allow list and your contacts.
+• Block everything: every call, contacts included.
+• Schedule: another mode during a time window, by day of the week (for example, allow list only from 10 PM to 7 AM).
+
+FILTERS
+• Telemarketing (0303), on by default: in Brazil, telemarketing may only call from 0303 numbers.
+• Hidden numbers.
+• Calls from abroad.
+• Repeated calls: with the allow list only, the same number calling again within 3 minutes gets through, since it may be urgent.
+
+LISTS
+• Exact number or "starts with" (for example 0303, 4003 or +1), with a name.
+• Add by typing, from your contacts or from the blocked calls.
+• Brazilian numbers in any format: with or without +55, with 0 and a carrier code, with or without the ninth digit.
+• Export and import the lists as a file that opens in a spreadsheet.
+
+WHEN BLOCKING
+• Decline (default) or silence: the call arrives without sound and shows as missed.
+• Notifications: none (default), one per block, or a daily summary.
+• History of blocked calls, with the reason, to allow the number or block it for good.
+
+CALL FROM THE APP
+• Keypad that suggests contacts by letters (6279 = MARY).
+• Contacts with accent-insensitive search and favorites first.
+• Calls go through Android itself and show on your phone's own call screen. With two SIMs, the app asks which one to use when Android is set to "ask every time".
+
+SHORTCUT
+• Quick Settings tile to turn blocking on and off.
+
+HOW IT WORKS
+Sossego uses Android's call screening (Android 10 or newer) without replacing your Phone app. Android does not pass calls from your contacts to call screening apps. So:
+• with the block list, block a contact through Android's own blocked numbers (the app opens that screen);
+• with block everything, calls from contacts are declined as soon as they start ringing (they may ring for an instant).
+
+PRIVACY
+• Free, with no ads.
+• No internet access: the app does not even have the permission.
+• No data collected: lists and history stay on your phone.
+• Open source (GPL-3.0): github.com/brunovinicioslg/apps-uteis

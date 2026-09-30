@@ -35,7 +35,8 @@ Dentro da pasta do app (ex.: `lanterna/`):
 .\gradlew.bat test lint assembleDebug      # lanterna/: testes unitários, lint e APK de depuração
 .\gradlew.bat :shared:jvmTest :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # trena/
 .\gradlew.bat :shared:jvmTest :tools:test :androidApp:testDebugUnitTest :androidApp:lintDebug :androidApp:assembleDebug   # gps-relevo/
-.\gradlew.bat :core:test :core:lint :app:testDebugUnitTest :app:lintDebug :app:assembleDebug   # sms-seguro/ (AGPL-3.0) e bloqueador/
+.\gradlew.bat :core:test :core:lint :app:testDebugUnitTest :app:lintDebug :app:assembleDebug   # sms-seguro/ (AGPL-3.0)
+.\gradlew.bat :core:test :app:testPlayDebugUnitTest :app:testFullDebugUnitTest :app:lintPlayDebug :app:lintFullDebug :app:assembleFullDebug   # bloqueador/
 .\gradlew.bat connectedDebugAndroidTest    # testes instrumentados (emulador ou aparelho conectado)
 ```
 
@@ -69,7 +70,15 @@ Sigilo (`sms-seguro/`):
 - "Segundo celular" no computador: `.\gradlew.bat :peer:installDist`, depois `peer/build/install/peer/bin/peer invite|send|ack|receive --state pasta ...`. Os SMS entram no emulador com `adb emu sms send <número> <texto>`; os que o app envia aparecem no log (`adb logcat -s SigiloSms`, só em depuração, sempre cifrados).
 - O emulador tem só 6 GB de dados e fica perto do mínimo: desinstale antes de reinstalar (`adb uninstall`), e para voltar ao Ladeira ou ao Alumia reinstale-os.
 
+Google Play (Alumia e Sossego; roteiro completo em `PUBLICAR.md`):
+- Pacotes: `lanterna/`: `:app:bundleRelease`; `bloqueador/`: `:app:bundlePlayRelease`. Assinados com a chave de envio de `keystore.properties` + `upload-key.jks` na pasta do app (fora do Git; sem eles o release sai sem assinatura). Cópias para enviar em `publicar/` (fora do Git).
+- Textos e imagens da loja em `<app>/fastlane/metadata/android/<pt-BR|en-US>/`. As imagens saem das telas reais: `StoreImagesTest` com `--rerun -PstoreImages=<pasta>` (sem a propriedade o teste é pulado); Robolectric com gráficos nativos e SDK 30 (cores próprias do app).
+- Os APKs de `celular/` continuam com a chave de depuração do PC (reassinar o release com `apksigner`), para atualizar o que já está nos celulares.
+- Políticas de privacidade: `<app>/PRIVACIDADE.md`. O link "Ver o código-fonte" de cada app abre a pasta dele no GitHub.
+
 Sossego (`bloqueador/`):
 - `minSdk 29` (o papel de filtro de chamadas só existe a partir do Android 10).
+- Sabores: `play` (Google Play, sem `READ_CALL_LOG`: a aba vira "Histórico" só com os bloqueios) e `full` (APK dos celulares, com o registro de chamadas). `BuildConfig.CALL_LOG` separa os dois; a permissão fica em `app/src/full/AndroidManifest.xml`.
+- `TabBarTest` mede de verdade (gráficos nativos) se cada rótulo das abas cabe numa linha a 360 dp; nome de aba novo precisa passar nele.
 - No emulador, ligações de verdade: `adb emu gsm call <número>`; o papel sem a tela do sistema: `adb shell cmd role add-role-holder android.app.role.CALL_SCREENING io.github.brunovinicioslg.sossego`; resultado no log (`SCREENING_COMPLETED`).
 - Robolectric não estabiliza um campo de texto dentro de um diálogo em telas de 411dp ou mais: os testes do diálogo de número usam a tela padrão (`ListDialogTest`). No aparelho funciona.

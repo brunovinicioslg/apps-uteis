@@ -67,7 +67,7 @@ import io.github.brunovinicioslg.alumia.torch.TorchState
 import io.github.brunovinicioslg.alumia.ui.theme.OnTorchAmber
 import io.github.brunovinicioslg.alumia.ui.theme.TorchAmber
 
-const val SOURCE_CODE_URL = "https://github.com/brunovinicioslg/apps-uteis"
+const val SOURCE_CODE_URL = "https://github.com/brunovinicioslg/apps-uteis/tree/main/lanterna"
 const val MAIN_LIST_TAG = "main_list"
 
 data class MainScreenState(

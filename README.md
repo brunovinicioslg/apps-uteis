@@ -12,6 +12,7 @@ Apps Android gratuitos, sem anúncios e de código aberto.
 | **Tijolão** | Emulador de jogos Java (J2ME) com biblioteca e avaliações; uso pessoal, sem jogos no repositório | [tijolao/](tijolao/) |
 
 Plano de desenvolvimento: [PLANO.md](PLANO.md)
+Publicação na Google Play: [PUBLICAR.md](PUBLICAR.md). Cada app tem sua política de privacidade na pasta (`PRIVACIDADE.md`).
 
 ## Licença
 

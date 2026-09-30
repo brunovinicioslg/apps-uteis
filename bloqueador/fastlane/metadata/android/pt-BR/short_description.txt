@@ -1,0 +1,1 @@
+Bloqueie chamadas indesejadas em silêncio: lista negra, lista branca ou tudo.

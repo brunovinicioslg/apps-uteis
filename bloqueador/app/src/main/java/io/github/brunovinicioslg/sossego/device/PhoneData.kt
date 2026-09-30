@@ -5,6 +5,7 @@ import android.content.Context
 import android.provider.CallLog
 import android.provider.ContactsContract
 import android.util.Log
+import io.github.brunovinicioslg.sossego.BuildConfig
 import io.github.brunovinicioslg.sossego.core.dial.CallKind
 import io.github.brunovinicioslg.sossego.core.dial.Contact
 import io.github.brunovinicioslg.sossego.core.dial.ContactSearch
@@ -55,7 +56,8 @@ class ContactsReader(private val context: Context) {
 /** The phone's call log, read only. Blocking: call off the main thread. */
 class CallLogReader(private val context: Context) {
 
-    fun canRead(): Boolean = DeviceStatus.granted(context, Manifest.permission.READ_CALL_LOG)
+    /** Never in the Google Play build, which does not ask for the call log. */
+    fun canRead(): Boolean = BuildConfig.CALL_LOG && DeviceStatus.granted(context, Manifest.permission.READ_CALL_LOG)
 
     /**
      * The latest calls, newest first; null without permission or on error.

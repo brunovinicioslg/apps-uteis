@@ -30,7 +30,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.core.net.toUri
 
-const val SOURCE_CODE_URL = "https://github.com/brunovinicioslg/apps-uteis"
+const val SOURCE_CODE_URL = "https://github.com/brunovinicioslg/apps-uteis/tree/main/trena"
 const val HOME_LIST_TAG = "home_list"
 
 @OptIn(ExperimentalMaterial3Api::class)

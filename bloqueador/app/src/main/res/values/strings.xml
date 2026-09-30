@@ -175,6 +175,9 @@
     <!-- Calling: keypad, recent calls, contacts -->
     <string name="tab_dialpad">Teclado</string>
     <string name="tab_recents">Recentes</string>
+    <!-- The recents tab in the Google Play build, which has only the blocked calls. -->
+    <string name="tab_history">Histórico</string>
+    <string name="title_blocked_calls">Chamadas bloqueadas</string>
     <string name="tab_contacts">Contatos</string>
     <string name="tab_blocking">Bloqueio</string>
     <string name="call_to">Ligar para %1$s</string>
@@ -187,6 +190,7 @@
     <string name="sim_choose_title">Ligar por qual chip?</string>
     <string name="recents_permission_title">Veja todas as suas chamadas</string>
     <string name="recents_permission_text">Permita o acesso ao registro de chamadas para ver aqui as recebidas, perdidas e feitas. Sem ele, aparecem só as bloqueadas.</string>
+    <string name="recents_blocked_only">Aqui aparecem as chamadas que o Sossego bloqueou. As recebidas, perdidas e feitas continuam no app Telefone.</string>
     <string name="recents_empty">Nenhuma chamada.</string>
     <string name="filter_all">Todas</string>
     <string name="filter_missed">Perdidas</string>

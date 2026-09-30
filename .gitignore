@@ -27,3 +27,6 @@ javagames/
 
 # APKs e dados para instalar nos celulares de teste (inclui os jogos do Tijolão): nunca no repositório.
 celular/
+
+# Pacotes assinados prontos para enviar à Google Play (ver PUBLICAR.md).
+publicar/

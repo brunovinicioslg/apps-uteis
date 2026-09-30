@@ -185,6 +185,27 @@ class CallingScreensTest {
     }
 
     @Test
+    fun `the Google Play build shows the blocked calls without asking for the call log`() {
+        compose.setContent {
+            SossegoTheme {
+                RecentsScreen(
+                    calls = listOf(RecentCall(System.currentTimeMillis(), "1133334444", CallKind.BLOCKED, reason = Reason.BLOCK_LISTED, blockId = 1)),
+                    callLogShown = false,
+                    filter = RecentsFilter.ALL,
+                    onFilter = {},
+                    actions = RecentsActions({}, {}, {}, {}, {}, {}),
+                    contentPadding = PaddingValues(),
+                    callLogAvailable = false,
+                )
+            }
+        }
+        compose.onNodeWithText("(11) 3333-4444").assertExists()
+        compose.onNodeWithText("Veja todas as suas chamadas").assertDoesNotExist()
+        compose.onNodeWithText("Perdidas").assertDoesNotExist()
+        compose.onNodeWithText("Aqui aparecem as chamadas que o Sossego bloqueou. As recebidas, perdidas e feitas continuam no app Telefone.").assertExists()
+    }
+
+    @Test
     fun `without the call log the recents offer to allow it`() {
         compose.setContent {
             SossegoTheme {

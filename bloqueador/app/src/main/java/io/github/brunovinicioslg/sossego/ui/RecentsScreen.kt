@@ -66,14 +66,25 @@ fun RecentsScreen(
     actions: RecentsActions,
     contentPadding: PaddingValues,
     zone: ZoneId = ZoneId.systemDefault(),
+    /** False in the Google Play build: without the call log, only the blocked calls show. */
+    callLogAvailable: Boolean = true,
 ) {
-    val shown = remember(calls, filter) { Recents.filter(calls, filter) }
+    val shown = remember(calls, filter, callLogAvailable) { if (callLogAvailable) Recents.filter(calls, filter) else calls }
     val today = LocalDate.now(zone)
     LazyColumn(
         modifier = Modifier.fillMaxSize().testTag(RECENTS_TAG),
         contentPadding = PaddingValues(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding() + 16.dp),
     ) {
-        if (!callLogShown) {
+        if (!callLogAvailable) {
+            item {
+                Text(
+                    stringResource(R.string.recents_blocked_only),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+        } else if (!callLogShown) {
             item {
                 Box(Modifier.padding(16.dp)) {
                     HintCard(
@@ -85,7 +96,7 @@ fun RecentsScreen(
                 }
             }
         }
-        item {
+        if (callLogAvailable) item {
             Row(
                 Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

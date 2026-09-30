@@ -27,6 +27,8 @@ Ligar e desligar a lanterna **chacoalhando o celular**, mesmo com o app fechado 
 - sobrevivência no HyperOS e no One UI;
 - widget e tecla lateral.
 
+**Google Play (30/09/2026):** versão 1.0.0, pacote `:app:bundleRelease` assinado com a chave de envio, textos, imagens e política de privacidade prontos. Falta o vídeo do serviço em primeiro plano, que a Play exige para o "uso especial" (roteiro em [../PUBLICAR.md](../PUBLICAR.md)).
+
 Comportamento da plataforma a conhecer: se o sistema encerrar o processo à força com a luz acesa, o Android apaga a lanterna. A detecção volta sozinha, mas a luz não é religada automaticamente.
 
 ## Viabilidade

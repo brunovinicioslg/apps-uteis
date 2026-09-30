@@ -16,8 +16,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Calling from the keypad, the contacts and the recent calls (the phone app shows the call). -->
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <!-- The recent calls tab: received, missed and made calls, next to the blocked ones. -->
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
 
     <application
         android:name=".SossegoApp"

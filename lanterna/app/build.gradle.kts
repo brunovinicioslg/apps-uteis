@@ -1,8 +1,15 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+}
+
+// The upload key for Google Play, kept outside Git: keystore.properties next to settings.gradle.kts
+// (storeFile, storePassword, keyAlias, keyPassword). Without it, release builds come out unsigned.
+val uploadKey: Properties? = rootProject.file("keystore.properties").takeIf { it.isFile }?.let { file ->
+    Properties().apply { file.inputStream().use { load(it) } }
 }
 
 android {
@@ -17,8 +24,19 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        uploadKey?.let { key ->
+            create("upload") {
+                storeFile = rootProject.file(key.getProperty("storeFile"))
+                storePassword = key.getProperty("storePassword")
+                keyAlias = key.getProperty("keyAlias")
+                keyPassword = key.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
@@ -26,6 +44,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (uploadKey != null) signingConfig = signingConfigs.getByName("upload")
         }
     }
 
@@ -51,12 +70,15 @@ android {
 
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        // StoreImagesTest writes the Google Play images only when given a folder: -PstoreImages=<folder>
+        unitTests.all { test -> project.findProperty("storeImages")?.let { test.systemProperty("storeImages", it) } }
     }
 
-    // Keeps the APK free of the Google-encrypted dependency blob (required by F-Droid).
+    // Keeps the APK free of the Google-encrypted dependency blob (required by F-Droid); the bundle,
+    // only for Google Play, keeps it so Play can warn about outdated libraries.
     dependenciesInfo {
         includeInApk = false
-        includeInBundle = false
+        includeInBundle = true
     }
 }
 

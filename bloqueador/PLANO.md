@@ -43,7 +43,13 @@ Abas: **Teclado · Recentes · Contatos · Bloqueio · Listas**. O app abre na �
 2. **Recentes:** o registro de chamadas do telefone junto com os bloqueios do app, cada chamada uma vez (o bloqueio substitui a linha que o telefone escreveu, com o motivo). Filtros: todas, perdidas, recebidas, feitas, bloqueadas. Ligar de volta, liberar, bloquear, copiar.
 3. **Contatos:** busca sem acento, favoritos primeiro; cada contato com seus números para ligar ou bloquear, e atalho para editar no app Contatos.
 4. **Ligação:** feita pelo Android (`TelecomManager.placeCall`), aparece na tela de chamada do próprio celular. Dois chips: se o Android estiver em "perguntar sempre", o app pergunta. Sem a permissão de ligar, abre o app Telefone com o número digitado.
-5. **Permissões novas**, pedidas só na hora: fazer ligações, registro de chamadas (a Play aceita para apps de bloqueio, com justificativa), contatos.
+5. **Permissões novas**, pedidas só na hora: fazer ligações, contatos e, fora da Play, registro de chamadas.
+
+### Google Play (30/09/2026)
+
+- A Play só libera o registro de chamadas para bloqueadores com "histórico comprovado de proteção significativa" (relatórios de analistas, prêmios), que um app novo não tem. Por isso há dois sabores: **`play`**, sem `READ_CALL_LOG` (a aba vira **Histórico**, só com os bloqueios, e o rediscar lembra o último número ligado pelo app), e **`full`**, o APK dos celulares, com o registro.
+- Encontrado pelas imagens da loja: "Bloqueadas" não cabia na aba a 360 dp (quebrava em "Bloqueada/s"). Rótulo trocado por "Histórico" (título "Chamadas bloqueadas"), rótulos limitados a uma linha e `TabBarTest` medindo cada rótulo em português e inglês.
+- Versão 1.0.0; pacote `:app:bundlePlayRelease`; textos, imagens e política de privacidade prontos (ver [../PUBLICAR.md](../PUBLICAR.md)).
 
 ### Etapa B (planejada): modo Telefone
 
@@ -57,7 +63,7 @@ O mesmo app como **app Telefone padrão**, opcional: o filtro passa a receber to
 - [x] Só lista branca: desconhecido recusado, contato toca, quem insiste passa (emulador).
 - [x] Bloquear tudo: desconhecido recusado pelo filtro, contato recusado ao tocar; voltando à lista negra, o contato toca de novo (emulador).
 - [x] Chamadas liberadas não vão para o histórico; as bloqueadas aparecem com o motivo.
-- [x] Testes: 53 do núcleo (números, listas, regras, horário, arquivo, teclado, recentes, contatos) e 51 do app (repositórios, decisão com banco real, respostas, telas). Lint sem avisos.
+- [x] Testes: 57 do núcleo (números, listas, regras, horário, arquivo, teclado, recentes, contatos) e 54 do app em cada sabor (repositórios, decisão com banco real, respostas, telas, rótulos das abas). Lint sem avisos nos dois sabores.
 - [x] Etapa A no emulador: sugestão pelo teclado, ligação para o contato e para número digitado (depuração e publicação/R8), recentes com a ligação feita e o bloqueio com motivo, contatos.
 - [ ] Testado no Galaxy S22 e no Redmi Note 12S com ligações reais entre os dois (os dois chips), inclusive ligar pelo Sossego e escolher o chip.
 - [ ] Redmi (HyperOS): confirmar que o "Bloquear tudo" recusa com o app fechado (pode exigir Início automático).

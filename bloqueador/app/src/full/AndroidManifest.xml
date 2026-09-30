@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only outside Google Play (see the flavors in build.gradle.kts). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The recent calls tab: received, missed and made calls, next to the blocked ones. -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+</manifest>

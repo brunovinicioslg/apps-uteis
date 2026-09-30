@@ -1,0 +1,33 @@
+O Alumia liga a lanterna quando você chacoalha o celular. Funciona com o app fechado e com a tela bloqueada: tire o celular do bolso, dê duas ou três sacudidas e pronto.
+
+CHACOALHAR PARA LIGAR
+• Escolha a sensibilidade (baixa, média ou alta) e quantas sacudidas são necessárias (2, 3 ou 4).
+• Funciona com o app fechado, com a tela bloqueada e, se você quiser, com a tela desligada.
+• Vibração curta ao ligar e um padrão diferente ao desligar, para saber o que aconteceu sem olhar.
+
+SEM ACENDER POR ACIDENTE
+• No bolso ou na bolsa, o gesto é ignorado (sensor de proximidade).
+• Durante ligações, também.
+• Caminhada, corrida e sacudidas lentas não contam.
+
+LANTERNA
+• Desligamento automático depois de 1, 5, 10 ou 30 minutos.
+• Desliga sozinha quando a bateria chega ao nível que você escolher.
+• Intensidade da luz no Android 13 ou mais novo, nos aparelhos que permitem.
+
+ATALHOS
+• Bloco nas Configurações rápidas para ativar e desativar o chacoalhar.
+• Widget na tela inicial.
+• Atalhos ao tocar e segurar o ícone do app.
+• Tecla lateral da Samsung (pressionar 2 vezes) e toque rápido nas costas do Pixel.
+
+NOTIFICAÇÃO OPCIONAL
+Para escutar o chacoalhar em segundo plano, o Android exige que o app mantenha uma notificação. Se ela incomodar, desligue a chave "Notificação fixa" no app: a notificação some e o chacoalhar continua funcionando.
+
+PRIVACIDADE
+• Grátis e sem anúncios.
+• Sem acesso à internet: o app nem tem essa permissão.
+• Nenhum dado coletado.
+• Código aberto (GPL-3.0): github.com/brunovinicioslg/apps-uteis
+
+Dica: em celulares Xiaomi e Samsung, libere o Alumia da economia de bateria (o app mostra como), para o sistema não interromper o chacoalhar.

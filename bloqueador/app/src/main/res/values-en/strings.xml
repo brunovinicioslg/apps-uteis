@@ -170,6 +170,9 @@
     <!-- Calling: keypad, recent calls, contacts -->
     <string name="tab_dialpad">Keypad</string>
     <string name="tab_recents">Recents</string>
+    <!-- The recents tab in the Google Play build, which has only the blocked calls. -->
+    <string name="tab_history">History</string>
+    <string name="title_blocked_calls">Blocked calls</string>
     <string name="tab_contacts">Contacts</string>
     <string name="tab_blocking">Blocking</string>
     <string name="call_to">Call %1$s</string>
@@ -182,6 +185,7 @@
     <string name="sim_choose_title">Call from which SIM?</string>
     <string name="recents_permission_title">See all your calls</string>
     <string name="recents_permission_text">Allow access to the call log to see received, missed and made calls here. Without it, only blocked calls show.</string>
+    <string name="recents_blocked_only">The calls Sossego blocked show here. Received, missed and made calls stay in the Phone app.</string>
     <string name="recents_empty">No calls.</string>
     <string name="filter_all">All</string>
     <string name="filter_missed">Missed</string>

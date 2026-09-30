@@ -39,11 +39,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.brunovinicioslg.sossego.BuildConfig
 import io.github.brunovinicioslg.sossego.R
 import io.github.brunovinicioslg.sossego.core.dial.CallKind
 import io.github.brunovinicioslg.sossego.core.dial.RecentsFilter
@@ -61,13 +63,14 @@ import java.time.LocalDateTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-const val SOURCE_CODE_URL = "https://github.com/brunovinicioslg/apps-uteis"
+const val SOURCE_CODE_URL = "https://github.com/brunovinicioslg/apps-uteis/tree/main/bloqueador"
 
 enum class Tab { DIALPAD, RECENTS, CONTACTS, BLOCKING, LISTS }
 
 /** The tab the app opens on: the last one used, or the blocking settings the first time. */
 private const val UI_PREFS = "ui"
 private const val LAST_TAB = "last_tab"
+private const val LAST_DIALED = "last_dialed"
 
 fun readDevice(context: Context) = DeviceState(
     screeningAvailable = DeviceStatus.screeningAvailable(context),
@@ -167,6 +170,7 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
 
     /** Places the call, asking for the SIM when the phone asks every time. */
     fun placeCall(number: String) {
+        if (number != VOICEMAIL) uiPrefs.edit { putString(LAST_DIALED, number) }
         val sims = caller.simChoices()
         when {
             sims.isNotEmpty() -> simChoice = number to sims
@@ -323,7 +327,9 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
         onVoicemail = { requestCall(VOICEMAIL) },
         onAllowContacts = { contactsPermission.launch(Manifest.permission.READ_CONTACTS) },
     )
+    // The call log knows the last call made; without it (Google Play), the last one made from here.
     val lastDialed = recents.firstOrNull { it.kind == CallKind.OUTGOING && it.number.isNotEmpty() }?.number
+        ?: uiPrefs.getString(LAST_DIALED, null)
 
     Scaffold(
         topBar = {
@@ -358,23 +364,20 @@ fun MainRoute(openHistoryRequests: Int, viewModel: MainViewModel = viewModel()) 
                 },
             )
         },
-        bottomBar = {
-            NavigationBar {
-                Tab.entries.forEach { item ->
-                    NavigationBarItem(
-                        selected = tab == item,
-                        onClick = { tab = item },
-                        icon = { Icon(painterResource(tabIcon(item)), contentDescription = null) },
-                        label = { Text(stringResource(tabLabel(item))) },
-                    )
-                }
-            }
-        },
+        bottomBar = { TabBar(tab) { tab = it } },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         when (tab) {
             Tab.DIALPAD -> DialpadScreen(phoneContacts, lastDialed, dialpadActions, padding)
-            Tab.RECENTS -> RecentsScreen(recents, callLogShown, recentsFilter, { recentsFilter = it }, recentsActions, padding)
+            Tab.RECENTS -> RecentsScreen(
+                calls = recents,
+                callLogShown = callLogShown,
+                filter = recentsFilter,
+                onFilter = { recentsFilter = it },
+                actions = recentsActions,
+                contentPadding = padding,
+                callLogAvailable = BuildConfig.CALL_LOG,
+            )
             Tab.CONTACTS -> ContactsScreen(phoneContacts, contactsActions, padding)
             Tab.BLOCKING -> HomeScreen(current, device, now, homeActions, padding)
             Tab.LISTS -> ListsScreen(entries.orEmpty(), listsActions, padding)
@@ -444,20 +447,37 @@ private fun importText(resources: Resources, result: ImportResult.Done): String 
 /** Spreadsheets save CSV files under many names; plain text covers the rest. */
 private val IMPORT_TYPES = arrayOf("text/*", "application/csv", "application/vnd.ms-excel", "application/octet-stream")
 
-private fun tabTitle(tab: Tab): Int = when (tab) {
+/** The tabs at the bottom. A label that does not fit ends in "…" instead of breaking the word. */
+@Composable
+internal fun TabBar(current: Tab, onSelect: (Tab) -> Unit) {
+    NavigationBar {
+        Tab.entries.forEach { item ->
+            NavigationBarItem(
+                selected = current == item,
+                onClick = { onSelect(item) },
+                icon = { Icon(painterResource(tabIcon(item)), contentDescription = null) },
+                label = { Text(stringResource(tabLabel(item)), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            )
+        }
+    }
+}
+
+internal fun tabTitle(tab: Tab): Int = when (tab) {
     Tab.BLOCKING -> R.string.app_name
+    Tab.RECENTS -> if (BuildConfig.CALL_LOG) R.string.tab_recents else R.string.title_blocked_calls
     else -> tabLabel(tab)
 }
 
-private fun tabLabel(tab: Tab): Int = when (tab) {
+internal fun tabLabel(tab: Tab): Int = when (tab) {
     Tab.DIALPAD -> R.string.tab_dialpad
-    Tab.RECENTS -> R.string.tab_recents
+    // Without the call log (Google Play), the tab holds only the blocked calls ("Bloqueadas" does not fit).
+    Tab.RECENTS -> if (BuildConfig.CALL_LOG) R.string.tab_recents else R.string.tab_history
     Tab.CONTACTS -> R.string.tab_contacts
     Tab.BLOCKING -> R.string.tab_blocking
     Tab.LISTS -> R.string.tab_lists
 }
 
-private fun tabIcon(tab: Tab): Int = when (tab) {
+internal fun tabIcon(tab: Tab): Int = when (tab) {
     Tab.DIALPAD -> R.drawable.ic_dialpad
     Tab.RECENTS -> R.drawable.ic_history
     Tab.CONTACTS -> R.drawable.ic_person

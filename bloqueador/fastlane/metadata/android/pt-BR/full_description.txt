@@ -1,0 +1,43 @@
+O Sossego bloqueia chamadas indesejadas em silêncio. Por padrão, ele só bloqueia: a chamada não toca, não aparece notificação e nada incomoda.
+
+ESCOLHA O QUE BLOQUEAR
+• Lista negra: só os números da sua lista e os filtros ligados.
+• Só lista branca: todos, menos a lista branca e os seus contatos.
+• Bloquear tudo: todas as chamadas, inclusive de contatos.
+• Horário: outro modo num intervalo, por dia da semana (por exemplo, só a lista branca das 22h às 7h).
+
+FILTROS
+• Telemarketing (0303), ligado por padrão: pela Anatel, o telemarketing só pode ligar de números 0303.
+• Números ocultos.
+• Ligações do exterior.
+• Quem insiste: no modo só lista branca, o mesmo número ligando de novo em até 3 minutos passa, porque pode ser urgente.
+
+LISTAS
+• Número exato ou "começa com" (por exemplo 0303, 4003 ou +1), com um nome.
+• Adicione digitando, pelos contatos ou pelo histórico de bloqueios.
+• Números em qualquer formato: com ou sem +55, com 0 e código de operadora, com ou sem o nono dígito.
+• Exporte e importe as listas num arquivo que abre em planilha.
+
+AO BLOQUEAR
+• Recusar (padrão) ou silenciar: a chamada chega sem som e fica como perdida.
+• Notificações: nenhuma (padrão), uma por bloqueio ou um resumo do dia.
+• Histórico das chamadas bloqueadas, com o motivo, para liberar o número ou bloquear para sempre.
+
+LIGAR PELO APP
+• Teclado com sugestão de contatos pelas letras (6274 = MARIA).
+• Contatos com busca sem acento e favoritos primeiro.
+• A ligação é feita pelo próprio Android e aparece na tela de chamada do seu celular. Com dois chips, o app pergunta qual usar quando o Android está em "perguntar sempre".
+
+ATALHO
+• Bloco nas Configurações rápidas para ligar e desligar o bloqueio.
+
+COMO FUNCIONA
+O Sossego usa o filtro de chamadas do Android (Android 10 ou mais novo), sem substituir o seu app Telefone. O Android não passa para o filtro as ligações de quem está nos seus contatos. Por isso:
+• no modo lista negra, para bloquear um contato use os números bloqueados do próprio Android (o app abre a tela);
+• no modo bloquear tudo, as chamadas de contatos são recusadas assim que começam a tocar (pode tocar por um instante).
+
+PRIVACIDADE
+• Grátis e sem anúncios.
+• Sem acesso à internet: o app nem tem essa permissão.
+• Nenhum dado coletado: listas e histórico ficam só no seu celular.
+• Código aberto (GPL-3.0): github.com/brunovinicioslg/apps-uteis
