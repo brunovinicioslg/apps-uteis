@@ -88,11 +88,11 @@ class StoreImagesTest {
     fun onlyWhenAsked() = assumeTrue("pass -PstoreImages=<folder> to write the store images", out != null)
 
     @Test
-    @Config(qualifiers = "pt-rBR-w360dp-h720dp-xxhdpi")
+    @Config(qualifiers = "pt-rBR-w360dp-h640dp-xxhdpi")
     fun `screenshots in Portuguese`() = screenshots("pt-BR", Sample.PT)
 
     @Test
-    @Config(qualifiers = "en-rUS-w360dp-h720dp-xxhdpi")
+    @Config(qualifiers = "en-rUS-w360dp-h640dp-xxhdpi")
     fun `screenshots in English`() = screenshots("en-US", Sample.EN)
 
     @Test
@@ -254,7 +254,7 @@ class StoreImagesTest {
                     Contact(4, "Helena Martins", listOf(ContactPhone("(11) 3222-5566", "Trabalho"))),
                     Contact(5, "José Almeida", listOf(ContactPhone("(31) 3333-2222", "Casa"), ContactPhone("(31) 98888-7777", "Celular"))),
                     Contact(6, "Maria Souza", listOf(ContactPhone("(11) 98765-4321", "Celular"))),
-                    Contact(7, "Mariana Costa", listOf(ContactPhone("(41) 99666-7788", "Celular"))),
+                    Contact(7, "Marcela Costa", listOf(ContactPhone("(41) 99666-7788", "Celular"))),
                     Contact(8, "Paulo Henrique", listOf(ContactPhone("(51) 98555-6677", "Celular"))),
                     Contact(9, "Rafael Lima", listOf(ContactPhone("(62) 99444-5566", "Celular"))),
                 ),

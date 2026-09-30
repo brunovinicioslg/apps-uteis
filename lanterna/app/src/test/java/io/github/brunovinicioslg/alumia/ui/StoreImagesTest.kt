@@ -69,11 +69,11 @@ class StoreImagesTest {
     fun onlyWhenAsked() = assumeTrue("pass -PstoreImages=<folder> to write the store images", out != null)
 
     @Test
-    @Config(qualifiers = "pt-rBR-w360dp-h720dp-xxhdpi")
+    @Config(qualifiers = "pt-rBR-w360dp-h640dp-xxhdpi")
     fun `screenshots in Portuguese`() = screenshots("pt-BR")
 
     @Test
-    @Config(qualifiers = "en-rUS-w360dp-h720dp-xxhdpi")
+    @Config(qualifiers = "en-rUS-w360dp-h640dp-xxhdpi")
     fun `screenshots in English`() = screenshots("en-US")
 
     @Test
