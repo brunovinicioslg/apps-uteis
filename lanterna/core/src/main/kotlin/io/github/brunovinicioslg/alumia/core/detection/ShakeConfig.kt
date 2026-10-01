@@ -33,6 +33,12 @@ data class ShakeConfig(
         require(gravityTimeConstantNanos > 0) { "gravityTimeConstantNanos must be positive" }
     }
 
+    /**
+     * With the screen off the phone is often in a pocket or a bag, where bounces can look like a
+     * shake: one stroke more makes an accident much rarer.
+     */
+    fun forScreenOff(): ShakeConfig = copy(requiredStrokes = (requiredStrokes + 1).coerceAtMost(MAX_STROKES))
+
     companion object {
         const val NANOS_PER_MILLI = 1_000_000L
         const val MIN_STROKES = 2

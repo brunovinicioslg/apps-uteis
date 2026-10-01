@@ -103,6 +103,35 @@ class ShakeDetectorTest {
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(value = Sensitivity::class, names = ["LOW", "MEDIUM"])
+    fun `running with the phone in a pocket never triggers`(sensitivity: Sensitivity) {
+        // Impact, rebound and flight make quick back-and-forth peaks; their uneven strength gives them away.
+        forEachCase(100) { seed, rnd ->
+            val detector = ShakeDetector(ShakeConfig(sensitivity = sensitivity))
+            assertEquals(emptyList(), detector.triggerTimes(runningInPocket(rnd)), "seed=$seed")
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(Sensitivity::class)
+    fun `uneven hand shakes still trigger exactly once`(sensitivity: Sensitivity) {
+        for (strokes in listOf(ShakeConfig.DEFAULT_STROKES, ShakeConfig.DEFAULT_STROKES + 1)) {
+            forEachCase(300) { seed, rnd ->
+                val signal = unevenHandShake(rnd, sensitivity.thresholdMs2, halfCycles = strokes + 2)
+                val detector = ShakeDetector(ShakeConfig(sensitivity = sensitivity, requiredStrokes = strokes))
+                assertEquals(1, detector.triggerTimes(signal).size, "seed=$seed strokes=$strokes")
+            }
+        }
+    }
+
+    @Test
+    fun `with the screen off one more stroke is needed`() {
+        assertEquals(4, ShakeConfig(requiredStrokes = 3).forScreenOff().requiredStrokes)
+        assertEquals(ShakeConfig.MAX_STROKES, ShakeConfig(requiredStrokes = ShakeConfig.MAX_STROKES).forScreenOff().requiredStrokes)
+        assertEquals(Sensitivity.LOW, ShakeConfig(sensitivity = Sensitivity.LOW).forScreenOff().sensitivity)
+    }
+
     @Test
     fun `slow swings never trigger`() {
         forEachCase(200) { seed, rnd ->

@@ -12,8 +12,10 @@ import kotlin.math.sqrt
  * 1. A low-pass filter tracks gravity; subtracting it gives linear acceleration.
  * 2. A stroke starts when linear acceleration exceeds the sensitivity threshold and ends when it
  *    drops below half of it (hysteresis). The stroke is represented by its peak.
- * 3. Strokes chain while each one points roughly opposite to the previous one and arrives within
- *    the configured gap window. Reaching the required count fires, then a cooldown starts.
+ * 3. Strokes chain while each one points roughly opposite to the previous one, arrives within the
+ *    configured gap window, keeps the rhythm of the previous gap and has a similar strength. A hand
+ *    shakes evenly; steps, impacts and bounces in a pocket mix short and long gaps and strong and weak
+ *    peaks. Reaching the required count fires, then a cooldown starts.
  *
  * Not thread-safe: feed samples from a single thread.
  */
@@ -42,6 +44,8 @@ class ShakeDetector(config: ShakeConfig = ShakeConfig()) {
     private var lastStrokeX = 0f
     private var lastStrokeY = 0f
     private var lastStrokeZ = 0f
+    private var lastStrokeMagnitude = 0f
+    private var lastGap = NO_TIME
     private var cooldownUntil = NO_TIME
 
     /**
@@ -115,6 +119,7 @@ class ShakeDetector(config: ShakeConfig = ShakeConfig()) {
         peakTime = NO_TIME
         chainLength = 0
         lastStrokeTime = NO_TIME
+        lastGap = NO_TIME
     }
 
     private fun recordPeak(time: Long, magnitudeSq: Float, x: Float, y: Float, z: Float) {
@@ -141,19 +146,31 @@ class ShakeDetector(config: ShakeConfig = ShakeConfig()) {
                 return false // ringing of the previous stroke, not a new movement
             }
             val dot = dirX * lastStrokeX + dirY * lastStrokeY + dirZ * lastStrokeZ
-            val continuesChain = gap <= config.maxStrokeGapNanos && dot <= OPPOSITE_DIRECTION_MAX_DOT
-            chainLength = if (continuesChain) chainLength + 1 else 1
+            val continuesChain = gap <= config.maxStrokeGapNanos &&
+                dot <= OPPOSITE_DIRECTION_MAX_DOT &&
+                withinRatio(magnitude, lastStrokeMagnitude, MAX_STRENGTH_RATIO) &&
+                (lastGap == NO_TIME || withinRatio(gap.toFloat(), lastGap.toFloat(), MAX_RHYTHM_RATIO))
+            if (continuesChain) {
+                chainLength++
+                lastGap = gap
+            } else {
+                chainLength = 1
+                lastGap = NO_TIME
+            }
         } else {
             chainLength = 1
+            lastGap = NO_TIME
         }
         lastStrokeTime = time
         lastStrokeX = dirX
         lastStrokeY = dirY
         lastStrokeZ = dirZ
+        lastStrokeMagnitude = magnitude
 
         if (chainLength >= config.requiredStrokes) {
             chainLength = 0
             lastStrokeTime = NO_TIME
+            lastGap = NO_TIME
             cooldownUntil = time + config.cooldownNanos
             return true
         }
@@ -167,5 +184,13 @@ class ShakeDetector(config: ShakeConfig = ShakeConfig()) {
         /** Cosine of the angle between strokes; -0.5 means the directions differ by at least 120°. */
         const val OPPOSITE_DIRECTION_MAX_DOT = -0.5f
         const val MAX_SAMPLE_GAP_NANOS = 500 * ShakeConfig.NANOS_PER_MILLI
+
+        /** A stroke may be at most this many times stronger (or weaker) than the previous one. */
+        const val MAX_STRENGTH_RATIO = 2.2f
+
+        /** A gap between strokes may be at most this many times longer (or shorter) than the previous one. */
+        const val MAX_RHYTHM_RATIO = 1.8f
+
+        fun withinRatio(a: Float, b: Float, maxRatio: Float): Boolean = a <= b * maxRatio && b <= a * maxRatio
     }
 }

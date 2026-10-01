@@ -33,6 +33,7 @@ class MainScreenTest {
         torch: TorchState = TorchState.Off,
         notificationShown: Boolean = true,
         batteryUnrestricted: Boolean = true,
+        manufacturer: Manufacturer = Manufacturer.OTHER,
     ) {
         this.settings = settings
         compose.setContent {
@@ -45,7 +46,7 @@ class MainScreenTest {
                         notificationShown = notificationShown,
                         batteryUnrestricted = batteryUnrestricted,
                         sideKeyEnabled = false,
-                        manufacturer = Manufacturer.OTHER,
+                        manufacturer = manufacturer,
                     ),
                     actions = MainScreenActions(
                         onToggleTorch = { torchClicks++ },
@@ -129,6 +130,22 @@ class MainScreenTest {
         show(notificationShown = true)
         compose.onNodeWithText("Notificação fixa").performClick()
         assertThat(notificationRequests).containsExactly(false)
+    }
+
+    @Test
+    fun `with the screen off the gesture stays off and the app points to lift to wake`() {
+        show(manufacturer = Manufacturer.SAMSUNG)
+        compose.onNodeWithText(
+            "No bolso nada acende. Para chacoalhar logo ao tirar do bolso, ligue \"Levantar para ativar\" em Configurações > Recursos avançados > Movimentos e gestos.",
+        ).assertExists()
+        compose.onNodeWithText("Funcionar com a tela desligada").performClick()
+        assertThat(settings.workWithScreenOff).isTrue()
+    }
+
+    @Test
+    fun `turning the screen-off gesture on warns about pockets`() {
+        show(settings = Settings(workWithScreenOff = true))
+        compose.onNodeWithText("Ligado: pode acender no bolso. Pede uma sacudida a mais e usa um pouco mais de bateria.").assertExists()
     }
 
     @Test

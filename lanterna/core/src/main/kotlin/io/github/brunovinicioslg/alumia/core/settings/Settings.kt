@@ -8,7 +8,11 @@ data class Settings(
     val detectionEnabled: Boolean = true,
     val sensitivity: Sensitivity = Sensitivity.MEDIUM,
     val requiredStrokes: Int = ShakeConfig.DEFAULT_STROKES,
-    val workWithScreenOff: Boolean = true,
+    /**
+     * Off by default since 1.0.1: in a pocket the screen is off, and shakes there lit the flashlight.
+     * With the phone's "lift to wake", taking it out turns the screen on, and the gesture works.
+     */
+    val workWithScreenOff: Boolean = false,
     val ignoreInPocket: Boolean = true,
     val vibrate: Boolean = true,
     /** 0 = never turn off automatically. */

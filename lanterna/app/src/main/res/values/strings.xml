@@ -28,7 +28,10 @@
     <string name="strokes_title">Sacudidas necessárias</string>
     <string name="strokes_summary">Mais sacudidas evitam acionamentos por acidente.</string>
     <string name="screen_off_title">Funcionar com a tela desligada</string>
-    <string name="screen_off_summary">Usa um pouco mais de bateria.</string>
+    <string name="screen_off_on_summary">Ligado: pode acender no bolso. Pede uma sacudida a mais e usa um pouco mais de bateria.</string>
+    <string name="screen_off_off_summary">No bolso nada acende. Para chacoalhar logo ao tirar do bolso, ligue nas configurações do celular a opção de acender a tela ao levantá-lo.</string>
+    <string name="screen_off_off_summary_samsung">No bolso nada acende. Para chacoalhar logo ao tirar do bolso, ligue \"Levantar para ativar\" em Configurações > Recursos avançados > Movimentos e gestos.</string>
+    <string name="screen_off_off_summary_xiaomi">No bolso nada acende. Para chacoalhar logo ao tirar do bolso, ligue em Configurações > Tela de bloqueio a opção de acender a tela ao levantar o celular.</string>
     <string name="pocket_title">Ignorar no bolso ou na bolsa</string>
     <string name="pocket_summary">Usa o sensor de proximidade.</string>
     <string name="vibrate_title">Vibrar ao ligar e desligar pelo gesto</string>

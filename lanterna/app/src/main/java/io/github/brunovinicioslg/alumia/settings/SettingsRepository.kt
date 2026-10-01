@@ -1,5 +1,6 @@
 package io.github.brunovinicioslg.alumia.settings
 
+import androidx.datastore.core.DataMigration
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
@@ -38,6 +39,9 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val autoOffMinutes = intPreferencesKey("auto_off_minutes")
         val lowBatteryPercent = intPreferencesKey("low_battery_percent")
         val torchLevelPercent = intPreferencesKey("torch_level_percent")
+
+        /** Set once the 1.0.1 default for the screen-off gesture has been applied. */
+        val screenOffDefaultApplied = booleanPreferencesKey("screen_off_default_1_0_1")
     }
 
     private fun Preferences.toSettings(): Settings {
@@ -53,6 +57,26 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             lowBatteryPercent = this[Keys.lowBatteryPercent] ?: defaults.lowBatteryPercent,
             torchLevelPercent = this[Keys.torchLevelPercent] ?: defaults.torchLevelPercent,
         ).sanitized()
+    }
+
+    companion object {
+        /**
+         * Version 1.0.0 stored every setting, its old "work with the screen off" default (on) included,
+         * on any change. In 1.0.1 that default turned off, because shakes in a pocket lit the flashlight:
+         * applied once to installs that come from 1.0.0. The user can turn it back on.
+         */
+        val screenOffDefaultMigration: DataMigration<Preferences> = object : DataMigration<Preferences> {
+            override suspend fun shouldMigrate(currentData: Preferences): Boolean = currentData[Keys.screenOffDefaultApplied] != true
+
+            override suspend fun migrate(currentData: Preferences): Preferences = currentData.toMutablePreferences().apply {
+                this[Keys.workWithScreenOff] = false
+                this[Keys.screenOffDefaultApplied] = true
+            }
+
+            override suspend fun cleanUp() = Unit
+        }
+
+        val migrations: List<DataMigration<Preferences>> = listOf(screenOffDefaultMigration)
     }
 
     private fun MutablePreferences.write(s: Settings) {

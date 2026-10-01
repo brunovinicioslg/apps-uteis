@@ -18,7 +18,8 @@ import io.github.brunovinicioslg.alumia.core.detection.ShakeDetector
  *
  * With the screen off it prefers the wake-up accelerometer, whose events wake the CPU by themselves,
  * with a small batching delay to save power. Devices without one get a regular accelerometer plus a
- * wake lock, because a regular sensor stops delivering once the CPU sleeps.
+ * wake lock, because a regular sensor stops delivering once the CPU sleeps. The phone is then often in
+ * a pocket, so the gesture needs one stroke more ([ShakeConfig.forScreenOff]).
  */
 class ShakeMonitor(private val context: Context, private val onShake: () -> Unit) : SensorEventListener {
 
@@ -29,7 +30,8 @@ class ShakeMonitor(private val context: Context, private val onShake: () -> Unit
     private val wakeLock = WakeLockHolder(context, "alumia:shake")
 
     private var enabled = false
-    private var workWithScreenOff = true
+    private var config = ShakeConfig()
+    private var workWithScreenOff = false
     private var screenOn = context.getSystemService(PowerManager::class.java)?.isInteractive ?: true
     private var registered: Sensor? = null
     private var screenReceiverRegistered = false
@@ -48,7 +50,7 @@ class ShakeMonitor(private val context: Context, private val onShake: () -> Unit
     }
 
     fun update(enabled: Boolean, config: ShakeConfig, workWithScreenOff: Boolean) {
-        if (detector.config != config) detector.config = config
+        this.config = config
         this.enabled = enabled
         this.workWithScreenOff = workWithScreenOff
         setScreenReceiverRegistered(enabled)
@@ -72,6 +74,8 @@ class ShakeMonitor(private val context: Context, private val onShake: () -> Unit
         val manager = sensorManager ?: return
         val listen = enabled && (screenOn || workWithScreenOff)
         val screenOffMode = listen && !screenOn
+        val wanted = if (screenOffMode) config.forScreenOff() else config
+        if (detector.config != wanted) detector.config = wanted
         val target = when {
             !listen -> null
             screenOffMode -> wakeUpAccelerometer ?: accelerometer

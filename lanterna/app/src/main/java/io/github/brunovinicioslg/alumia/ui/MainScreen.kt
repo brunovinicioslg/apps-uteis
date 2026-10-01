@@ -190,7 +190,7 @@ fun MainScreen(state: MainScreenState, actions: MainScreenActions) {
                 }
             }
 
-            item { DetectionSection(settings, state.notificationShown, actions.onSettingsChange, actions.onNotificationChange) }
+            item { DetectionSection(settings, state.notificationShown, state.manufacturer, actions.onSettingsChange, actions.onNotificationChange) }
             item { TorchSection(settings, state.torchMaxLevel, actions.onSettingsChange) }
             item { ShortcutsSection(state.sideKeyEnabled, actions.onSideKeyChange) }
             item { AboutSection(actions.onOpenSourceCode) }
@@ -244,6 +244,7 @@ private fun TorchButton(torch: TorchState, onClick: () -> Unit) {
 private fun DetectionSection(
     settings: Settings,
     notificationShown: Boolean,
+    manufacturer: Manufacturer,
     onChange: ((Settings) -> Settings) -> Unit,
     onNotificationChange: (Boolean) -> Unit,
 ) {
@@ -282,7 +283,15 @@ private fun DetectionSection(
         )
         SwitchRow(
             title = stringResource(R.string.screen_off_title),
-            summary = stringResource(R.string.screen_off_summary),
+            // Off, the phone's "lift to wake" turns the screen on when it leaves the pocket.
+            summary = stringResource(
+                when {
+                    settings.workWithScreenOff -> R.string.screen_off_on_summary
+                    manufacturer == Manufacturer.SAMSUNG -> R.string.screen_off_off_summary_samsung
+                    manufacturer == Manufacturer.XIAOMI -> R.string.screen_off_off_summary_xiaomi
+                    else -> R.string.screen_off_off_summary
+                },
+            ),
             checked = settings.workWithScreenOff,
             onCheckedChange = { value -> onChange { it.copy(workWithScreenOff = value) } },
         )

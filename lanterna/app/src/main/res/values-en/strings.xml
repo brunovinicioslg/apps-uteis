@@ -26,7 +26,10 @@
     <string name="strokes_title">Shakes needed</string>
     <string name="strokes_summary">More shakes prevent accidental triggers.</string>
     <string name="screen_off_title">Work with the screen off</string>
-    <string name="screen_off_summary">Uses a little more battery.</string>
+    <string name="screen_off_on_summary">On: it may light up in a pocket. Takes one more shake and uses a little more battery.</string>
+    <string name="screen_off_off_summary">Nothing lights up in a pocket. To shake right after taking the phone out, turn on the option that wakes the screen when you lift the phone in its settings.</string>
+    <string name="screen_off_off_summary_samsung">Nothing lights up in a pocket. To shake right after taking the phone out, turn on \"Lift to wake\" in Settings > Advanced features > Motions and gestures.</string>
+    <string name="screen_off_off_summary_xiaomi">Nothing lights up in a pocket. To shake right after taking the phone out, turn on the option that wakes the screen when you lift the phone in Settings > Lock screen.</string>
     <string name="pocket_title">Ignore in a pocket or bag</string>
     <string name="pocket_summary">Uses the proximity sensor.</string>
     <string name="vibrate_title">Vibrate when the gesture toggles the light</string>

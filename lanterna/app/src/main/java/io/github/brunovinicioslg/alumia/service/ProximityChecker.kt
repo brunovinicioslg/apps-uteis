@@ -5,42 +5,57 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import kotlin.coroutines.resume
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
 
-/** One-shot proximity reading, used to ignore shakes while the phone is in a pocket or bag. */
+/**
+ * Proximity reading taken when a shake fires, to ignore shakes while the phone is in a pocket or bag.
+ *
+ * Some sensors first repeat their last known value and only then measure, so a "far" first reading
+ * gets a moment to turn into "near"; a "near" one is enough at once.
+ */
 class ProximityChecker(context: Context) {
 
     private val sensorManager: SensorManager? = context.getSystemService(SensorManager::class.java)
-    private val sensor: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY)
+
+    // The wake-up variant keeps reporting while the processor sleeps, as it does with the screen off.
+    private val sensor: Sensor? = sensorManager?.let {
+        it.getDefaultSensor(Sensor.TYPE_PROXIMITY, true) ?: it.getDefaultSensor(Sensor.TYPE_PROXIMITY)
+    }
 
     /** False when the device has no proximity sensor or it does not answer in time. */
     suspend fun isCovered(): Boolean {
         val manager = sensorManager ?: return false
         val proximity = sensor ?: return false
-        val distance = withTimeoutOrNull(TIMEOUT_MS) { readOnce(manager, proximity) } ?: return false
-        return distance < proximity.maximumRange
+        // Android's own rule: some sensors report a maximum range far above their "far" value.
+        val threshold = minOf(proximity.maximumRange, TYPICAL_THRESHOLD_CM)
+        val readings = Channel<Boolean>(Channel.CONFLATED)
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                val distance = event.values.firstOrNull() ?: return
+                readings.trySend(distance >= 0f && distance < threshold)
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+        }
+        if (!manager.registerListener(listener, proximity, SensorManager.SENSOR_DELAY_FASTEST)) return false
+        try {
+            val first = withTimeoutOrNull(FIRST_READING_TIMEOUT_MS) { readings.receive() } ?: return false
+            if (first) return true
+            return withTimeoutOrNull(CONFIRM_FAR_MS) {
+                do {
+                    val near = readings.receive()
+                } while (!near)
+                true
+            } ?: false
+        } finally {
+            manager.unregisterListener(listener)
+        }
     }
 
-    private suspend fun readOnce(manager: SensorManager, proximity: Sensor): Float? =
-        suspendCancellableCoroutine { continuation ->
-            val listener = object : SensorEventListener {
-                override fun onSensorChanged(event: SensorEvent) {
-                    manager.unregisterListener(this)
-                    if (continuation.isActive) continuation.resume(event.values.firstOrNull())
-                }
-
-                override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
-            }
-            continuation.invokeOnCancellation { manager.unregisterListener(listener) }
-            // On-change sensors deliver the current value right after registration.
-            if (!manager.registerListener(listener, proximity, SensorManager.SENSOR_DELAY_FASTEST)) {
-                continuation.resume(null)
-            }
-        }
-
     private companion object {
-        const val TIMEOUT_MS = 300L
+        const val FIRST_READING_TIMEOUT_MS = 500L
+        const val CONFIRM_FAR_MS = 150L
+        const val TYPICAL_THRESHOLD_CM = 5f
     }
 }

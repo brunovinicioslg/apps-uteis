@@ -87,3 +87,46 @@ internal fun forEachCase(cases: Int, baseSeed: Long = 20260927L, block: (caseSee
         block(seed, Random(seed))
     }
 }
+
+/**
+ * Running with the phone in a pocket: heel impact, rebound and the flight phase (free fall), all
+ * along the body's vertical, at running cadence.
+ */
+internal fun runningInPocket(rnd: Random): List<Sample> {
+    val builder = SignalBuilder(rnd.nextDouble(50.0, 200.0), rnd)
+    val period = 1 / rnd.nextDouble(2.5, 3.2)
+    val impact = rnd.nextDouble(18.0, 35.0)
+    val pulse = rnd.nextDouble(0.07, 0.12)
+    val rebound = impact * rnd.nextDouble(0.3, 0.6)
+    val reboundLength = 0.06
+    val flight = rnd.nextDouble(0.08, 0.14)
+    val profile = { phase: Double ->
+        when {
+            phase < pulse -> impact * sin(PI * phase / pulse)
+            phase < pulse + reboundLength -> -rebound * sin(PI * (phase - pulse) / reboundLength)
+            phase > period - flight -> -G * 0.9
+            else -> 0.0
+        }
+    }
+    // Without its mean the trace averages to gravity, as a real one does.
+    val steps = 1000
+    val mean = (0 until steps).sumOf { profile(it * period / steps) } / steps
+    return builder.segment(60.0) { t -> builder.up * (profile(t % period) - mean) }.build()
+}
+
+/** A hand shake whose strokes differ, as a real hand's do: each has its own length, strength and direction. */
+internal fun unevenHandShake(rnd: Random, threshold: Float, halfCycles: Int): List<Sample> {
+    val builder = SignalBuilder(rnd.nextDouble(40.0, 200.0), rnd)
+    val frequency = rnd.nextDouble(2.0, 5.0)
+    val amplitude = rnd.nextDouble(threshold * 1.6, 40.0)
+    val axis = Vec3.randomUnit(rnd)
+    builder.rest(1.0)
+    repeat(halfCycles) { i ->
+        val length = 1 / (2 * frequency) * (1 + rnd.nextDouble(-0.2, 0.2))
+        val strength = amplitude * (1 + rnd.nextDouble(-0.3, 0.3))
+        val direction = (axis + axis.perpendicular(rnd) * rnd.nextDouble(-0.35, 0.35)).normalized()
+        val sign = if (i % 2 == 0) 1.0 else -1.0
+        builder.segment(length) { t -> direction * (sign * strength * sin(PI * t / length)) }
+    }
+    return builder.rest(1.0).build()
+}

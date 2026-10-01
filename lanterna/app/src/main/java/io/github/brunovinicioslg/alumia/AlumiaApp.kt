@@ -19,7 +19,10 @@ class AlumiaApp : Application() {
     }
 }
 
-private val Context.settingsDataStore by preferencesDataStore(name = "settings")
+private val Context.settingsDataStore by preferencesDataStore(
+    name = "settings",
+    produceMigrations = { SettingsRepository.migrations },
+)
 
 /** Process-wide singletons, created once per process. */
 class AppContainer(context: Context) {
