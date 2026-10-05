@@ -311,7 +311,10 @@ fun ConversationScreen(conversationId: Long, initialDraft: String?, onBack: () -
         AlertDialog(
             onDismissRequest = { switchingTo = null },
             title = { Text(stringResource(R.string.sim_switch_title)) },
-            text = { Text(stringResource(R.string.sim_switch_text, title)) },
+            text = {
+                SensitiveWindow()
+                Text(stringResource(R.string.sim_switch_text, title))
+            },
             confirmButton = {
                 TextButton(onClick = {
                     switchingTo = null
@@ -326,7 +329,10 @@ fun ConversationScreen(conversationId: Long, initialDraft: String?, onBack: () -
         AlertDialog(
             onDismissRequest = { deleting = null },
             title = { Text(stringResource(R.string.delete_message_title)) },
-            text = { Text(message.body, maxLines = 4, overflow = TextOverflow.Ellipsis) },
+            text = {
+                SensitiveWindow()
+                Text(message.body, maxLines = 4, overflow = TextOverflow.Ellipsis)
+            },
             confirmButton = { TextButton(onClick = { deleting = null; engine { it.deleteMessage(message.id) } }) { Text(stringResource(R.string.delete)) } },
             dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.cancel)) } },
         )

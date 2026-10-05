@@ -18,6 +18,7 @@
     <string name="notif_reply">Responder</string>
     <string name="notif_reply_hint">Mensagem</string>
     <string name="notif_you_replied">Você: %1$s</string>
+    <string name="notif_reply_sent">Resposta enviada</string>
     <string name="notif_reply_failed">A resposta não foi enviada. Abra o Sigilo para tentar de novo.</string>
     <string name="notif_invite">Quer conversar com criptografia</string>
     <string name="notif_key_changed">A chave de segurança mudou</string>
@@ -143,7 +144,7 @@
     <string name="auto_lock_minutes">%1$d min depois de sair</string>
     <string name="settings_lock_now">Bloquear agora</string>
     <string name="settings_notification_content">Mostrar o texto de SMS comuns nas notificações</string>
-    <string name="settings_notification_content_summary">Mensagens criptografadas nunca aparecem nas notificações.</string>
+    <string name="settings_notification_content_summary">Desligado, a notificação mostra só quem escreveu. Mensagens criptografadas nunca aparecem nas notificações.</string>
     <string name="settings_blocked">Números bloqueados</string>
     <string name="settings_about">Sobre</string>
     <string name="about_text">Versão %1$s. Grátis e de código aberto (AGPL-3.0). Criptografia do Signal (libsignal): PQXDH com chaves pós-quânticas e double ratchet. Sem servidor: as conversas ficam só nos celulares.</string>

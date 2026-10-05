@@ -55,6 +55,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // No screenshots, no screen recording, and a blank card in the recent apps list.
         if (BuildConfig.SECURE_WINDOW) window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        // Nor text for apps that read the screen through accessibility.
+        window.decorView.markAccessibilitySensitive()
         if (savedInstanceState == null) handle(intent)
         setContent {
             SigiloTheme {

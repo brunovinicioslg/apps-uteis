@@ -15,9 +15,12 @@ class AppSettings(context: Context) {
         get() = prefs.getLong(KEY_AUTO_LOCK, DEFAULT_AUTO_LOCK_MS)
         set(value) = prefs.edit { putLong(KEY_AUTO_LOCK, value) }
 
-    /** Show the text of ordinary SMS in notifications (encrypted ones never show it). */
+    /**
+     * Show the text of ordinary SMS in notifications (encrypted ones never show it). Off by default:
+     * screenshots are blocked in the app, but not in the notification shade.
+     */
     var showOrdinaryContent: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_CONTENT, true)
+        get() = prefs.getBoolean(KEY_SHOW_CONTENT, false)
         set(value) = prefs.edit { putBoolean(KEY_SHOW_CONTENT, value) }
 
     companion object {

@@ -22,7 +22,8 @@ import io.github.brunovinicioslg.sigilo.app.ui.MainActivity
 
 /**
  * Message notifications. Encrypted conversations never show who wrote or what: just "New
- * message". With a password set, no notification shows content at all.
+ * message". With a password set, no notification shows content at all. Ordinary SMS show who wrote,
+ * and their text only when the user asks for it ([AppSettings.showOrdinaryContent]).
  */
 class Notifier(private val context: Context, private val settings: AppSettings) {
 
@@ -38,16 +39,13 @@ class Notifier(private val context: Context, private val settings: AppSettings) 
 
     fun showNew(conversation: Conversation, messages: List<Message>, hideContent: Boolean) {
         if (!allowed()) return
-        val private = hideContent || messages.any { it.encrypted } || !settings.showOrdinaryContent
-        val title = if (private && (hideContent || messages.any { it.encrypted })) {
-            context.getString(R.string.app_name)
-        } else {
-            names.nameOf(conversation.address) ?: conversation.address
-        }
-        val text = if (private) {
-            if (messages.size == 1) context.getString(R.string.notif_new_message) else context.getString(R.string.notif_new_messages, messages.size)
-        } else {
+        val namesSender = !hideContent && messages.none { it.encrypted }
+        val showsText = namesSender && settings.showOrdinaryContent
+        val title = if (namesSender) names.nameOf(conversation.address) ?: conversation.address else context.getString(R.string.app_name)
+        val text = if (showsText) {
             messages.joinToString("\n") { describe(it) }
+        } else {
+            if (messages.size == 1) context.getString(R.string.notif_new_message) else context.getString(R.string.notif_new_messages, messages.size)
         }
         val builder = NotificationCompat.Builder(context, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_notification)
@@ -64,7 +62,7 @@ class Notifier(private val context: Context, private val settings: AppSettings) 
             .addAction(0, context.getString(R.string.notif_mark_read), markRead(conversation.id))
         // Replying from here only where the notification says who wrote: never past the password
         // lock, and not to encrypted conversations, whose notifications name no one.
-        if (!private) builder.addAction(replyAction(conversation.id))
+        if (namesSender) builder.addAction(replyAction(conversation.id))
         notify(idFor(conversation.id), builder.build())
     }
 
@@ -77,7 +75,8 @@ class Notifier(private val context: Context, private val settings: AppSettings) 
         val notification = NotificationCompat.Builder(context, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(names.nameOf(conversation.address) ?: conversation.address)
-            .setContentText(context.getString(R.string.notif_you_replied, reply))
+            // The reply is shown only where received text is.
+            .setContentText(if (settings.showOrdinaryContent) context.getString(R.string.notif_you_replied, reply) else context.getString(R.string.notif_reply_sent))
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setPublicVersion(publicVersion())

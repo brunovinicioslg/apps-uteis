@@ -15,6 +15,7 @@
     <string name="notif_reply">Reply</string>
     <string name="notif_reply_hint">Message</string>
     <string name="notif_you_replied">You: %1$s</string>
+    <string name="notif_reply_sent">Reply sent</string>
     <string name="notif_reply_failed">The reply was not sent. Open Sigilo to try again.</string>
     <string name="notif_mark_read">Mark as read</string>
     <string name="notif_invite">Wants to chat with encryption</string>
@@ -141,7 +142,7 @@
     <string name="auto_lock_minutes">%1$d min after leaving</string>
     <string name="settings_lock_now">Lock now</string>
     <string name="settings_notification_content">Show the text of ordinary SMS in notifications</string>
-    <string name="settings_notification_content_summary">Encrypted messages never appear in notifications.</string>
+    <string name="settings_notification_content_summary">Off, the notification shows only who wrote. Encrypted messages never appear in notifications.</string>
     <string name="settings_blocked">Blocked numbers</string>
     <string name="settings_about">About</string>
     <string name="about_text">Version %1$s. Free and open source (AGPL-3.0). Signal\'s encryption (libsignal): PQXDH with post-quantum keys and the double ratchet. No server: conversations stay on the phones.</string>

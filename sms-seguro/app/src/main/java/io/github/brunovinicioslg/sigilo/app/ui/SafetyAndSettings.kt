@@ -179,7 +179,10 @@ fun SettingsScreen(onBack: () -> Unit) {
         AlertDialog(
             onDismissRequest = { passwordDialog = false },
             title = { Text(stringResource(if (hasPassword) R.string.settings_password_change else R.string.settings_password_set)) },
-            text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { PasswordFields(password, confirm, { password = it; error = null }, { confirm = it; error = null }, error) } },
+            text = {
+                SensitiveWindow()
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { PasswordFields(password, confirm, { password = it; error = null }, { confirm = it; error = null }, error) }
+            },
             confirmButton = {
                 TextButton(onClick = {
                     error = passwordProblem(password, confirm)

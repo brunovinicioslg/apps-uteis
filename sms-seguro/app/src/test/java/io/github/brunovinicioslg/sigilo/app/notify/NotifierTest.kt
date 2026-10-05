@@ -3,6 +3,7 @@ package io.github.brunovinicioslg.sigilo.app.notify
 import android.Manifest
 import android.app.Application
 import android.app.NotificationManager
+import androidx.core.app.NotificationCompat
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import io.github.brunovinicioslg.sigilo.app.AppSettings
@@ -47,6 +48,28 @@ class NotifierTest {
     fun anOrdinarySmsCanBeAnsweredFromTheNotification() {
         notifier.showNew(conversation(Encryption.NONE), listOf(message(encrypted = false)), hideContent = false)
         assertThat(actions()).containsExactly("Marcar como lida" to 0, "Responder" to 1).inOrder()
+    }
+
+    private fun shown() = shadowOf(manager).allNotifications.single().extras
+
+    @Test
+    fun byDefaultAnOrdinarySmsShowsWhoWroteButNotTheText() {
+        notifier.showNew(conversation(Encryption.NONE), listOf(message(encrypted = false)), hideContent = false)
+        assertThat(shown().getCharSequence(NotificationCompat.EXTRA_TITLE).toString()).isEqualTo("+5531999998888")
+        assertThat(shown().getCharSequence(NotificationCompat.EXTRA_TEXT).toString()).isEqualTo("Nova mensagem")
+        manager.cancelAll()
+        notifier.showReplied(conversation(Encryption.NONE), "Combinado")
+        assertThat(shown().getCharSequence(NotificationCompat.EXTRA_TEXT).toString()).isEqualTo("Resposta enviada")
+    }
+
+    @Test
+    fun theTextShowsWhenTheUserAsksForIt() {
+        AppSettings(app).showOrdinaryContent = true
+        notifier.showNew(conversation(Encryption.NONE), listOf(message(encrypted = false)), hideContent = false)
+        assertThat(shown().getCharSequence(NotificationCompat.EXTRA_TEXT).toString()).isEqualTo("Chego às 8")
+        manager.cancelAll()
+        notifier.showReplied(conversation(Encryption.NONE), "Combinado")
+        assertThat(shown().getCharSequence(NotificationCompat.EXTRA_TEXT).toString()).isEqualTo("Você: Combinado")
     }
 
     @Test
